@@ -1,93 +1,97 @@
 # Corebound — Roadmap
 
-*Goal: a polished, bug-free Jivagraha vertical slice (20–30 minutes) by 25 April 2027, ready for a 2027 BETTER GROUND application. Dates after April follow the 2026 cycle pattern and will move once 2027 dates are announced.*
+Chapter 1 (Jivagraha) is built all the way to a polished free demo before worlds 2–5 begin. Every milestone ends with a playable build at the same link. No calendar dates: progress depends on session frequency and tuning.
 
-## Phases and gates
+## How each milestone runs
 
-| # | Phase | Dates | What gets built | Gate to pass before moving on |
-| --- | --- | --- | --- | --- |
-| 0 | Pre-production | 19 Oct – 15 Nov 2026 | Lock concept, engine and who codes; GDD v1; paper-prototype Harmony; art style test; task board | **Concept lock:** a one-page pitch all four agree on |
-| 1 | Core prototype | 16 Nov – 27 Dec 2026 | Walk around a round planet; mine iron, silicon, ice; polar build grid; solar, battery, electrolyzer; oxygen; save/load | **Greybox playable:** a new player survives the first night |
-| 2 | Systems | 28 Dec 2026 – 7 Feb 2027 | Drill → smelter → storage chain; day–night; rover; Harmony v1 changes sky, water, flora | **Harmony test:** playtesters notice the world reacting without being told |
-| 3 | Exam season (light) | 8 Feb – 21 Mar 2027 | Feature freeze: art, music, lore logs only; finish with a bug-bash | — |
-| 4 | Vertical slice | 22 Mar – 25 Apr 2027 | Root Guardian puzzle; polished first five minutes; launch teaser; trailer; blueprint v2 | **Application:** playable web link + 60-second trailer |
-| 5 | Program polish | May – Aug 2027 | Mentor feedback; three playtest rounds; judge's-cut save; Himasagara teaser; performance | **Build freeze** two weeks before the final |
-| 6 | Final | Sep 2027 (to confirm) | Pitch rehearsal; booth kit; "problems we solved" story; backup build | — |
+1. Claude builds it, tests it, screenshots it, and updates the playable link.
+2. The owner plays it and reports what felt good, boring, confusing or broken.
+3. Claude fixes and tunes before the next milestone. Owner feedback outranks this plan.
 
-## Vertical slice checklist (Jivagraha)
+## Chapter 1: Jivagraha
 
-### World and survival
-- [ ] Walk, jump and drill around a round planet with gravity toward the core
-- [ ] Oxygen and suit power; blackout returns you to the shelter
-- [ ] Day–night cycle as the planet turns
-- [ ] Planet view (M) showing the whole world and the Harmony meter
+### M0 Foundations
+- [ ] Vite + TypeScript + Phaser project; GitHub Pages deploy
+- [ ] Round planet rendering with layers (sky, surface, crust, mantle, core)
+- [ ] Player walk/jump with gravity toward the core; camera rotates with the player
+- [ ] Dig crust tiles; planet view (M)
+- [ ] Title screen
 
-### Factory
-- [ ] Polar build grid with ghost preview, snapping and cost check
-- [ ] Machines: shelter dome, solar panel, battery, electrolyzer, auto-drill, smelter, conveyor, storage, bio-filter, launch pad
-- [ ] One complete chain: ore → smelter → plates → rover parts
+### M1 Survive
+- [ ] Mining, backpack (8 stacks), crafting from backpack
+- [ ] Oxygen and suit power; blackout and wake in the shelter
+- [ ] Shelter dome, solar panel, battery, electrolyzer
+- [ ] Planet rotation: day and night
+- [ ] Autosave + manual save/load
 
-### Harmony
-- [ ] Air, Water and Soil stocks driving sky tint, flora state and music layers
-- [ ] Bloom resource that appears only at high Harmony and is needed for one recipe
+### M2 Automate
+- [ ] Build menu with polar-grid ghost placement, rotate, remove
+- [ ] Auto-drill, smelter, silicon furnace, coal burner, storage
+- [ ] Conveyors around rings, lifts between rings
+- [ ] Power network with under-supply slowdown
+- [ ] Research terminal and tier 1–2 tech tree
 
-### Guardian, vehicle, story
-- [ ] Root Guardian three-step puzzle and the first Quantum Fragment
-- [ ] Rover that reaches the far crater
-- [ ] 8–10 lore logs
-- [ ] Rocket launch teaser for Himasagara
+### M3 Harmony
+- [ ] Air, Water, Soil stocks and flora absorption
+- [ ] Sky tint, flora states, haze, acid rain (repair state)
+- [ ] Bio-filter, settling pond, Sabatier reactor, bloom materials
+- [ ] Synthesised music layers driven by factory size and Harmony
 
-### Showcase
-- [ ] Scripted first five minutes (see below)
-- [ ] Judge's-cut save loaded from the main menu
-- [ ] 60-second trailer and attract-mode loop
-- [ ] One-page how-to-play
-- [ ] Save and load
+### M4 Chapter 1 complete — free demo
+- [ ] Root Guardian: wake rules, dormant-machine zone, three-step puzzle, ally bonus
+- [ ] Vehicle bay and rover; far crater area
+- [ ] SARATHI dialogue, 8–10 memory logs, guided first hour (see GDD)
+- [ ] Quantum Fragment chamber, launch pad, launch sequence and "to be continued"
+- [ ] Settings, difficulty modes, science cards
+- [ ] itch.io page text and screenshots for the owner to publish
 
-## The first five minutes (script)
+**Gate — fun check:** owner plays Chapter 1 end to end and decides: continue to the full game? hire an artist? free or paid?
 
-1. **0:00** Cryo-pod alarm; oxygen at 30%.
-2. **0:30** Mine ice beside the pod.
-3. **1:30** Build an electrolyzer and breathe.
-4. **2:30** Place the first solar panel as the world turns toward night.
-5. **4:00** Night falls, the battery drains, the alarm returns.
-6. **5:00** The first auto-drill runs on its own: the "it works" moment.
-7. **6:00** The first puff of smog, and a nearby flower wilts: the hook.
+## Worlds 2 to 5
 
-## Who owns what
+### M5 Himasagara
+- [ ] Pipes and fluids; heaters; hydrogen fuel cells; desalination
+- [ ] Cold hazard and blizzards; ice shell over an ocean
+- [ ] Submarine; Ice Leviathan
 
-| Role | Owns | First two weeks |
-| --- | --- | --- |
-| Game Director (team lead) | GDD, Harmony numbers, playtests, pitch, dev diary | Rewrite the blueprint; paper-prototype Harmony with tokens |
-| Lead Programmer | Player and gravity, polar grid, simulation tick, save/load | Set up the engine and repo; walk around a round planet |
-| Lead 2D Artist & UI | Style guide, world tiles, buildings, HUD, Harmony visuals | One mock screenshot of Jivagraha (planet, factory ring, smog) |
-| Narrative & Audio | Lore logs, Guardian design, layered soundscape, trailer | Write the Root Guardian puzzle; list 10 log titles; sound moodboard |
+### M6 Taptashila
+- [ ] Heat hazard, lava flows; geothermal power
+- [ ] Drones; heat crawler; Magma Serpent
 
-## Team rhythm
+### M7 Vayudweep
+- [ ] Floating island rings; lightning; wind turbines
+- [ ] Jetpack and glider; cargo rockets between worlds; Storm Bird
 
-- **Daily:** one-line update on WhatsApp (done / doing / blocked).
-- **Weekly:** Google Meet sprint planning; pick tasks from the board; demo what changed.
-- **At each gate:** an in-person review; play the build; decide pass or fix.
-- **Every week:** one entry in the dev diary; every AI use in the AI log.
+### M8 Shunyapath
+- [ ] The wreck; Quantum Core assembly; drill pod
+- [ ] SARATHI's directive puzzle; Harvest and Covenant endings; per-world epilogues
 
-## Risks
+**Gate — content complete:** the whole story plays from start to finish.
 
-| Risk | Fix |
-| --- | --- |
-| Scope creep | Anything not on the slice checklist goes on an "after the final" list |
-| One programmer for a systems game | Data-driven content; a second member learns to edit data and simple scripts |
-| School exams in Feb–Mar | Feature freeze during Phase 3 |
-| Slow on weak laptops | Separate simulation tick; test monthly on the weakest laptop |
-| Harmony feels preachy or punishing | Reward clean play with bloom resources; tune in playtests |
-| AI rules unclear | Ask tGELF in writing; keep the AI use log |
-| Public repo reveals the twist | Acceptable for now; make the repo private if the team prefers |
-| A member ages out before 2027 | Check every member's eligibility now |
+## Release
 
-## After the final (parking lot)
+### M9 Launch
+- [ ] Sandbox mode; accessibility pass; key rebinding; translations framework
+- [ ] Balancing pass across all worlds
+- [ ] Electron desktop build (Windows/Mac); Steam integration (achievements, cloud saves)
+- [ ] Trailer capture, store page text, screenshots; Steam AI-content disclosure text
 
-Ideas that are good but not in the slice go here, not into the build.
+### M10 Mobile (optional)
+- [ ] Touch controls redesign; Capacitor Android build
 
-- Worlds 2–5 in full
-- Submarine, glider and heat-shield rover
-- Geothermal power from the mantle
-- Korean subtitles for the Seoul showcase
+## Publishing
+
+| Where | When | Cost | Notes |
+| --- | --- | --- | --- |
+| GitHub Pages | From M0 | Free | Playable link while the repo is public |
+| itch.io | Demo at M4; full game at M9 | Free to list; revenue share set by the owner (default 10%) + payment fees | Browser or download |
+| Steam | M9 (demo earlier for wishlists) | $100 per game, returned after $1,000 sales | Needs owner's Steamworks account and tax details; AI-content disclosure |
+| Google Play | M10, optional | $25 one time | Personal accounts need a 14-day closed test with 12+ testers |
+
+## Parking lot (not scheduled)
+
+- Human-made art pass
+- Recorded soundtrack
+- Hindi and Marathi translations
+- Korean, Japanese and other languages
+- Console ports

@@ -1,191 +1,219 @@
-# Corebound — Game Design Document (v0.1)
+# Corebound — Game Design Document (v0.2)
 
-*Status: draft for the Phase 0 concept lock. Numbers marked* (tune) *are starting values to be changed in playtests. Sections marked* **TBD** *have a named owner.*
-
-This version merges the three earlier documents (the BETTER GROUND blueprint, the pitch-deck notes and the "PROJECT: ODYSSEY" GDevelop prompt) into one game. Where they disagreed, the decision is recorded in §11.
+*Status: pre-production. Numbers marked* (tune) *are starting values for playtesting. Items marked* **owner** *need the owner's decision.*
 
 ---
 
-## 1. Pillars
+## 1. Pitch
 
-Every feature must serve at least one pillar. If it serves none, it waits until after the final.
+Corebound is a 2D survival-factory game on small, living round planets. You walk all the way around each world, dig down toward its core, and build machines that keep you alive and carry you to the next planet. Every machine also changes the world: skies haze over, forests wilt, and giant Guardians wake. You win them over with engineering, never weapons.
 
-1. **Your factory is your answer.** The game's moral question is answered by how you build, not by a single button at the end.
-2. **Science, not weapons.** Problems — including the giant Guardians — are solved with real engineering and real chemistry. No combat, no damage, no killing.
-3. **The whole world, at a glance.** Each world is small and round enough to see at once, so its health is always readable.
-4. **Satisfying automation.** Watching a line of machines you designed run on its own must feel good.
+The twist arrives slowly: these worlds were born from your own crashed ship, and to save the last seeds of humanity you may have to take their life back.
 
-## 2. Player fantasy and audience
-
-- **Fantasy:** a lone, resourceful custodian who turns a hostile situation into a working, *responsible* industry.
-- **Audience:** ages 10–25 who enjoy building, optimising and uncovering mysteries (Factorio, Terraria, Stardew Valley, Subnautica, Terra Nil players).
-- **Session:** the Jivagraha vertical slice is 20–30 minutes; a booth visitor must be hooked within 5.
-
-## 3. Core loop
-
-```
-Harvest elements → Automate the base → Craft vehicles → Explore the world
-        ↑                 │ emissions lower Harmony            │
-        │                 ▼                                     ▼
- Fly to next world ← Quantum Fragment ← Calm the Guardian ←─────┘
-                          ▲
-           Harmony: high = bloom resources, low = Guardian wakes early
-```
-
-- **Minute to minute:** mine, carry, place machines, keep oxygen and power up.
-- **Hour to hour:** grow production chains, balance Harmony, unlock a vehicle, calm a Guardian.
-- **Whole game:** five worlds, five fragments, one ending decided by how you built.
-
-## 4. The world: round planets and the polar grid
-
-Each world is a disc seen from the side, with gravity pulling toward its centre.
-
-| Layer (outside → in) | Rings | What lives there |
-| --- | --- | --- |
-| Sky | 2 | Weather, smog, solar collectors, rocket path |
-| Surface | 1 | Flora, the shelter, most machines, conveyors |
-| Crust | 3 | Ore seams, ice pockets, buried water, Guardian roots |
-| Mantle | 2 | Heat for geothermal power (later worlds) |
-| Core | 1 | The Quantum Fragment chamber |
-
-- **Polar build grid.** Positions are `(ring, sector)`. Jivagraha has 64 sectors (tune). A building occupies one ring and a width of 1–4 sectors. Placement checks are simple integer comparisons.
-- **Movement.** The player is stored in polar coordinates `(angle, altitude)`. Left/right changes `angle`; jumping adds outward velocity; gravity pulls `altitude` back to the surface. Convert to x/y only when drawing. This avoids the rotation bugs of force-based radial gravity.
-- **Camera.** Follows the player and rotates so "up" always points away from the core. Press **M** to zoom out to the whole-planet view, which also shows Harmony.
-- **Day and night.** The planet rotates; one day on Jivagraha lasts 4 minutes (tune). Solar works only on the lit side.
-
-## 5. Survival (gentle by design)
-
-| Stat | Drains when | Refills at |
-| --- | --- | --- |
-| Oxygen | Always outside the shelter; faster when running | Inside the shelter dome, fed by the electrolyzer |
-| Suit power | Mining, running, using tools | Battery charging points |
-
-- Hitting zero on either causes a **blackout**: the player wakes in the shelter and drops what they were carrying at the blackout spot.
-- There is **no health and no damage** anywhere in the game.
-
-## 6. Elements, machines and recipes
-
-Real chemistry, simplified. Every machine has a one-card **science log** written by the narrative lead.
-
-| Raw element | Source |
+| | |
 | --- | --- |
-| Iron ore (Fe₂O₃) | Crust seams |
-| Silica sand (SiO₂) | Surface dunes |
-| Carbon | Coal-like crust seams, or harvested alien wood (lowers Harmony) |
-| Ice (H₂O) | Crust pockets, polar caps |
+| Genre | Survival + automation + exploration, with a story |
+| Feels like | Factorio's machines, Terraria's digging, Terra Nil's healing, Outer Wilds' tiny planets |
+| Length | ~12–15 h story; sandbox after |
+| Players | Single-player |
+| Platforms | Web first; Windows/Mac (Electron) for itch.io and Steam; mobile optional |
+| Violence | None |
 
-| Machine | Input | Output | Harmony effect |
-| --- | --- | --- | --- |
-| Shelter dome | — | Safe zone, oxygen refill | None |
-| Solar panel | Daylight | Power | None |
-| Battery | Power | Stored power | None |
-| Electrolyzer | Ice, power | Oxygen (to shelter), hydrogen | None |
-| Auto-drill | Power | Ore | Soil + (tailings); seismic noise |
-| Smelter | Iron ore, carbon, power | Iron plates | Air + (CO₂) |
-| Silicon furnace | Silica, carbon, power | Silicon | Air + |
-| Conveyor | Items | Items moved one sector per tick | None |
-| Storage | Items | Items | None |
-| Bio-filter | Water, power | — | Air − |
-| Settling pond | Drill tailings | — | Soil − , Water − |
-| Recycler | Scrap | Plates (fewer drills needed) | Indirect − |
-| Sabatier reactor | Captured CO₂, hydrogen | Methane rocket fuel, water | Air − |
-| Launch pad | Methane, parts | Launch to next world | None |
+## 2. Pillars
 
-Design rule: **the clean route must also be the efficient route.** The Sabatier reactor turns captured smelter exhaust into rocket fuel, so a player who cleans up gets to leave sooner.
+1. **Your factory is your answer.** The moral question is answered by how you build, not by one button at the end.
+2. **Science, not weapons.** Every problem, including the Guardians, is solved with engineering and simplified real chemistry.
+3. **The whole world at a glance.** Worlds are small and round enough to see whole, so their health is always readable.
+4. **Satisfying automation.** Watching a line you designed run on its own must feel good.
 
-## 7. Harmony (the signature system)
+## 3. Screen and camera
 
-Each world tracks three pollution stocks, each 0–100: **Air (A)**, **Water (W)** and **Soil (S)**.
+- **Play view:** camera close to the player on the curved surface; the camera rotates so the player's feet always point to the core. Next world visible in the sky.
+- **Planet view (M):** zooms out until the whole disc fits; shows the factory ring, Harmony, Guardian state. Used for planning.
+- **HUD:** oxygen and suit power (top-left), objective (top-centre), Harmony dots for Air/Water/Soil (top-right), hotbar + backpack count (bottom), mini planet map (bottom-right).
+- **Underground:** dark; lit by helmet lamp, ore glow and machine lights.
 
-Every simulation tick:
-
-```
-stock = clamp(stock + emissions − flora_absorption − filter_removal, 0, 100)
-Harmony = 100 − (0.4·A + 0.3·W + 0.3·S)        (weights: tune)
-```
-
-| Harmony | Band | What the player sees and feels |
-| --- | --- | --- |
-| 80–100 | Thriving | Bright sky, flora glows, extra music layer; **bloom resources** appear (needed for advanced recipes) |
-| 50–79 | Stable | Normal world |
-| 25–49 | Stressed | Haze, wilting flora, acid rain slowly corrodes exposed machines (they need repair, they are never destroyed) |
-| 0–24 | Collapse | Storms, dead flora, the Guardian wakes early and agitated |
-
-- Harmony is **never shown as a bare number** in normal play: the sky, the flora and the music carry it. A meter appears in planet view (**M**).
-- Flora absorbs pollution only while healthy, so neglect compounds — but recovery is always possible.
-
-## 8. Apex Guardians
-
-Guardians are living protectors of each world. They wake when Harmony drops below 50 or when the player disturbs their habitat, and they block a region until calmed. Calming them reuses systems the player already knows.
-
-**Jivagraha — the Root Guardian** (name **TBD**, narrative lead; "Mahavata", from the banyan, is a candidate)
-
-1. A seismic scan reveals its root network; move drills off the root sectors.
-2. Route smelter exhaust through a bio-filter until the Air stock drops below 30.
-3. Replant spore pods from a bloom; the Guardian settles and opens the path to the first Quantum Fragment.
-
-**Himasagara — the Cryo-Leviathan:** build a sonar beacon network, restore the heat balance of the ocean vents, deliver an algae nutrient cycle.
-
-Other worlds: **TBD** (narrative lead), same rule.
-
-## 9. Worlds and vehicles
-
-| # | World | Look | Vehicle it introduces | In vertical slice? |
-| --- | --- | --- | --- | --- |
-| 1 | Jivagraha | Lush green | Rover | Yes, fully playable |
-| 2 | Himasagara | Frozen ocean | Submarine | Launch teaser only |
-| 3 | Taptashila | Volcanic desert | Heat-shielded rover | No |
-| 4 | Vayudweep | Floating storm islands | Glider | No |
-| 5 | Shunyapath | Dead cosmic ruins | — (final choice) | No |
-
-Backtracking: new vehicles open sealed areas on earlier worlds (for example, the submarine reaches Jivagraha's buried sea).
-
-## 10. Story
-
-- **Frame:** the Custodian wakes from cryo with lost memory. Each Quantum Fragment restores one memory log.
-- **Twist:** the system was barren. When the Custodian's ship exploded, its experimental Quantum Core scattered and **warped time**, so millions of years of evolution passed while the Custodian slept.
-- **Stakes:** the ship carries the last Seeds of Humanity. Re-forming the Quantum Core powers the terraforming engines — and kills the five ecosystems.
-- **Ending (earned):**
-  - *Take the cores* — always possible. Humanity's seeds thrive; the five worlds go grey.
-  - *Leave the cores* — possible only if the player has built enough clean power and closed-loop production to terraform without them. A new human settlement coexists with the living worlds. This is the true ending.
-- **Lore logs:** 8–10 in the slice. Titles and text **TBD** (narrative lead).
-
-## 11. Decisions log
-
-| Topic | Decision | Why |
-| --- | --- | --- |
-| Name | Corebound (not "Project: Odyssey") | Matches the blueprint and describes gravity toward the core |
-| Guardians | Never hostile, never fought; no turrets or fences | Program's no-violence guideline; Pillar 2 |
-| World shape | Round worlds, polar grid | Whole world visible; simpler placement on curves; strong visual hook (pending team confirmation) |
-| Economy | Real elements | STEM value; enables the Sabatier "clean is efficient" loop |
-| Survival | Oxygen and suit power only | Tension without damage; suits ages 10+ |
-| Ending | Earned through play | A pre-picked "true ending" is not a real dilemma |
-| Engine | **Open** — Unity 6 LTS or Godot 4 | Depends on laptop RAM and who writes the code |
-
-## 12. Art and audio direction
-
-- **Visual style:** HD pixel art with 2D lighting; each world has its own palette. Quantum objects glow. Factories glow warm (orange) against cool natural tones, so industry is always visible.
-- **Character:** the Custodian wears a bulky, non-military, modular science suit.
-- **Harmony in visuals:** sky tint, flora animation state and particle haze are driven directly by the Harmony band.
-- **Audio:** ambient synth-wave plus organic alien nature sounds; factory rhythm layers grow with factory size. In the Thriving band, a nature layer returns over the industry.
-- Designs avoid any element that demeans or stereotypes a culture.
-
-## 13. Controls (PC)
+## 4. Controls (PC, rebindable)
 
 | Action | Key |
 | --- | --- |
-| Move | A / D (or arrows) |
-| Jump | W / Space |
-| Mine / use | Left mouse |
-| Build mode | B |
-| Interact | F |
-| Inventory | Tab |
-| Planet view and Harmony meter | M |
+| Walk | A / D |
+| Jump / jetpack | W or Space |
+| Mine, dig, use tool | Hold left mouse |
+| Build menu | B, click to place |
+| Rotate / remove building | R / X |
+| Interact, enter vehicle | F |
+| Backpack and crafting | Tab |
+| Planet view | M |
+| Research tree | T |
+| Pause | Esc |
 
-## 14. Technical shape (engine-agnostic)
+Game speed 1× / 2× / 3×.
 
-- **Simulation tick:** factory and Harmony update 5 times per second (tune), separately from rendering.
-- **Data-driven content:** items, recipes, machines and Harmony coefficients live in data assets (ScriptableObjects in Unity, Resources in Godot) that the director edits without code.
-- **Saves:** one JSON file holding the polar grid, inventories, stocks and story flags.
-- **Performance target:** 60 fps on the team's weakest laptop with 150 machines placed.
-- **Builds:** a web build for the application link and a Windows build for the booth laptop.
+## 5. World structure (polar grid)
+
+Each world is a disc. Positions are `(ring, sector)`.
+
+| Layer (outside → in) | Rings (tune) | Contents |
+| --- | --- | --- |
+| Sky | 3 | Weather, smog, rocket path, floating islands (world 4) |
+| Surface | 1 | Flora, shelter, most machines, conveyors |
+| Crust | 10 | Diggable tiles: rock, ore seams, ice, buried water, Guardian lairs |
+| Mantle | 3 | Heat for geothermal (worlds 3+), hard rock |
+| Core | 1 | Quantum Fragment chamber, sealed until the Guardian is calm |
+
+- Jivagraha: 96 sectors (tune). Deeper rings have fewer sectors so tiles keep a similar size.
+- Player stored as `(angle, altitude)`; gravity reduces altitude toward the surface/floor; convert to x/y only for drawing.
+- Buildings occupy one ring and 1–4 sectors; placement is integer comparison.
+- The planet rotates: day length 4 min on Jivagraha (tune). Solar works only on the lit side.
+
+## 6. Survival
+
+| Stat | Drains | Refills |
+| --- | --- | --- |
+| Oxygen | Outside the shelter; faster when running | Shelter dome (fed by electrolyzer), O2 canisters |
+| Suit power | Mining, running, jetpack, cold | Charging points, batteries |
+
+- Zero on either → **blackout**: wake in the shelter; carried items drop where you fell (a marker shows them).
+- No health, no damage, no death.
+- Hazards (night, cold, heat, storms, acid rain) drain the suit faster or put machines into *repair*, never destroy them.
+
+## 7. Building and logistics
+
+- Build menu → ghost preview snaps to the polar grid → place if affordable.
+- **Conveyors** around a ring; **lifts** between rings; **pipes** for water, O2, H2, CO2, methane; **drones** (world 3+) for long distance; **cargo rockets** (world 4+) between worlds.
+- Backpack: 8 stacks (tune) to push automation.
+
+## 8. Power
+
+| Source | Works | Pollution |
+| --- | --- | --- |
+| Solar | Lit side only | None |
+| Battery | Stores | None |
+| Coal burner | Always | Air + |
+| Hydrogen fuel cell | If fed H2 | None |
+| Wind turbine | Storm worlds | None |
+| Geothermal | Near the mantle | None |
+
+Under-supply: machines slow proportionally; the oxygen system is the first to flicker (warning).
+
+## 9. Elements, machines, research
+
+Elements by world: Jivagraha — iron, silicon, carbon, ice. Himasagara — copper, salt. Taptashila — sulfur, aluminium, gold. Vayudweep — lithium, nitrogen. Shunyapath — salvage.
+
+| Machine (Jivagraha) | Input | Output | Harmony |
+| --- | --- | --- | --- |
+| Shelter dome | — | Safe zone, O2 refill | — |
+| Solar panel | Daylight | Power | — |
+| Battery | Power | Stored power | — |
+| Electrolyzer | Ice, power | O2, H2 | — |
+| Auto-drill | Power | Ore | Soil + |
+| Smelter | Iron ore, carbon, power | Iron plates | Air + |
+| Silicon furnace | Silica, carbon, power | Silicon | Air + |
+| Coal burner | Carbon | Power | Air ++ |
+| Conveyor / lift | Items | Moved items | — |
+| Storage | Items | Items | — |
+| Bio-filter | Water, power | — | Air − |
+| Settling pond | Tailings | — | Soil −, Water − |
+| Sabatier reactor | CO2, H2 | Methane fuel, water | Air − |
+| Research terminal | Sample packs | Tech unlocks | — |
+| Vehicle bay | Parts | Rover | — |
+| Launch pad | Methane, parts, Fragment | Launch | — |
+
+- **Research:** craft sample packs, feed the terminal. Tier 3+ research needs **bloom** materials (only at high Harmony).
+- **Science cards:** one 20-second card per machine explaining the real science.
+- **Design rule:** clean routes must also be efficient routes (Sabatier turns smelter CO2 into rocket fuel; recyclers cut drill needs; bloom unlocks the best tech).
+
+## 10. Harmony
+
+Per world, three stocks 0–100: Air (A), Water (W), Soil (S).
+
+```
+each tick: stock = clamp(stock + emissions − flora_absorption − filter_removal, 0, 100)
+Harmony = 100 − (0.4·A + 0.3·W + 0.3·S)      (weights: tune)
+flora_absorption scales with flora health, so neglect compounds; recovery is always possible
+```
+
+| Harmony | Band | Effects |
+| --- | --- | --- |
+| 80–100 | Thriving | Bright sky, glowing flora, extra music layer, **bloom** spawns |
+| 50–79 | Stable | Normal |
+| 25–49 | Stressed | Haze, wilting, acid rain puts exposed machines into repair |
+| 0–24 | Collapse | Storms, dead flora, Guardian wakes early and agitated |
+
+Shown through sky tint, flora animation, water colour, particles and music; numbers only in planet view. Colour-blind safe: bands also differ by shape and sound.
+
+## 11. Guardians
+
+- One per world (1–4). Wakes when Harmony < 50 or when the player digs into its lair.
+- Awake: shuts down machines in an area (machines go dormant, not destroyed), blocks paths; restlessness rises as Harmony falls.
+- Calmed by a three-step eco-puzzle using known systems. Calm Guardian = ally with a world bonus, opens the path to the Fragment.
+
+| World | Guardian (English placeholder; Sanskrit name: **owner**) | Puzzle | Ally bonus |
+| --- | --- | --- | --- |
+| Jivagraha | Root Guardian | Move drills off its roots (seismic scan); clear smog with bio-filters; replant bloom spores | Flora absorbs 2× |
+| Himasagara | Ice Leviathan | Sonar beacons to guide it; restore ocean-vent heat; feed an algae cycle | Free heat near vents |
+| Taptashila | Magma Serpent | Ease vent pressure; re-route lava channels; plant heat lichen | Geothermal +50% |
+| Vayudweep | Storm Bird | Rebuild wind channels; ground lightning; seed clouds | Storms charge batteries |
+| Shunyapath | SARATHI's directive | Prove a closed-loop power network can run the terraformer | Unlocks the Covenant ending |
+
+## 12. Worlds
+
+| # | World | Look | Hazard | Big new idea | Vehicle | Est. hours |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | Jivagraha | Lush living forest | Night | Survival, factory, Harmony | Rover | 2 |
+| 2 | Himasagara | Frozen ocean | Cold, blizzards | Pipes, heaters, fuel cells | Submarine | 2.5 |
+| 3 | Taptashila | Volcanic desert | Heat, lava | Geothermal, drones | Heat crawler | 2.5 |
+| 4 | Vayudweep | Storm sky islands | Lightning, falls | Wind, jetpack/glider, cargo rockets | Glider | 3 |
+| 5 | Shunyapath | Dead wreck world | No air, radiation | Quantum Core assembly | Drill pod | 2 |
+
+New vehicles reopen sealed areas on earlier worlds.
+
+## 13. Story
+
+- **The Custodian:** scientist, memory lost, bulky non-military suit.
+- **SARATHI:** damaged ship AI; guide and light humour; repairs itself as memory logs are found; bound by one directive: save the Seeds of Humanity.
+- **Reveal path:** W1 mission *Ark*, a "Quantum Core" → W2 fossils too young, clocks disagree → W3 ship alloy fused in million-year-old rock → W4 full memory: Earth gone; the Core shattered, bent time, seeded four dead worlds → W5 the wreck; re-assembling the Core kills the living worlds.
+- **Delivery:** memory logs, SARATHI lines, environmental details. No long cutscenes.
+
+### Endings
+
+| Ending | Condition | Outcome |
+| --- | --- | --- |
+| The Harvest | Always available: take the fragments | Seeds bloom on Shunyapath; living worlds fade to grey |
+| The Covenant (true) | Leave the fragments; requires clean power + closed-loop production across worlds sufficient to run the terraformer (threshold: tune) | Humans settle alongside the living worlds |
+| Epilogue variations | Each world's Harmony when left | Per-world final scene |
+
+## 14. Modes and options
+
+| Mode | Changes |
+| --- | --- |
+| Calm | Oxygen/power never run out; Guardians wake only from the story |
+| Standard | As designed |
+| Engineer | Faster pollution, costlier clean tech, tighter oxygen |
+| Sandbox | Unlocked after W1; free resources, no story |
+
+Autosave + 3 manual slots (browser storage on web, files on desktop). Rebindable keys, text size, subtitles, colour-blind palettes. English first; text externalised for translation (Hindi, Marathi later).
+
+## 15. Art and audio
+
+- **Art:** code-drawn "luminous flat" style — clean shapes, soft gradients, glow, particles, animated skies and flora; one palette per world. Factories glow warm against cool nature. All art in `src/art/` so it can be replaced by a human artist or asset pack.
+- **Audio:** synthesised (Web Audio): ambient pads for nature; rhythmic layers that grow with factory size; a nature layer returns when Thriving. Recorded packs can be added if the owner supplies files.
+
+## 16. Technical
+
+- TypeScript + Phaser + Vite. Simulation (`src/core`, `src/systems`) is plain TypeScript, independent of Phaser, and unit-tested.
+- Fixed simulation tick 5 Hz (tune), separate from rendering at 60 fps.
+- Saves: one JSON document (grid, inventories, stocks, flags, version number for migrations).
+- Performance target: 60 fps with 300 machines on a mid-range laptop.
+- Builds: web (GitHub Pages), desktop (Electron), mobile (Capacitor, optional).
+
+## 17. Decisions log
+
+| Date | Decision | Why |
+| --- | --- | --- |
+| 2026-10-18 | No longer a KRAFTON Better Ground entry; built by Claude for release | Owner's decision |
+| 2026-10-18 | Web stack (TypeScript + Phaser) instead of Unity | Claude can build, run and test it in its own workspace |
+| 2026-10-18 | Round worlds + polar grid; Harmony as the core system; no violence; earned ending | Merged from the original blueprint, pitch notes and "Project: Odyssey" |
+| 2026-10-18 | Chapter 1 (Jivagraha) is completed as a free demo before worlds 2–5 | Learn what is fun before building more |
+| Open | Art direction beyond code-drawn style; Guardian names; price; repo visibility at launch; subtitle for the name | **owner** |
