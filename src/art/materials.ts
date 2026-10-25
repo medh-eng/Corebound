@@ -2,7 +2,14 @@
 // that brightens at night; plants can sway in the wind.
 import * as THREE from 'three';
 
+export const MAX_BOXES = 128;
+const boxMin: THREE.Vector4[] = Array.from({ length: MAX_BOXES }, () => new THREE.Vector4(1e9, 1e9, 1e9, 0));
+const boxMax: THREE.Vector3[] = Array.from({ length: MAX_BOXES }, () => new THREE.Vector3(-1e9, -1e9, -1e9));
+
 export const shared = {
+  uBoxMin: { value: boxMin },   // w = 1 keeps water inside (rivers)
+  uBoxMax: { value: boxMax },
+  uBoxCount: { value: 0 },
   uTime: { value: 0 },
   uNight: { value: 0 },        // 0 day .. 1 night, at the player's location
   uWind: { value: 1 },
@@ -23,6 +30,7 @@ export interface StylisedOptions {
   envMapIntensity?: number;
   mottle?: number;             // world-space colour variation (terrain detail)
   map?: THREE.Texture | null;
+  cutBoxes?: 'ground';          // hide this mesh inside dug-out regions (voxel chunks draw there)
 }
 
 let key = 0;
@@ -44,7 +52,7 @@ export function stylised(o: StylisedOptions = {}): THREE.MeshStandardMaterial {
   const swayH = o.swayHeight ?? 1;
   const mottle = o.mottle ?? 0;
   const id = ++key;
-  m.customProgramCacheKey = () => `stylised-${o.glow ? 1 : 0}-${sway > 0 ? 1 : 0}-${mottle > 0 ? 1 : 0}-${id}`;
+  m.customProgramCacheKey = () => `stylised-${o.glow ? 1 : 0}-${sway > 0 ? 1 : 0}-${mottle > 0 ? 1 : 0}-${o.cutBoxes ? 1 : 0}-${id}`;
   m.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = shared.uTime;
     shader.uniforms.uNight = shared.uNight;
@@ -78,6 +86,13 @@ export function stylised(o: StylisedOptions = {}): THREE.MeshStandardMaterial {
           transformed.z += k * 0.6 * cos(uTime * 1.3 + ph * 1.7);
         }`,
       );
+    }
+    if (o.cutBoxes) {
+      shader.uniforms.uBoxMin = shared.uBoxMin; shader.uniforms.uBoxMax = shared.uBoxMax; shader.uniforms.uBoxCount = shared.uBoxCount;
+      vDecl.push('varying vec3 vCutP;');
+      fDecl.push('varying vec3 vCutP;', CUT_GLSL);
+      vs = vs.replace('#include <begin_vertex>', '#include <begin_vertex>\n vCutP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+      fs = fs.replace('void main() {', 'void main() {\n if (insideCut(vCutP, false)) discard;');
     }
     if (mottle > 0) {
       vDecl.push('varying vec3 vWorldP;');
@@ -125,4 +140,39 @@ export function paintGeometry(g: THREE.BufferGeometry, color: THREE.ColorReprese
   }
   g.setAttribute('glow', new THREE.BufferAttribute(gl, 3));
   return g;
+}
+
+const CUT_GLSL = /* glsl */ `
+  uniform vec4 uBoxMin[${MAX_BOXES}];
+  uniform vec3 uBoxMax[${MAX_BOXES}];
+  uniform int uBoxCount;
+  bool insideCut(vec3 p, bool water) {
+    for (int i = 0; i < ${MAX_BOXES}; i++) {
+      if (i >= uBoxCount) break;
+      if (water && uBoxMin[i].w > 0.5) continue;
+      float g = water ? 1.0 : 0.0; // water hides a little beyond the box so no slivers show in pits
+      if (all(greaterThanEqual(p, uBoxMin[i].xyz - g)) && all(lessThan(p, uBoxMax[i] + g))) return true;
+    }
+    return false;
+  }`;
+
+/** Shadow-casting copy of the ground material that also skips dug-out regions. */
+export function cutDepthMaterial(): THREE.MeshDepthMaterial {
+  const m = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
+  m.onBeforeCompile = (shader) => {
+    shader.uniforms.uBoxMin = shared.uBoxMin; shader.uniforms.uBoxMax = shared.uBoxMax; shader.uniforms.uBoxCount = shared.uBoxCount;
+    shader.vertexShader = 'varying vec3 vCutP;\n' + shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vCutP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    shader.fragmentShader = 'varying vec3 vCutP;\n' + CUT_GLSL + '\n' + shader.fragmentShader.replace('void main() {', 'void main() {\n if (insideCut(vCutP, false)) discard;');
+  };
+  return m;
+}
+
+/** Water is hidden inside dug regions unless that region holds a river. */
+export function applyWaterCut(m: THREE.MeshStandardMaterial) {
+  m.onBeforeCompile = (shader) => {
+    shader.uniforms.uBoxMin = shared.uBoxMin; shader.uniforms.uBoxMax = shared.uBoxMax; shader.uniforms.uBoxCount = shared.uBoxCount;
+    shader.vertexShader = 'varying vec3 vCutP;\n' + shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vCutP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    shader.fragmentShader = 'varying vec3 vCutP;\n' + CUT_GLSL + '\n' + shader.fragmentShader.replace('void main() {', 'void main() {\n if (insideCut(vCutP, true)) discard;');
+  };
+  m.customProgramCacheKey = () => 'water-cut';
 }

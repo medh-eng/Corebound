@@ -1,13 +1,21 @@
-// Corebound M0 "look test": a living planet you can walk, jump and fly around.
+// Corebound — Chapter 1 on Jivagraha: dig, build and breathe on a living world.
 import * as THREE from 'three';
 import { JIVAGRAHA } from './data/worlds';
 import { START_BASE } from './data/base';
+import { ITEMS, YIELD, MACHINES, SURVIVAL, type ItemId, type MachineId, type Recipe } from './data/items';
+import { CHAPTER1_GOALS, SARATHI_EVENTS } from './data/story';
 import { Terrain } from './core/terrain';
+import { VoxelWorld, type Dig } from './core/voxels';
+import { Mat } from './core/geology';
 import { stepMover, altitude, type MoverState, type Collider } from './core/motion';
 import { sunDir, sunElevation, timeForSunrise, daylight, localClock } from './core/daycycle';
 import type { V3 } from './core/vec';
 import { buildPlanet } from './render/planet';
 import { scatterWorld, decorateBase, surfaceMatrix } from './render/scatter';
+import { DigRenderer } from './render/digRender';
+import { OreField, ORE_ITEM, type OreNode } from './render/ore';
+import { LaserView } from './render/laser';
+import { buildMachine, ghostOf, preloadMachines, type MachineView } from './render/machines';
 import { buildSky } from './art/sky';
 import { shared } from './art/materials';
 import { paintModel } from './art/paint';
@@ -17,6 +25,8 @@ import { PlayerView } from './render/player';
 import { CameraRig } from './render/cameraRig';
 import { buildPostFX } from './render/postfx';
 import { Input } from './systems/input';
+import { Backpack, type Slot } from './systems/inventory';
+import { newBase, tickBase, type BaseState, type PlacedMachine } from './systems/base';
 import { UI, type Goal } from './ui/ui';
 
 declare global {
@@ -32,13 +42,33 @@ export interface GameOptions {
   yawDeg: number;
   pitch?: number;
   dist?: number;
-  near?: string;      // testing: start near a landmark kind (e.g. 'banyan')
-  alt?: number;       // testing: start this many metres in the air
+  near?: string;        // testing: start near a landmark kind (e.g. 'banyan')
+  alt?: number;         // testing: start this many metres in the air
+}
+
+const SAVE_KEY = 'corebound.save.v1';
+
+interface SaveData {
+  v: 1;
+  days: number;
+  me: { pos: V3; heading: V3 };
+  pack: (Slot | null)[];
+  base: BaseState;
+  digs: Dig[];
+  ore: number[];
+  goal: number;
+  mined: Partial<Record<ItemId, number>>;
+  crafted: Partial<Record<ItemId, number>>;
+  flags: Record<string, boolean>;
 }
 
 const V = (v: V3) => new THREE.Vector3(v.x, v.y, v.z);
 const P = (v: THREE.Vector3): V3 => ({ x: v.x, y: v.y, z: v.z });
 const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+
+function readSave(): SaveData | null {
+  try { const s = localStorage.getItem(SAVE_KEY); return s ? (JSON.parse(s) as SaveData) : null; } catch { return null; }
+}
 
 export async function startGame(opts: GameOptions) {
   const world = JIVAGRAHA;
@@ -62,11 +92,15 @@ export async function startGame(opts: GameOptions) {
   // ── World ─────────────────────────────────────────────
   ui.loading('Shaping the planet', 0.1); await nextFrame();
   const terrain = new Terrain(world);
+  const voxels = new VoxelWorld(terrain, world.seed);
   const R = world.radius;
-  const groundR = (d: V3) => terrain.groundRadius(d);
-  const groundRV = (d: THREE.Vector3) => terrain.groundRadius(P(d));
+  const groundR = (d: V3, fromR?: number) => (fromR === undefined ? terrain.groundRadius(d) : voxels.floorRadius(d, fromR));
+  const groundRV = (d: THREE.Vector3) => groundR(P(d), d.length() > 1 ? d.length() : undefined);
+  const solidNearDigs = (p: V3) => voxels.edited(p) && voxels.solid(p);
   const planet = buildPlanet(world, terrain, low ? 96 : 144);
   scene.add(planet.ground, planet.water);
+  const dug = new DigRenderer(voxels, terrain, world);
+  scene.add(dug.group);
 
   // Where you start, and which way you face: toward the morning sun, with the sun a little to the right.
   const up0 = V(terrain.spawnDir);
@@ -83,6 +117,7 @@ export async function startGame(opts: GameOptions) {
   const colliders: Collider[] = [];
   const domeDir = along(START_BASE.shelterDome.forward, START_BASE.shelterDome.right);
   const domePoint = domeDir.clone().multiplyScalar(terrain.groundRadius(P(domeDir)));
+  const doorDir = spawnPoint.clone().sub(domePoint); doorDir.addScaledVector(domeDir, -doorDir.dot(domeDir)).normalize();
   const dome = new THREE.Group();
   dome.name = 'shelter';
   try {
@@ -103,15 +138,16 @@ export async function startGame(opts: GameOptions) {
 
   const lotusDir = along(START_BASE.solarLotus.forward, START_BASE.solarLotus.right);
   const lotusPoint = lotusDir.clone().multiplyScalar(terrain.groundRadius(P(lotusDir)));
-  try {
-    const lotus = await loadModel('solar_lotus');
-    lotus.applyMatrix4(surfaceMatrix(terrain, lotusDir, (START_BASE.solarLotus.yawDeg * Math.PI) / 180, 1, 0.05, 0, spawnPoint.clone().sub(lotusPoint)));
-    lotus.traverse((o) => { const mm = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined; if (mm) mm.envMapIntensity = 1.4; });
-    scene.add(lotus);
+  await preloadMachines();
+  {
+    const lv = buildMachine('solar_lotus');
+    lv.root.applyMatrix4(surfaceMatrix(terrain, lotusDir, (START_BASE.solarLotus.yawDeg * Math.PI) / 180, 1, 0.05, 0, spawnPoint.clone().sub(lotusPoint)));
+    lv.root.traverse((o) => { const mm = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined; if (mm) mm.envMapIntensity = 1.4; });
+    scene.add(lv.root);
     colliders.push({ pos: P(lotusPoint), radius: 0.5 });
-  } catch { /* optional */ }
+  }
 
-  // ── Plants, rocks, crystals ───────────────────────────
+  // ── Plants, rocks, crystals, ore ──────────────────────
   ui.loading('Growing the forest', 0.5); await nextFrame();
   const scatter = scatterWorld(terrain, world.seed, up0, [
     { pos: domePoint, radius: 8 }, { pos: lotusPoint, radius: 4 }, { pos: spawnPoint, radius: 4.5 },
@@ -119,6 +155,10 @@ export async function startGame(opts: GameOptions) {
   scene.add(scatter.group);
   colliders.push(...scatter.colliders);
   scene.add(decorateBase(terrain, { up: up0, forward, right }, { dome: domePoint }));
+  const ore = new OreField(terrain, world.seed, { up: up0, forward, right }, [{ pos: domePoint, radius: 5 }, { pos: lotusPoint, radius: 2.5 }, { pos: spawnPoint, radius: 2 }]);
+  scene.add(ore.group);
+  const laser = new LaserView();
+  scene.add(laser.group);
 
   // ── Sky and light ─────────────────────────────────────
   ui.loading('Lighting the sky', 0.7); await nextFrame();
@@ -143,10 +183,11 @@ export async function startGame(opts: GameOptions) {
   scene.add(hemi);
   const nightFill = new THREE.DirectionalLight('#8f86ff', 0.0);
   scene.add(nightFill, nightFill.target);
+  const helmet = new THREE.SpotLight('#fff0d8', 0, 22, 0.55, 0.6, 1.5);
+  scene.add(helmet, helmet.target);
   const fog = new THREE.FogExp2('#ffe3b6', 0.006);
   scene.fog = fog;
 
-  // Environment lighting for metal and water, refreshed as the sun moves.
   const pmrem = new THREE.PMREMGenerator(renderer);
   let envRT: THREE.WebGLRenderTarget | null = null;
   let envTimer = 0;
@@ -166,9 +207,7 @@ export async function startGame(opts: GameOptions) {
     pos: P(spawnPoint.clone().addScaledVector(up0, 0.05)), vel: { x: 0, y: 0, z: 0 },
     heading: P(forward), grounded: true, jetFuel: 1, jetting: false,
   };
-
   if (opts.near && scatter.landmarks[opts.near]?.length) {
-    // Testing: stand 16 m from the landmark closest to the base, facing it.
     const lm = scatter.landmarks[opts.near].slice().sort((a, b) => a.distanceTo(spawnPoint) - b.distanceTo(spawnPoint))[0];
     const u = lm.clone().normalize();
     const away = spawnPoint.clone().sub(lm); away.addScaledVector(u, -away.dot(u)).normalize();
@@ -178,21 +217,156 @@ export async function startGame(opts: GameOptions) {
     me.heading = P(h);
   }
   if (opts.alt) { const u = V(me.pos).normalize(); me.pos = P(V(me.pos).addScaledVector(u, opts.alt)); me.grounded = false; me.vel = P(u.multiplyScalar(0.5)); }
+
   const rig = new CameraRig(camera, R, groundRV);
   if (opts.pitch !== undefined) rig.pitch = opts.pitch;
   if (opts.dist !== undefined) rig.dist = opts.dist;
   const post = buildPostFX(renderer, scene, camera);
 
-  // ── Goals for this first look ─────────────────────────
-  const circumference = 2 * Math.PI * R;
-  let travelled = 0;
-  let reachedDome = false, flewHigh = false;
-  const goals = (): Goal[] => [
-    { key: 'Now', text: 'Walk to your shelter dome', done: reachedDome },
-    { key: 'Next', text: flewHigh ? 'Jetpack high above the forest' : 'Hold Space in the air to jetpack 8 m up', done: flewHigh },
-    { key: 'Explore', text: `Walk all the way around the world · ${Math.min(100, Math.floor((travelled / circumference) * 100))}%` },
-    { key: '???', text: 'Something vast moves beneath the glowing forest…', mystery: true },
-  ];
+  // ── Game state ────────────────────────────────────────
+  const pack = new Backpack(8);
+  let base = newBase();
+  base.machines.push({ id: 'solar_lotus', pos: P(lotusPoint) });
+  const machineViews = new Map<PlacedMachine, MachineView>();
+  let goalIndex = 0;
+  const mined: Partial<Record<ItemId, number>> = {};
+  const crafted: Partial<Record<ItemId, number>> = {};
+  const flags: Record<string, boolean> = {};
+  const fraction = new Map<ItemId, number>();
+
+  const machineCollider = (m: PlacedMachine): Collider => ({ pos: m.pos, radius: MACHINES[m.id].radius });
+  const addMachineView = (m: PlacedMachine, yaw = 0) => {
+    if (machineViews.has(m)) return;
+    if (m.id === 'solar_lotus' && V(m.pos).distanceTo(lotusPoint) < 0.5) return; // the starting lotus is already in the scene
+    const v = buildMachine(m.id);
+    const dir = V(m.pos).normalize();
+    v.root.applyMatrix4(surfaceMatrix(terrain, dir, yaw, 1, 0.03, 0, domePoint.clone().sub(V(m.pos))));
+    v.root.position.copy(V(m.pos));
+    scene.add(v.root);
+    machineViews.set(m, v);
+    colliders.push(machineCollider(m));
+  };
+  const removeMachine = (m: PlacedMachine) => {
+    const v = machineViews.get(m);
+    if (v) { scene.remove(v.root); machineViews.delete(m); }
+    base.machines = base.machines.filter((x) => x !== m);
+    const ci = colliders.findIndex((c) => c.pos === m.pos);
+    if (ci >= 0) colliders.splice(ci, 1);
+  };
+
+  // Flora sitting in a freshly dug hole is removed with the soil.
+  const clearFlora = (c: THREE.Vector3, r: number) => {
+    const m4 = new THREE.Matrix4(), p = new THREE.Vector3(), zero = new THREE.Matrix4().makeScale(0, 0, 0);
+    for (const obj of scatter.group.children) {
+      const im = obj as THREE.InstancedMesh;
+      if (!im.isInstancedMesh || !['grass', 'fern', 'smallMushroom', 'lotus', 'smallRock', 'crystal'].includes(im.name)) continue;
+      if (!im.boundingSphere || im.boundingSphere.center.distanceTo(c) > im.boundingSphere.radius + r) continue;
+      let changed = false;
+      for (let i = 0; i < im.count; i++) {
+        im.getMatrixAt(i, m4);
+        p.setFromMatrixPosition(m4);
+        if (p.distanceTo(c) < r + 0.25) { im.setMatrixAt(i, zero); changed = true; }
+      }
+      if (changed) im.instanceMatrix.needsUpdate = true;
+    }
+  };
+
+  const doDig = (c: THREE.Vector3, r: number) => {
+    const res = voxels.dig(P(c), r);
+    dug.rebuild(res.chunks);
+    clearFlora(c, r);
+    return res.removed;
+  };
+
+  const give = (id: ItemId, n: number, from: 'mine' | 'craft' | 'other' = 'other') => {
+    const left = pack.add(id, n);
+    const got = n - left;
+    if (got > 0) {
+      if (from === 'mine') mined[id] = (mined[id] ?? 0) + got;
+      ui.pickup(`+${got} ${ITEMS[id].name}`, ITEMS[id].color);
+    }
+    if (left > 0 && !flags.fullWarned) { ui.sarathi(SARATHI_EVENTS.backpackFull); flags.fullWarned = true; setTimeout(() => (flags.fullWarned = false), 20000); }
+    if (ui.packOpen) ui.renderPack(pack.slots, (r) => pack.canCraft(r));
+  };
+
+  // ── Saving ────────────────────────────────────────────
+  const save = () => {
+    if (opts.shot) return;
+    const data: SaveData = {
+      v: 1, days, me: { pos: { ...me.pos }, heading: { ...me.heading } }, pack: pack.toJSON(), base,
+      digs: voxels.digs, ore: ore.amounts(), goal: goalIndex, mined, crafted, flags,
+    };
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch { /* storage full or blocked */ }
+  };
+  const load = (d: SaveData) => {
+    days = d.days;
+    me.pos = d.me.pos; me.heading = d.me.heading; me.vel = { x: 0, y: 0, z: 0 };
+    pack.load(d.pack);
+    base = d.base;
+    voxels.replay(d.digs);
+    dug.rebuild(voxels.chunks.keys());
+    for (const g of d.digs) clearFlora(V(g), g.r);
+    ore.restore(d.ore);
+    goalIndex = d.goal;
+    Object.assign(mined, d.mined); Object.assign(crafted, d.crafted); Object.assign(flags, d.flags);
+    for (const m of base.machines) addMachineView(m);
+  };
+  addEventListener('beforeunload', save);
+
+  // ── Goals ─────────────────────────────────────────────
+  const goalDone = (id: string): boolean => {
+    const has = (mid: MachineId) => base.machines.some((m) => m.id === mid && V(m.pos).distanceTo(domePoint) < SURVIVAL.gridRadius);
+    switch (id) {
+      case 'ice': return (mined.ice ?? 0) >= 3;
+      case 'iron': return (mined.iron_ore ?? 0) >= 6;
+      case 'silica': return (mined.silica ?? 0) >= 4;
+      case 'craft_elec': return (crafted.electrolyzer ?? 0) >= 1 || has('electrolyzer');
+      case 'place_elec': return has('electrolyzer');
+      case 'load_ice': return base.machines.some((m) => m.id === 'electrolyzer' && ((m.ice ?? 0) > 0 || (m.burn ?? 0) > 0)) || base.shelterO2 > 0;
+      case 'breathe': return !!flags.breathed;
+      case 'battery': return has('battery');
+      case 'night': return !!flags.survivedNight;
+      default: return false;
+    }
+  };
+  const goalsView = (): Goal[] => {
+    const cur = CHAPTER1_GOALS[Math.min(goalIndex, CHAPTER1_GOALS.length - 1)];
+    const next = CHAPTER1_GOALS[goalIndex + 1];
+    const list: Goal[] = [{ key: 'Now', text: cur.text }];
+    if (next) list.push({ key: 'Next', text: next.text });
+    list.push({ key: '???', text: 'Something vast moves beneath the glowing forest…', mystery: true });
+    return list;
+  };
+  const advanceGoals = () => {
+    let moved = false;
+    while (goalIndex < CHAPTER1_GOALS.length - 1 && goalDone(CHAPTER1_GOALS[goalIndex].id)) { goalIndex++; moved = true; }
+    if (moved) { ui.sarathi(CHAPTER1_GOALS[goalIndex].sarathi, 9); ui.toast('Goal complete'); save(); }
+    ui.goals(goalsView());
+  };
+
+  // ── UI actions ────────────────────────────────────────
+  let building: { id: MachineId; item: ItemId; ghost: THREE.Group; yaw: number; ok: boolean; pos: THREE.Vector3 } | null = null;
+  const startBuild = (item: ItemId) => {
+    const mid = ITEMS[item].placeable;
+    if (!mid || pack.count(item) < 1) return;
+    if (building) scene.remove(building.ghost);
+    building = { id: mid, item, ghost: ghostOf(buildMachine(mid)), yaw: 0, ok: false, pos: new THREE.Vector3() };
+    scene.add(building.ghost);
+    closePack();
+    ui.toast(`Placing ${ITEMS[item].name}`);
+  };
+  const cancelBuild = () => { if (building) { scene.remove(building.ghost); building = null; } };
+  ui.onCraft = (r: Recipe) => {
+    if (pack.craft(r)) {
+      crafted[r.out] = (crafted[r.out] ?? 0) + r.n;
+      ui.pickup(`Crafted ${ITEMS[r.out].name}`, ITEMS[r.out].color);
+      ui.renderPack(pack.slots, (x) => pack.canCraft(x));
+      advanceGoals();
+    }
+  };
+  ui.onPlace = (id) => startBuild(id);
+  const openPack = () => { ui.renderPack(pack.slots, (r) => pack.canCraft(r)); ui.setPack(true); if (document.pointerLockElement) document.exitPointerLock(); };
+  const closePack = () => { ui.setPack(false); if (playing && !opts.shot) input.lock(); };
 
   // ── State and loop ────────────────────────────────────
   let playing = false;
@@ -201,16 +375,22 @@ export async function startGame(opts: GameOptions) {
   let frames = 0;
   let last = performance.now();
   let acc = 0;
+  let digTimer = 0, oreTimer = 0, goalTimer = 0, saveTimer = 20;
+  let wasNight = false, lowWarned = false;
 
-  const begin = () => {
+  const begin = (resume: boolean) => {
+    const d = resume ? readSave() : null;
+    if (d) load(d);
+    else { try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ } }
     playing = true;
     rig.autoSpin = 0;
     rig.titleFrame = 0;
     rig.setMode('follow', opts.shot ? 0.001 : 4.5);
     ui.showHud();
-    ui.goals(goals());
+    ui.goals(goalsView());
     if (!opts.shot) input.lock();
     setTimeout(() => ui.toast('Jivagraha'), 3800);
+    setTimeout(() => ui.sarathi(CHAPTER1_GOALS[goalIndex].sarathi, 10), d ? 1000 : 5200);
   };
 
   if (opts.view === 'orbit') { rig.mode = 'orbit'; rig.orbitPitch = 0.75; }
@@ -218,7 +398,7 @@ export async function startGame(opts: GameOptions) {
     rig.mode = opts.view;
     playing = true;
     ui.showHud();
-    ui.goals(goals());
+    ui.goals(goalsView());
   } else {
     rig.mode = 'orbit';
     rig.orbitPitch = 0.62;
@@ -228,9 +408,13 @@ export async function startGame(opts: GameOptions) {
   }
 
   document.addEventListener('pointerlockchange', () => {
-    if (!document.pointerLockElement && playing && !opts.shot) ui.showPause(() => input.lock());
+    if (!document.pointerLockElement && playing && !opts.shot && !ui.packOpen) { save(); ui.showPause(() => input.lock()); }
   });
-  renderer.domElement.addEventListener('click', () => { if (playing && !input.locked && !opts.shot) { ui.hidePause(); input.lock(); } });
+  renderer.domElement.addEventListener('click', () => { if (playing && !input.locked && !opts.shot && !ui.packOpen) { ui.hidePause(); input.lock(); } });
+  addEventListener('keydown', (e) => {
+    if (!playing) return;
+    if (e.code === 'Tab') { e.preventDefault(); if (ui.packOpen) closePack(); else { cancelBuild(); openPack(); } }
+  });
 
   addEventListener('resize', () => {
     camera.aspect = innerWidth / innerHeight;
@@ -245,6 +429,36 @@ export async function startGame(opts: GameOptions) {
   const cols = {
     dayZ: new THREE.Color(pal.skyDayZenith), dayH: new THREE.Color(pal.skyDayHorizon), setH: new THREE.Color(pal.skySunsetHorizon), nightH: new THREE.Color(pal.skyNightHorizon),
   };
+  const camDir = new THREE.Vector3();
+
+  /** What the crosshair points at: a deposit or the ground. */
+  const aim = (): { point: THREE.Vector3; normal: THREE.Vector3; node?: OreNode } | null => {
+    camera.getWorldDirection(camDir);
+    const o = camera.position;
+    const start = Math.max(0, rig.dist - 0.6);
+    const hitOre = ore.raycast(o, camDir, start + 9);
+    let tGround = -1;
+    for (let t = start; t < start + 9; t += 0.1) {
+      const p = o.clone().addScaledVector(camDir, t);
+      if (voxels.density(p.x, p.y, p.z) > 0) { tGround = t; break; }
+    }
+    const pos = V(me.pos);
+    if (hitOre && (tGround < 0 || hitOre.t < tGround)) {
+      const p = o.clone().addScaledVector(camDir, hitOre.t);
+      if (p.distanceTo(pos) > 8) return null;
+      return { point: p, normal: camDir.clone().negate(), node: hitOre.node };
+    }
+    if (tGround < 0) return null;
+    const p = o.clone().addScaledVector(camDir, tGround);
+    if (p.distanceTo(pos) > 8) return null;
+    return { point: p, normal: camDir.clone().negate() };
+  };
+
+  const nearestMachine = (pos: THREE.Vector3, maxD: number) => {
+    let best: PlacedMachine | null = null, bd = maxD;
+    for (const m of base.machines) { const d = V(m.pos).distanceTo(pos); if (d < bd) { bd = d; best = m; } }
+    return best;
+  };
 
   const update = (dt: number) => {
     const pad = input.pollPad();
@@ -254,11 +468,10 @@ export async function startGame(opts: GameOptions) {
 
     if (input.hit('F3')) showStats = !showStats;
     if (input.hit('KeyH')) ui.toggleHelp();
-    if (input.wheel) rig.dist = THREE.MathUtils.clamp(rig.dist + input.wheel * 0.8, 3.5, 14);
+    if (input.wheel && !building) rig.dist = THREE.MathUtils.clamp(rig.dist + input.wheel * 0.8, 3.5, 14);
 
-    // Movement (fixed steps for stable physics).
-    const active = playing && !ui.paused && (input.locked || opts.shot) && !rig.transitioning;
-    if (playing && input.hit('KeyM')) rig.setMode(rig.mode === 'follow' ? 'orbit' : 'follow', 1.4);
+    const active = playing && !ui.paused && !ui.packOpen && (input.locked || opts.shot) && !rig.transitioning;
+    if (active && input.hit('KeyM')) rig.setMode(rig.mode === 'follow' ? 'orbit' : 'follow', 1.4);
     const look = input.sensitivity;
     let yaw = 0;
     if (active && rig.mode === 'follow') {
@@ -271,28 +484,131 @@ export async function startGame(opts: GameOptions) {
     const walk = active && rig.mode === 'follow';
     const fwd = walk ? (input.down('KeyW') || input.down('ArrowUp') ? 1 : 0) - (input.down('KeyS') || input.down('ArrowDown') ? 1 : 0) - pad.ly : 0;
     const side = walk ? (input.down('KeyD') || input.down('ArrowRight') ? 1 : 0) - (input.down('KeyA') || input.down('ArrowLeft') ? 1 : 0) + pad.lx : 0;
+    const sprint = input.down('ShiftLeft') || input.down('ShiftRight');
     const jumpHit = walk && input.hit('Space');
     acc += dt;
     const STEP = 1 / 60;
     let first = true;
-    const before = V(me.pos);
     while (acc >= STEP) {
       stepMover(me, {
-        forward: fwd, right: side, sprint: input.down('ShiftLeft') || input.down('ShiftRight'),
-        jump: jumpHit && first, jet: walk && input.down('Space'), yaw: first ? yaw : 0,
-      }, STEP, groundR, colliders);
+        forward: fwd, right: side, sprint, jump: jumpHit && first, jet: walk && input.down('Space') && base.power > 0.02, yaw: first ? yaw : 0,
+      }, STEP, groundR, colliders, undefined, solidNearDigs);
       first = false;
       acc -= STEP;
     }
     if (first && yaw) me.heading = P(V(me.heading).applyAxisAngle(V(me.pos).normalize(), yaw));
     const pos = V(me.pos);
-    travelled += pos.distanceTo(before);
     const up = tmpUp.copy(pos).normalize();
+    const heading = V(me.heading);
 
-    // Goals.
-    if (!reachedDome && pos.distanceTo(domePoint) < 6.5) { reachedDome = true; ui.toast('Shelter reached'); }
-    if (!flewHigh && altitude(me, groundR) > 8) { flewHigh = true; ui.toast('Look at that view'); }
-    if (frames % 15 === 0 && playing) ui.goals(goals());
+    // Machines: interact (E), pick up (X), use canister (Q).
+    const near = nearestMachine(pos, 2.8);
+    const atShelter = pos.distanceTo(domePoint) < 4.4;
+    let prompt: string | null = null;
+    if (walk && !building) {
+      if (near?.id === 'electrolyzer') {
+        prompt = `<b>E</b> load ice (${near.ice ?? 0} inside) · <b>X</b> pick up`;
+        if (input.hit('KeyE')) {
+          const n = Math.min(pack.count('ice'), 20 - (near.ice ?? 0));
+          if (n > 0) { pack.remove('ice', n); near.ice = (near.ice ?? 0) + n; ui.pickup(`Loaded ${n} ice`, ITEMS.ice.color); advanceGoals(); }
+          else ui.toast(pack.count('ice') ? 'Electrolyzer is full' : 'You have no ice');
+        }
+      } else if (near) {
+        prompt = `${MACHINES[near.id].name} · <b>X</b> pick up`;
+      } else if (atShelter) {
+        prompt = base.shelterO2 > 0 ? 'Shelter airlock · breathing shelter air' : 'Shelter airlock · <b>no air yet</b> — the shelter needs an electrolyzer';
+      }
+      if (near && input.hit('KeyX')) {
+        const item = near.id as ItemId;
+        if (pack.add(item, 1) === 0) {
+          if (near.ice) pack.add('ice', near.ice);
+          removeMachine(near);
+          ui.pickup(`Picked up ${ITEMS[item].name}`, ITEMS[item].color);
+        } else ui.toast('Backpack full');
+      }
+      if (input.hit('KeyQ')) {
+        if (pack.remove('o2_canister', 1)) { base.oxygen = Math.min(1, base.oxygen + 0.4); ui.pickup('Breathed an O₂ canister', ITEMS.o2_canister.color); }
+        else ui.toast('No O₂ canisters — craft them from ice');
+      }
+      if (input.hit('KeyB')) {
+        if (building) cancelBuild();
+        else {
+          const item = (['electrolyzer', 'battery', 'solar_lotus'] as ItemId[]).find((i) => pack.count(i) > 0);
+          if (item) startBuild(item); else ui.toast('Nothing to build — craft a machine first (Tab)');
+        }
+      }
+    } else if (walk && building) {
+      if (input.hit('KeyB') || input.hit('Escape')) cancelBuild();
+    }
+
+    // Build mode: a ghost on the ground ahead of you.
+    if (building) {
+      if (input.hit('KeyR')) building.yaw += Math.PI / 4;
+      if (input.wheel) building.yaw += input.wheel * 0.2;
+      const target = pos.clone().addScaledVector(heading, 3.4).normalize();
+      const gr = groundR(P(target), pos.length() + 1);
+      building.pos.copy(target).multiplyScalar(gr);
+      const r = MACHINES[building.id].radius;
+      const clear = colliders.every((c) => V(c.pos).distanceTo(building!.pos) > c.radius + r + 0.2);
+      const dry = terrain.height(target.x, target.y, target.z) > world.seaLevel + 0.2;
+      building.ok = clear && dry && building.pos.distanceTo(domePoint) > 3.9;
+      const g = building.ghost;
+      g.matrixAutoUpdate = true;
+      g.position.set(0, 0, 0); g.quaternion.identity(); g.scale.set(1, 1, 1);
+      g.applyMatrix4(surfaceMatrix(terrain, target, building.yaw, 1, 0.03, 0, domePoint.clone().sub(building.pos)));
+      g.position.copy(building.pos);
+      (g.userData.ghostMat as THREE.MeshBasicMaterial).color.set(building.ok ? '#5cffd6' : '#ff6a5a');
+      prompt = building.ok ? '<b>Click</b> to place · <b>R</b> turn · <b>B</b> cancel' : 'Too close to something, or in water';
+      if (walk && input.hit('Mouse0') && building.ok && pack.remove(building.item, 1)) {
+        const m: PlacedMachine = { id: building.id, pos: P(building.pos) };
+        if (m.id === 'electrolyzer') m.ice = 0;
+        base.machines.push(m);
+        addMachineView(m, building.yaw);
+        ui.pickup(`Placed ${ITEMS[building.item].name}`, ITEMS[building.item].color);
+        if (V(m.pos).distanceTo(domePoint) > SURVIVAL.gridRadius) ui.sarathi('That is too far from the shelter to share its power.');
+        cancelBuild();
+        advanceGoals();
+        save();
+      }
+    }
+
+    // Mining laser.
+    let lasering = false;
+    let laserTo: THREE.Vector3 | null = null, laserN: THREE.Vector3 | null = null;
+    if (walk && !building && (input.down('Mouse0') || opts.shot && (window as unknown as { __laser?: boolean }).__laser) && base.power > 0.01) {
+      const a = aim();
+      if (a) {
+        lasering = true;
+        laserTo = a.point; laserN = a.normal;
+        if (a.node) {
+          oreTimer += dt;
+          ui.progress(Math.min(1, oreTimer / 0.45));
+          if (oreTimer >= 0.45) { oreTimer = 0; if (ore.take(a.node)) give(ORE_ITEM[a.node.kind], 1, 'mine'); }
+        } else {
+          digTimer += dt;
+          ui.progress(Math.min(1, digTimer / 0.16));
+          if (digTimer >= 0.16) {
+            digTimer = 0;
+            const tooClose = a.point.distanceTo(domePoint) < 5.2 || base.machines.some((m) => V(m.pos).distanceTo(a.point) < 1.6);
+            if (tooClose) { if (!flags.closeWarned) { ui.sarathi(SARATHI_EVENTS.tooClose); flags.closeWarned = true; } }
+            else {
+              const removed = doDig(a.point, 0.9);
+              for (const [mat, vol] of removed) {
+                const y = YIELD[mat as Mat];
+                if (!y) continue;
+                const f = (fraction.get(y.item) ?? 0) + vol * y.perM3;
+                const whole = Math.floor(f);
+                fraction.set(y.item, f - whole);
+                if (whole > 0) give(y.item, whole, 'mine');
+              }
+            }
+          }
+        }
+      }
+    }
+    if (!lasering) { digTimer = 0; oreTimer = 0; ui.progress(0); }
+    const hand = pos.clone().addScaledVector(up, 1.15).addScaledVector(new THREE.Vector3().crossVectors(up, player.facing).normalize(), -0.38).addScaledVector(player.facing, 0.35);
+    laser.update(dt, laserTo ? hand : null, laserTo, laserN);
 
     // Sun, sky and light for the place you stand.
     const sd = V(sunDir(days));
@@ -322,6 +638,11 @@ export async function startGame(opts: GameOptions) {
     nightFill.target.position.copy(pos);
     nightFill.intensity = 0.8 * night;
     renderer.toneMappingExposure = 1.05 + night * 0.3;
+    // Helmet lamp: on at night and underground.
+    const underground = voxels.edited(me.pos) && pos.length() < terrain.groundRadius(P(up)) - 1.2;
+    helmet.intensity = THREE.MathUtils.lerp(helmet.intensity, (night > 0.6 || underground) ? 40 : 0, 1 - Math.exp(-4 * dt));
+    helmet.position.copy(pos).addScaledVector(up, 1.7);
+    helmet.target.position.copy(pos).addScaledVector(up, 1.0).addScaledVector(camera.getWorldDirection(camDir), 6);
 
     tmpCol.copy(cols.nightH).lerp(cols.dayH, day).lerp(cols.setH, sunset * 0.35).lerp(cols.dayZ, 0.35 * day);
     fog.color.copy(tmpCol);
@@ -330,9 +651,41 @@ export async function startGame(opts: GameOptions) {
     envTimer -= dt * (timeScale > 1 ? 6 : 1);
     if (envTimer <= 0) { refreshEnv(); envTimer = 1.5; }
 
-    player.update(dt, pos, up, V(me.vel), V(me.heading), me.grounded, me.jetting, shared.uTime.value);
-    rig.update(dt, pos, up, V(me.heading));
-    ui.vitals(me.jetFuel, localClock(days, P(up)));
+    // Survival and power.
+    if (playing && !ui.paused) {
+      const res = tickBase(base, {
+        dt, inShelter: atShelter, running: sprint && (fwd !== 0 || side !== 0), lasering, jetting: me.jetting,
+        sunAt: (p) => daylight(sunElevation(days, P(V(p).normalize()))),
+        nearShelter: (p) => V(p).distanceTo(domePoint) < SURVIVAL.gridRadius,
+      });
+      if (atShelter && base.shelterO2 > 0 && base.oxygen > 0.5 && !flags.breathed) { flags.breathed = true; advanceGoals(); }
+      if (res.blackout) {
+        const wake = domePoint.clone().addScaledVector(doorDir, 4.2).normalize();
+        me.pos = P(wake.multiplyScalar(terrain.groundRadius(P(wake)) + 0.1));
+        me.vel = { x: 0, y: 0, z: 0 };
+        ui.sarathi(SARATHI_EVENTS.blackout, 8);
+        ui.toast('Blackout');
+      }
+      if (base.oxygen < 0.25 && !lowWarned) { ui.sarathi(SARATHI_EVENTS.lowOxygen); lowWarned = true; }
+      if (base.oxygen > 0.4) lowWarned = false;
+      for (const [m, v] of machineViews) {
+        if (m.id === 'battery') v.setLevel?.(res.capacity > 0 ? base.stored / res.capacity : 0);
+        if (m.id === 'electrolyzer') v.setActive?.(res.making);
+      }
+      const baseNight = 1 - daylight(sunElevation(days, P(domeDir)));
+      if (baseNight > 0.8 && !wasNight) { wasNight = true; ui.sarathi(SARATHI_EVENTS.nightFalls); if (goalIndex >= 8) flags.sawNight = true; }
+      if (baseNight < 0.3 && wasNight) { wasNight = false; ui.sarathi(SARATHI_EVENTS.sunrise); if (flags.sawNight) { flags.survivedNight = true; advanceGoals(); } }
+      const gridText = `Power ${res.produceKW.toFixed(1)} kW${res.capacity ? ` · Battery ${base.stored.toFixed(0)}/${res.capacity} kWh` : ''}`;
+      ui.vitals(base.oxygen, base.power, base.shelterO2 / SURVIVAL.shelterO2Capacity, localClock(days, P(up)), gridText);
+      goalTimer -= dt;
+      if (goalTimer <= 0) { advanceGoals(); goalTimer = 0.5; }
+      saveTimer -= dt;
+      if (saveTimer <= 0) { save(); saveTimer = 20; }
+    }
+    ui.prompt(playing ? prompt : null);
+
+    player.update(dt, pos, up, V(me.vel), heading, me.grounded, me.jetting, shared.uTime.value);
+    rig.update(dt, pos, up, heading);
   };
 
   const render = () => {
@@ -340,18 +693,31 @@ export async function startGame(opts: GameOptions) {
     post.composer.render();
   };
 
-  // Shared for testing and tuning in the browser console.
+  // Hooks for tests and tuning in the browser console.
   window.__game = {
     setTime: (offsetDays: number) => { days = t0 + offsetDays; envTimer = 0; },
     teleport: (fw: number, rt: number) => { const d = along(fw, rt); me.pos = P(d.multiplyScalar(terrain.groundRadius(P(d)) + 0.1)); },
     stats: () => ({ calls: renderer.info.render.calls, triangles: renderer.info.render.triangles }),
-    state: () => ({ pos: { ...me.pos }, grounded: me.grounded, fuel: me.jetFuel, alt: altitude(me, groundR), travelled }),
+    state: () => ({ pos: { ...me.pos }, grounded: me.grounded, fuel: me.jetFuel, alt: altitude(me, groundR), oxygen: base.oxygen, power: base.power, shelterO2: base.shelterO2, goal: CHAPTER1_GOALS[goalIndex].id, pack: pack.slots, machines: base.machines.length }),
+    dig: (fw: number, rt: number, depth: number, r: number) => {
+      const d = along(fw, rt); const g = terrain.groundRadius(P(d));
+      for (let k = 0; k <= depth; k += 0.8) doDig(d.clone().multiplyScalar(g - k), r);
+    },
+    give: (id: ItemId, n: number) => give(id, n, 'mine'),
+    craft: (id: ItemId) => { const r = Backpack.recipes().find((x) => x.out === id); if (r) ui.onCraft(r); },
+    place: (id: MachineId, fw: number, rt: number) => {
+      const d = along(fw, rt); const m: PlacedMachine = { id, pos: P(d.multiplyScalar(terrain.groundRadius(P(d)))) };
+      if (id === 'electrolyzer') m.ice = 0;
+      base.machines.push(m); addMachineView(m);
+    },
+    loadIce: (n: number) => { for (const m of base.machines) if (m.id === 'electrolyzer') m.ice = (m.ice ?? 0) + n; },
+    face: (fw: number, rt: number) => { const t = along(fw, rt).multiplyScalar(R).sub(V(me.pos)); const u = V(me.pos).normalize(); t.addScaledVector(u, -t.dot(u)).normalize(); me.heading = P(t); },
   };
 
   ui.loading('Ready', 1);
   await nextFrame();
   ui.hideLoading();
-  if (!opts.skipTitle) ui.showTitle(begin);
+  if (!opts.skipTitle) ui.showTitle(!!readSave(), () => begin(false), () => begin(true));
 
   const loop = () => {
     const now = performance.now();
@@ -362,7 +728,7 @@ export async function startGame(opts: GameOptions) {
     render();
     if (showStats) {
       const i = renderer.info.render;
-      ui.stats(`${fpsAvg.toFixed(0)} fps\n${i.calls} draw calls\n${(i.triangles / 1000).toFixed(0)}k triangles\n${scatter.instances.toLocaleString()} plants & rocks`);
+      ui.stats(`${fpsAvg.toFixed(0)} fps\n${i.calls} draw calls\n${(i.triangles / 1000).toFixed(0)}k triangles\n${scatter.instances.toLocaleString()} plants & rocks\n${voxels.chunks.size} dug chunks`);
     } else ui.stats(null);
     input.endFrame();
     frames++;

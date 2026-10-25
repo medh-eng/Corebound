@@ -1,6 +1,6 @@
 // Character movement on a small planet: gravity pulls toward the centre,
 // "up" is always away from it, and walking happens in the local tangent plane.
-import { add, cross, dot, len, norm, reject, rotateAround, scale, sub, type V3 } from './vec';
+import { add, anyTangent, cross, dot, len, norm, reject, rotateAround, scale, sub, type V3 } from './vec';
 
 export interface MoveInput {
   forward: number;   // -1..1
@@ -51,9 +51,10 @@ export function stepMover(
   s: MoverState,
   input: MoveInput,
   dt: number,
-  groundRadius: (dir: V3) => number,
+  groundRadius: (dir: V3, fromR?: number) => number,
   colliders: readonly Collider[],
   p: MoveParams = DEFAULT_MOVE,
+  solid?: (p: V3) => boolean,
 ): void {
   let up = norm(s.pos);
   // Keep heading tangent (parallel transport as we move over the curve), then turn.
@@ -102,10 +103,30 @@ export function stepMover(
     }
   }
 
+  // Dug ground: push away from tunnel walls and stop at ceilings.
+  if (solid) {
+    up = norm(s.pos);
+    const f = anyTangent(up), g2 = cross(up, f);
+    for (let a = 0; a < 8; a++) {
+      const ang = (a / 8) * Math.PI * 2;
+      const d = add(scale(f, Math.cos(ang)), scale(g2, Math.sin(ang)));
+      for (const hgt of [0.9, 1.5]) {
+        const probe = add(add(s.pos, scale(up, hgt)), scale(d, p.bodyRadius));
+        if (solid(probe)) {
+          s.pos = sub(s.pos, scale(d, 0.06));
+          const into = dot(s.vel, d);
+          if (into > 0) s.vel = sub(s.vel, scale(d, into));
+        }
+      }
+    }
+    const head = add(s.pos, scale(up, 1.85));
+    if (solid(head) && dot(s.vel, up) > 0) s.vel = reject(s.vel, up);
+  }
+
   // Stand on the ground.
   up = norm(s.pos);
-  const g = groundRadius(up);
   const r = len(s.pos);
+  const g = groundRadius(up, r);
   if (r <= g + 0.02 && dot(s.vel, up) <= 0.01) {
     s.pos = scale(up, g);
     s.vel = reject(s.vel, up);
@@ -118,6 +139,6 @@ export function stepMover(
 }
 
 /** Height of the character above the ground (m). */
-export function altitude(s: MoverState, groundRadius: (dir: V3) => number): number {
-  return len(s.pos) - groundRadius(norm(s.pos));
+export function altitude(s: MoverState, groundRadius: (dir: V3, fromR?: number) => number): number {
+  return len(s.pos) - groundRadius(norm(s.pos), len(s.pos));
 }

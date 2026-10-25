@@ -1,8 +1,8 @@
 // Builds the planet surface mesh (a cube-sphere) and its water from the Terrain maths.
 import * as THREE from 'three';
-import { Terrain } from '../core/terrain';
+import { Terrain, type SurfaceSample } from '../core/terrain';
 import type { WorldDef } from '../data/worlds';
-import { stylised } from '../art/materials';
+import { stylised, cutDepthMaterial, applyWaterCut } from '../art/materials';
 
 const FACES: [number[], number[], number[]][] = [
   [[1, 0, 0], [0, 0, -1], [0, 1, 0]],
@@ -28,12 +28,37 @@ export interface PlanetMeshes {
   water: THREE.Mesh;
 }
 
+export interface SurfacePalette {
+  grassLow: THREE.Color; grassHigh: THREE.Color; dry: THREE.Color; rock: THREE.Color; rockDark: THREE.Color;
+  vein: THREE.Color; sand: THREE.Color; snow: THREE.Color; seabed: THREE.Color;
+}
+
+export function surfacePalette(world: WorldDef): SurfacePalette {
+  const P = world.palette, c = (s: string) => new THREE.Color(s);
+  return { grassLow: c(P.grassLow), grassHigh: c(P.grassHigh), dry: c(P.grassDry), rock: c(P.rock), rockDark: c(P.rockDark), vein: c(P.vein), sand: c(P.sand), snow: c(P.snow), seabed: c(P.seabed) };
+}
+
+/** Ground colour for unit direction (x, y, z) given its terrain sample and slope (0 flat .. 1 vertical). */
+export function surfaceColor(world: WorldDef, pal: SurfacePalette, s: SurfaceSample, x: number, y: number, z: number, slope: number, out: THREE.Color) {
+  const hn = THREE.MathUtils.clamp((s.h + 2) / 9, 0, 1);
+  out.copy(pal.grassLow).lerp(pal.grassHigh, hn * 0.8 + 0.1 * Math.sin(x * 31 + z * 17));
+  out.lerp(pal.dry, (1 - THREE.MathUtils.smoothstep(s.forest, 0.0, 0.6)) * 0.35 + s.flat * 0.2);
+  const rockAmt = Math.max(s.rock, THREE.MathUtils.smoothstep(slope, 0.12, 0.3));
+  if (rockAmt > 0) {
+    const rc = pal.rock.clone().lerp(pal.rockDark, THREE.MathUtils.clamp(slope * 2.5, 0, 1) * 0.6);
+    if (Math.sin(y * 48 + Math.sin(x * 23) * 2 + Math.cos(z * 19) * 2) > 0.93) rc.lerp(pal.vein, 0.85);
+    out.lerp(rc, rockAmt);
+  }
+  const shore = 1 - THREE.MathUtils.smoothstep(s.h, world.seaLevel + 0.15, world.seaLevel + 0.9);
+  out.lerp(pal.sand, shore * 0.85);
+  if (s.h < world.seaLevel - 0.2) out.lerp(pal.seabed, THREE.MathUtils.clamp((world.seaLevel - s.h) / 1.5, 0, 1));
+  out.lerp(pal.snow, s.snow);
+  return out;
+}
+
 export function buildPlanet(world: WorldDef, terrain: Terrain, segments = 144): PlanetMeshes {
   const P = world.palette;
-  const col = (s: string) => new THREE.Color(s);
-  const cGrassLow = col(P.grassLow), cGrassHigh = col(P.grassHigh), cDry = col(P.grassDry);
-  const cRock = col(P.rock), cRockDark = col(P.rockDark), cVein = col(P.vein);
-  const cSand = col(P.sand), cSnow = col(P.snow), cSeabed = col(P.seabed);
+  const pal = surfacePalette(world);
 
   const N = segments, V = N + 1;
   const count = 6 * V * V;
@@ -44,7 +69,6 @@ export function buildPlanet(world: WorldDef, terrain: Terrain, segments = 144): 
   const R = world.radius;
   const eps = 0.004;
   const tmp = new THREE.Color();
-  const veinNoise = (x: number, y: number, z: number) => Math.sin(y * 48 + Math.sin(x * 23) * 2 + Math.cos(z * 19) * 2);
 
   let vi = 0, ii = 0;
   for (let f = 0; f < 6; f++) {
@@ -83,20 +107,7 @@ export function buildPlanet(world: WorldDef, terrain: Terrain, segments = 144): 
         nor[vi * 3] = nx; nor[vi * 3 + 1] = ny; nor[vi * 3 + 2] = nz;
         const slope = 1 - (nx * x + ny * y + nz * z); // 0 flat .. 1 vertical
 
-        // Colour: grass → sandstone on steep or ridged ground, sand near water, snow at the poles.
-        const hn = THREE.MathUtils.clamp((s.h + 2) / 9, 0, 1);
-        tmp.copy(cGrassLow).lerp(cGrassHigh, hn * 0.8 + 0.1 * Math.sin(x * 31 + z * 17));
-        tmp.lerp(cDry, (1 - THREE.MathUtils.smoothstep(s.forest, 0.0, 0.6)) * 0.35 + s.flat * 0.2);
-        const rockAmt = Math.max(s.rock, THREE.MathUtils.smoothstep(slope, 0.12, 0.3));
-        if (rockAmt > 0) {
-          const rc = cRock.clone().lerp(cRockDark, THREE.MathUtils.clamp(slope * 2.5, 0, 1) * 0.6);
-          if (veinNoise(x, y, z) > 0.93) rc.lerp(cVein, 0.85);
-          tmp.lerp(rc, rockAmt);
-        }
-        const shore = 1 - THREE.MathUtils.smoothstep(s.h, world.seaLevel + 0.15, world.seaLevel + 0.9);
-        tmp.lerp(cSand, shore * 0.85);
-        if (s.h < world.seaLevel - 0.2) tmp.lerp(cSeabed, THREE.MathUtils.clamp((world.seaLevel - s.h) / 1.5, 0, 1));
-        tmp.lerp(cSnow, s.snow);
+        surfaceColor(world, pal, s, x, y, z, slope, tmp);
         cols[vi * 3] = tmp.r; cols[vi * 3 + 1] = tmp.g; cols[vi * 3 + 2] = tmp.b;
         vi++;
       }
@@ -119,7 +130,8 @@ export function buildPlanet(world: WorldDef, terrain: Terrain, segments = 144): 
   fixWinding(g);
   g.computeBoundingSphere();
 
-  const ground = new THREE.Mesh(g, stylised({ vertexColors: true, roughness: 0.93, mottle: 0.12 }));
+  const ground = new THREE.Mesh(g, stylised({ vertexColors: true, roughness: 0.93, mottle: 0.12, cutBoxes: 'ground' }));
+  ground.customDepthMaterial = cutDepthMaterial();
   ground.receiveShadow = true;
   ground.castShadow = true;
   ground.name = 'ground';
@@ -130,6 +142,7 @@ export function buildPlanet(world: WorldDef, terrain: Terrain, segments = 144): 
       color: P.water, roughness: 0.08, metalness: 0.0, transparent: true, opacity: 0.82, envMapIntensity: 1.4,
     }),
   );
+  applyWaterCut(water.material as THREE.MeshStandardMaterial);
   water.name = 'water';
   water.receiveShadow = true;
   return { ground, water };

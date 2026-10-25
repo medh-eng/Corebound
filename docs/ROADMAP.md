@@ -16,7 +16,9 @@ Chapter 1 (Jivagraha) is built all the way to a polished free demo before worlds
 - **Delivered:** title screen with the owner's logo over the turning planet; flight down to the surface; walking, running, jumping and jetpack on a 150 m planet; day–night with aurora; glowing mushroom and banyan forests, rocks, crystals, ferns, grass, lotus flowers; the painted shelter dome with chimney smoke and the solar lotus; planet view; goals panel; pause screen; gamepad basics.
 - **Not yet:** Rapier physics (comes with digging in M1), a skeleton for the Custodian, sound.
 
-### M1 Dig and survive
+### M1 Dig and survive — first version built 2026-10-25
+- **Delivered:** laser digging anywhere (pits and tunnels, with sandstone, iron, ice and carbon underground), surface deposits near the base, 8-slot backpack with crafting (electrolyzer, battery, solar lotus, O₂ canister), placing and picking up machines, oxygen and suit power, shelter air from the electrolyzer, solar + battery power through the night, blackout, helmet lamp, guided goals with SARATHI lines, autosave and Continue.
+- **Still to do in M1:** a skeleton and real walk for the Custodian (file prepared for Mixamo), texture and sky images from the owner, sound.
 - **Build:** smooth diggable terrain (density field + marching cubes in workers); mining laser with VFX; ore pickup; backpack (8 stacks) and crafting; oxygen and suit power; blackout and wake; shelter dome, solar lotus, battery, electrolyzer; day/night consequences; autosave and save slots.
 - **Art (owner):** Custodian concept + turnaround + rigged GLB; Chapter 1 textures; Jivagraha sky.
 

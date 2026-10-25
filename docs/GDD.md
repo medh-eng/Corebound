@@ -245,4 +245,11 @@ Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manua
 | 2026-10-25 | Collision is an analytic height field + circle colliders until diggable terrain; Rapier arrives with M1 | Simplest robust walking on a sphere for the look test |
 | 2026-10-25 | Plain white models are painted by per-pixel shader programs (`src/art/paint.ts`) from their shape; characters, creatures and vehicles must arrive textured | Crisp, consistent game materials without AI-baked shading |
 | 2026-10-25 | Custodian has no skeleton yet: procedural waddle walk; rig via Mixamo or the 3D tool's auto-rig before M1 animation work | Model arrived unrigged |
+| 2026-10-25 | Owner said "continue": M1 started before the M0 playtest | Owner's call |
+| 2026-10-25 | Digging: the planet stays analytic; only dug areas become 18 m voxel chunks (0.75 m cells, surface nets); the planet surface hides inside them | Fast everywhere, detailed where you dig; no worker threads needed yet |
+| 2026-10-25 | Rapier deferred again: walking uses the density field (floor search, wall and ceiling probes) | Simple and tested; revisit for vehicles in M4 |
+| 2026-10-25 | Underground materials: soil, sandstone (silica), iron veins, ice pockets (>1.4 m deep), carbon seams (>2.5 m), deep rock; plus surface deposits of ice, iron and carbon | Readable first hour; every material reachable near the base |
+| 2026-10-25 | Shelter is entered at its airlock (stand at the door) rather than a walk-in interior | Interior is later work |
+| 2026-10-25 | Blackout returns you to the shelter with 35% oxygen and drops nothing | "No punishment" pillar; revisit for Engineer difficulty |
+| 2026-10-25 | Starting base already has one solar lotus; the player crafts the electrolyzer and battery | Shorter path to the first "it works" moment |
 | Open | Guardian names; price; repo visibility at launch; name subtitle; final art direction sign-off | **owner** |
