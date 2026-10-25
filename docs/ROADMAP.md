@@ -10,9 +10,11 @@ Chapter 1 (Jivagraha) is built all the way to a polished free demo before worlds
 
 ## Chapter 1: Jivagraha
 
-### M0 Look test
+### M0 Look test — built 2026-10-25, waiting for owner playtest
 - **Build:** Vite + TypeScript + Three.js + Rapier project; GitHub Pages deploy. A small sphere planet with atmosphere glow, sun, day–night cycle, stylised sky, bloom and tone mapping. Third-person character (placeholder) walking, jumping and jetpack-hopping with gravity to the centre; camera aligned to the surface; planet view (M). Procedural trees and grass. Title screen.
-- **Art (owner):** style tests, key art, Jivagraha concept art (orbit, surface day/night, healthy vs polluted, underground).
+- **Art (owner):** style tests, key art, Jivagraha concept art (orbit, surface day/night, healthy vs polluted, underground). ✓ Received, plus all five worlds, Guardians, logo, Custodian, shelter dome and solar lotus.
+- **Delivered:** title screen with the owner's logo over the turning planet; flight down to the surface; walking, running, jumping and jetpack on a 150 m planet; day–night with aurora; glowing mushroom and banyan forests, rocks, crystals, ferns, grass, lotus flowers; the painted shelter dome with chimney smoke and the solar lotus; planet view; goals panel; pause screen; gamepad basics.
+- **Not yet:** Rapier physics (comes with digging in M1), a skeleton for the Custodian, sound.
 
 ### M1 Dig and survive
 - **Build:** smooth diggable terrain (density field + marching cubes in workers); mining laser with VFX; ore pickup; backpack (8 stacks) and crafting; oxygen and suit power; blackout and wake; shelter dome, solar lotus, battery, electrolyzer; day/night consequences; autosave and save slots.

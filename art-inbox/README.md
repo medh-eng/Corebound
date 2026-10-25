@@ -18,4 +18,9 @@ Use the file names from the Prompt Pack (the "Prompt Pack" tab of the Corebound 
 | `video/` | Teaser clips | MP4 |
 | `audio/` | Music, sound effects, voice | WAV or MP3 |
 
+**White or coloured models?**
+- **Machines and buildings** can be plain white: Claude paints them in the game's own ceramic, copper and glowing jaali materials. Clear shapes (bands, rings, doors, lattice) help.
+- **Characters, creatures, SARATHI, vehicles and anything with painted detail** must come with colour and texture.
+- **Characters** also need a skeleton to walk properly: use the tool's auto-rig option, or ask Claude to prepare the model for Mixamo.
+
 **3D model limits:** character up to 40,000 triangles; vehicle up to 30,000; machine up to 15,000; small prop up to 5,000; textures 2048 × 2048.

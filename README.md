@@ -10,7 +10,7 @@ Built by Claude from an original idea, for release on the web, itch.io and Steam
 
 ## Status
 
-**Pre-production** (October 2026). Next milestone: **M0 Look test** — walk, jump and jetpack around a tiny 3D planet with sky, sun and day–night.
+**M0 Look test is built** (October 2026): walk, run, jump and jetpack around Jivagraha, a tiny living planet with day and night. Next: owner playtest, then **M1 Dig and survive**.
 
 | Document | What it holds |
 | --- | --- |
@@ -21,7 +21,33 @@ Built by Claude from an original idea, for release on the web, itch.io and Steam
 
 ## Play it
 
-A playable build will be published to GitHub Pages from M0 onward; the link will appear here.
+**https://medh-eng.github.io/Corebound/** (needs a computer browser with WebGL 2; Chrome or Edge recommended).
+
+| Key | Action |
+| --- | --- |
+| W A S D | Walk |
+| Mouse | Look around |
+| Shift | Run |
+| Space | Jump; hold in the air for the jetpack |
+| M | Planet view |
+| N (hold) | Speed up time to see night and the aurora |
+| Mouse wheel | Camera distance |
+| F3 | Performance info |
+| Esc | Pause |
+
+Slow computer? Add `?q=low` to the address.
+
+## For developers
+
+```
+npm install
+npm run dev        # play locally at http://localhost:5173/Corebound/
+npm test           # unit tests for terrain, movement and day-night
+npm run assets     # turn art-inbox/ uploads into game-ready files in public/assets/
+npm run build      # release build in dist/
+```
+
+Every push to `main` runs the tests and publishes the build to GitHub Pages.
 
 ## Technology
 

@@ -1,0 +1,36 @@
+{
+  "models": {
+    "custodian": {
+      "targetTriangles": 40000,
+      "height": 1.85,
+      "textureSize": 1024
+    },
+    "shelter_dome": {
+      "targetTriangles": 24000,
+      "height": 3.8,
+      "textureSize": 1024
+    },
+    "solar_lotus": {
+      "targetTriangles": 15000,
+      "height": 2.6,
+      "textureSize": 1024
+    }
+  },
+  "images": {
+    "logo": {
+      "src": "style/logo_ideas.png",
+      "crop": [
+        176,
+        811,
+        1696,
+        428
+      ],
+      "width": 1400,
+      "alphaFromBlack": true
+    },
+    "key_art": {
+      "src": "style/key_art.png",
+      "width": 1920
+    }
+  }
+}

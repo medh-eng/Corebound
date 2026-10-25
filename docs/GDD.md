@@ -57,7 +57,7 @@ Game speed 1× / 2× / 3×.
 
 ## 5. Worlds as spheres
 
-- Each world is a sphere (radius ~250 m on Jivagraha (tune); walking around takes ~10 minutes, rover ~3).
+- Each world is a sphere (radius 150 m on Jivagraha (tune); walking around takes ~3 minutes, rover ~1).
 - Layers: surface, crust (diggable, ~60 m deep (tune)), mantle (hard; geothermal heat from world 3), core chamber (Quantum Fragment, sealed until the Guardian is calm).
 - **Terrain:** signed-distance density field on a sphere, chunked, meshed with marching cubes / surface nets in Web Workers; digging subtracts density. Materials per voxel (soil, rock, ore types, ice).
 - **Gravity:** toward planet centre for player, vehicles, items and loose physics objects.
@@ -240,4 +240,9 @@ Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manua
 | 2026-10-18 | Owner produces art with AI tools from the Prompt Pack; Claude builds world, effects, procedural creatures | Division of labour for a big 3D game |
 | 2026-10-18 | Chapter 1 (Jivagraha) completed as a free demo before worlds 2–5; hook test with 5 new players | Learn what is fun before building more |
 | 2026-10-18 | Mobile dropped for the 3D version; Steam Deck is the handheld target | Factory building in 3D needs mouse/gamepad |
+| 2026-10-25 | Jivagraha radius 150 m (was ~250) | Strong, visible curvature from the ground in the look test |
+| 2026-10-25 | M0 uses Three.js WebGLRenderer + Neutral tone mapping and a light saturation grade; WebGPU later | Widest browser support; colours closest to the concept art |
+| 2026-10-25 | Collision is an analytic height field + circle colliders until diggable terrain; Rapier arrives with M1 | Simplest robust walking on a sphere for the look test |
+| 2026-10-25 | Plain white models are painted by per-pixel shader programs (`src/art/paint.ts`) from their shape; characters, creatures and vehicles must arrive textured | Crisp, consistent game materials without AI-baked shading |
+| 2026-10-25 | Custodian has no skeleton yet: procedural waddle walk; rig via Mixamo or the 3D tool's auto-rig before M1 animation work | Model arrived unrigged |
 | Open | Guardian names; price; repo visibility at launch; name subtitle; final art direction sign-off | **owner** |
