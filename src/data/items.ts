@@ -18,6 +18,7 @@ export const ITEMS: Record<ItemId, ItemDef> = {
 
 /** Cubic metres of each material that make one item when mined. Soil gives nothing. */
 export const YIELD: Partial<Record<Mat, { item: ItemId; perM3: number }>> = {
+  [Mat.Soil]: { item: 'silica', perM3: 0.45 },   // sandy topsoil
   [Mat.Rock]: { item: 'silica', perM3: 0.9 },
   [Mat.DeepRock]: { item: 'silica', perM3: 0.9 },
   [Mat.Iron]: { item: 'iron_ore', perM3: 2.2 },

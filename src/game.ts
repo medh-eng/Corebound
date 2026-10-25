@@ -653,12 +653,13 @@ export async function startGame(opts: GameOptions) {
 
     // Survival and power.
     if (playing && !ui.paused) {
+      const o2Before = base.oxygen;
       const res = tickBase(base, {
         dt, inShelter: atShelter, running: sprint && (fwd !== 0 || side !== 0), lasering, jetting: me.jetting,
         sunAt: (p) => daylight(sunElevation(days, P(V(p).normalize()))),
         nearShelter: (p) => V(p).distanceTo(domePoint) < SURVIVAL.gridRadius,
       });
-      if (atShelter && base.shelterO2 > 0 && base.oxygen > 0.5 && !flags.breathed) { flags.breathed = true; advanceGoals(); }
+      if (atShelter && base.oxygen > o2Before && !flags.breathed) { flags.breathed = true; advanceGoals(); }
       if (res.blackout) {
         const wake = domePoint.clone().addScaledVector(doorDir, 4.2).normalize();
         me.pos = P(wake.multiplyScalar(terrain.groundRadius(P(wake)) + 0.1));

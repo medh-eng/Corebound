@@ -4,7 +4,7 @@ export interface StoryGoal { id: string; text: string; sarathi: string }
 export const CHAPTER1_GOALS: StoryGoal[] = [
   { id: 'ice', text: 'Mine 3 ice — hold the left mouse button on the blue crystals', sarathi: 'Custodian… can you hear me? Oxygen is low. There is ice in the rocks nearby. Use your laser.' },
   { id: 'iron', text: 'Mine 6 iron ore from the rust-red boulders', sarathi: 'Good. Ice gives us water, and water gives us air. We need iron to build the machine that splits it.' },
-  { id: 'silica', text: 'Dig 4 silica from the ground or pale sandstone', sarathi: 'Sandstone is mostly silica. Dig into the ground below the grass — I will count what you collect.' },
+  { id: 'silica', text: 'Dig 4 silica — laser the ground; sandstone below gives more', sarathi: 'Sandstone is mostly silica. Dig into the ground below the grass — I will count what you collect.' },
   { id: 'craft_elec', text: 'Open your backpack (Tab) and craft an electrolyzer', sarathi: 'You have everything for an electrolyzer. It splits ice into oxygen and hydrogen.' },
   { id: 'place_elec', text: 'Place the electrolyzer near your shelter (B, then click)', sarathi: 'Set it close to the shelter so its air pipes reach inside.' },
   { id: 'load_ice', text: 'Load it with ice — walk up to it and press E', sarathi: 'The solar lotus will power it while the sun is up.' },
