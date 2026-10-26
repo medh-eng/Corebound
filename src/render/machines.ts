@@ -64,18 +64,40 @@ function electrolyzer(): MachineView {
   };
 }
 
-let lotusModel: THREE.Group | null = null;
+const models = new Map<MachineId, THREE.Group>();
 
+/** Loads the owner's machine models; any that are missing fall back to code-built versions. */
 export async function preloadMachines() {
-  try { lotusModel = await loadModel('solar_lotus'); } catch { lotusModel = null; }
+  for (const id of ['solar_lotus', 'battery', 'electrolyzer', 'smelter'] as MachineId[]) {
+    try { models.set(id, await loadModel(id)); } catch { /* fallback below */ }
+  }
+}
+
+function fromModel(id: MachineId): MachineView | null {
+  const m = models.get(id);
+  if (!m) return null;
+  const root = new THREE.Group();
+  const copy = m.clone();
+  copy.traverse((o) => { const mesh = o as THREE.Mesh; if (mesh.isMesh) (mesh.material as THREE.MeshStandardMaterial).envMapIntensity = 1.2; });
+  root.add(copy);
+  // A light that shows the machine is working (inside tanks, furnace mouth, charge meter).
+  const light = new THREE.PointLight(id === 'smelter' ? '#ff8a3a' : '#5cffd6', 0, id === 'smelter' ? 6 : 3.5, 2);
+  light.position.set(0, id === 'smelter' ? 0.7 : 0.8, id === 'smelter' ? 0.9 : 0.55);
+  root.add(light);
+  return {
+    root,
+    setActive: (on) => { light.intensity = on ? (id === 'smelter' ? 6 + Math.sin(performance.now() / 90) * 1.5 : 2.5) : 0; },
+    setLevel: (v) => { light.intensity = 0.3 + 2.2 * v; },
+  };
 }
 
 export function buildMachine(id: MachineId): MachineView {
+  const fromArt = fromModel(id);
+  if (fromArt) return fromArt;
   if (id === 'battery') return battery();
   if (id === 'electrolyzer') return electrolyzer();
   const root = new THREE.Group();
-  if (lotusModel) root.add(lotusModel.clone());
-  else root.add(new THREE.Mesh(new THREE.ConeGeometry(0.8, 2, 8), new THREE.MeshStandardMaterial({ color: '#334' })));
+  root.add(new THREE.Mesh(new THREE.ConeGeometry(0.8, 2, 8), new THREE.MeshStandardMaterial({ color: '#334' })));
   return { root };
 }
 
@@ -83,7 +105,7 @@ export function buildMachine(id: MachineId): MachineView {
 export function ghostOf(view: MachineView): THREE.Group {
   const g = view.root;
   const mat = new THREE.MeshBasicMaterial({ color: '#5cffd6', transparent: true, opacity: 0.35, depthWrite: false });
-  g.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) { m.material = mat; m.castShadow = false; } });
+  g.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) { m.material = mat; m.castShadow = false; } if ((o as THREE.Light).isLight) o.visible = false; });
   g.userData.ghostMat = mat;
   return g;
 }

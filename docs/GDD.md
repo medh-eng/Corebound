@@ -252,4 +252,7 @@ Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manua
 | 2026-10-25 | Shelter is entered at its airlock (stand at the door) rather than a walk-in interior | Interior is later work |
 | 2026-10-25 | Blackout returns you to the shelter with 35% oxygen and drops nothing | "No punishment" pillar; revisit for Engineer difficulty |
 | 2026-10-25 | Starting base already has one solar lotus; the player crafts the electrolyzer and battery | Shorter path to the first "it works" moment |
+| 2026-10-26 | Custodian uses the owner's Mixamo rig: idle, stance idle, walk, run, walk back, turns, jump (root motion removed; the game moves the character) | Real animation replaces the procedural waddle |
+| 2026-10-26 | Owner's battery, electrolyzer and smelter models replace the code-built ones | Owner art |
+| 2026-10-26 | Smelter and iron plates brought forward from M2; the solar lotus now needs iron plates | Owner supplied the smelter; gives the first hour a step toward factories |
 | Open | Guardian names; price; repo visibility at launch; name subtitle; final art direction sign-off | **owner** |

@@ -14,6 +14,26 @@
       "targetTriangles": 15000,
       "height": 2.6,
       "textureSize": 1024
+    },
+    "battery": {
+      "targetTriangles": 12000,
+      "height": 1.5,
+      "textureSize": 1024
+    },
+    "electrolyzer": {
+      "targetTriangles": 12000,
+      "height": 1.7,
+      "textureSize": 1024
+    },
+    "smelter": {
+      "targetTriangles": 14000,
+      "height": 2.6,
+      "textureSize": 1024
+    },
+    "custodian_rigged": {
+      "targetTriangles": 40000,
+      "height": 1.85,
+      "textureSize": 1024
     }
   },
   "images": {

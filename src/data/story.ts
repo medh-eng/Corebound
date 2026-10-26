@@ -11,6 +11,7 @@ export const CHAPTER1_GOALS: StoryGoal[] = [
   { id: 'breathe', text: 'Step into your shelter and breathe', sarathi: 'Electrolysis complete. You are breathing. I consider that a good start.' },
   { id: 'battery', text: 'Find carbon (black rocks), craft a battery and place it', sarathi: 'Night is coming. Solar power will fall to zero. I recommend a battery. And perhaps a blanket.' },
   { id: 'night', text: 'Survive your first night on Jivagraha', sarathi: 'The forest is glowing. I have never seen anything like it. Or… I do not remember seeing it.' },
+  { id: 'smelter', text: 'Craft a smelter, load it with iron ore and carbon (E), and collect 4 iron plates', sarathi: 'Iron plates mean real machines. Careful — smelting makes smoke, and this world notices.' },
   { id: 'done', text: 'Explore, dig deeper, and keep your shelter breathing', sarathi: 'Seismic activity below us. Something very large is… waking. We should be ready.' },
 ];
 

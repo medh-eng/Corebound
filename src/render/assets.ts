@@ -19,3 +19,16 @@ export async function loadModel(name: string): Promise<THREE.Group> {
   });
   return gltf.scene;
 }
+
+/** Loads a processed model with its animations. */
+export async function loadAnimated(name: string): Promise<{ scene: THREE.Group; clips: THREE.AnimationClip[] }> {
+  const gltf = await loader.loadAsync(assetUrl(`models/${name}.glb`));
+  gltf.scene.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.frustumCulled = false; // skinned meshes move outside their bind-pose bounds
+  });
+  return { scene: gltf.scene, clips: gltf.animations };
+}

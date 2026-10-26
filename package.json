@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "assets": "node scripts/process-assets.mjs",
-    "shots": "node scripts/screenshots.mjs"
+    "shots": "node scripts/screenshots.mjs",
+    "rig": "node scripts/build-rig.mjs && node scripts/process-assets.mjs custodian_rigged"
   },
   "dependencies": {
     "simplex-noise": "^4.0.3",

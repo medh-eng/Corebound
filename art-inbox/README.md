@@ -23,4 +23,6 @@ Use the file names from the Prompt Pack (the "Prompt Pack" tab of the Corebound 
 - **Characters, creatures, SARATHI, vehicles and anything with painted detail** must come with colour and texture.
 - **Characters** also need a skeleton to walk properly: use the tool's auto-rig option, or ask Claude to prepare the model for Mixamo.
 
+**Animations:** Mixamo FBX files ("With Skin") go in `models/`. Claude merges them into one rigged model with `npm run rig`. Current clips: Idle, Idle (1), Walking, Running, Jump, Standing Walk Back, Left Turn, Right Turn.
+
 **3D model limits:** character up to 40,000 triangles; vehicle up to 30,000; machine up to 15,000; small prop up to 5,000; textures 2048 × 2048.

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { Backpack } from '../src/systems/inventory';
-import { newBase, tickBase } from '../src/systems/base';
+import { newBase, tickBase, type PlacedMachine } from '../src/systems/base';
 import { RECIPES } from '../src/data/items';
 
 const tick = (o: Partial<Parameters<typeof tickBase>[1]> = {}) => ({
@@ -55,5 +55,16 @@ describe('survival and power', () => {
     stored.machines.push({ id: 'electrolyzer', pos: { x: 0, y: 0, z: 0 }, ice: 5 });
     for (let i = 0; i < 30; i++) tickBase(stored, tick({ sunAt: () => 0 }));
     expect(stored.shelterO2).toBeGreaterThan(10);
+  });
+});
+
+describe('smelter', () => {
+  it('turns ore and carbon into plates with power', () => {
+    const s = newBase();
+    const sm: PlacedMachine = { id: 'smelter', pos: { x: 0, y: 0, z: 0 }, ore: 4, carbon: 2 };
+    s.machines.push({ id: 'solar_lotus', pos: { x: 0, y: 0, z: 0 } }, sm);
+    for (let i = 0; i < 20; i++) tickBase(s, tick());
+    expect(sm.plates).toBe(2);
+    expect(sm.ore).toBe(0);
   });
 });

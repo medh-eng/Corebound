@@ -10,7 +10,7 @@ Built by Claude from an original idea, for release on the web, itch.io and Steam
 
 ## Status
 
-**M0 Look test is built** (October 2026): walk, run, jump and jetpack around Jivagraha, a tiny living planet with day and night. Next: owner playtest, then **M1 Dig and survive**.
+**M1 Dig and survive is playable** (October 2026): dig and mine with the laser, craft and place machines, keep your shelter breathing through the night, smelt iron plates. The Custodian is fully animated. Next: owner playtest, then **M2 Build and automate**.
 
 | Document | What it holds |
 | --- | --- |
@@ -29,6 +29,11 @@ Built by Claude from an original idea, for release on the web, itch.io and Steam
 | Mouse | Look around |
 | Shift | Run |
 | Space | Jump; hold in the air for the jetpack |
+| Left mouse (hold) | Mining laser |
+| Tab | Backpack and crafting |
+| B / R | Build mode / turn the machine |
+| E / X | Use / pick up a machine |
+| Q | Breathe an O₂ canister |
 | M | Planet view |
 | N (hold) | Speed up time to see night and the aurora |
 | Mouse wheel | Camera distance |
@@ -51,7 +56,7 @@ Every push to `main` runs the tests and publishes the build to GitHub Pages.
 
 ## Technology
 
-TypeScript + Three.js (WebGPU/WebGL) + Rapier physics, built with Vite. Desktop builds via Electron for Steam and itch.io; web demo on GitHub Pages; Steam Deck as the handheld target.
+TypeScript + Three.js (WebGL), built with Vite; voxel digging with surface nets. Desktop builds via Electron for Steam and itch.io; web demo on GitHub Pages; Steam Deck as the handheld target.
 
 ## Copyright
 

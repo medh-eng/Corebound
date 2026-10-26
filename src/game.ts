@@ -242,6 +242,8 @@ export async function startGame(opts: GameOptions) {
     const dir = V(m.pos).normalize();
     v.root.applyMatrix4(surfaceMatrix(terrain, dir, yaw, 1, 0.03, 0, domePoint.clone().sub(V(m.pos))));
     v.root.position.copy(V(m.pos));
+    if (m.id === 'smelter') { const sm = chimneySmoke(); sm.position.set(0, 2.7, 0); v.root.add(sm); v.root.userData.smoke = sm; }
+    m.yaw = yaw;
     scene.add(v.root);
     machineViews.set(m, v);
     colliders.push(machineCollider(m));
@@ -309,7 +311,7 @@ export async function startGame(opts: GameOptions) {
     ore.restore(d.ore);
     goalIndex = d.goal;
     Object.assign(mined, d.mined); Object.assign(crafted, d.crafted); Object.assign(flags, d.flags);
-    for (const m of base.machines) addMachineView(m);
+    for (const m of base.machines) addMachineView(m, m.yaw ?? 0);
   };
   addEventListener('beforeunload', save);
 
@@ -326,6 +328,7 @@ export async function startGame(opts: GameOptions) {
       case 'breathe': return !!flags.breathed;
       case 'battery': return has('battery');
       case 'night': return !!flags.survivedNight;
+      case 'smelter': return (mined.iron_plate ?? 0) >= 4;
       default: return false;
     }
   };
@@ -513,6 +516,17 @@ export async function startGame(opts: GameOptions) {
           if (n > 0) { pack.remove('ice', n); near.ice = (near.ice ?? 0) + n; ui.pickup(`Loaded ${n} ice`, ITEMS.ice.color); advanceGoals(); }
           else ui.toast(pack.count('ice') ? 'Electrolyzer is full' : 'You have no ice');
         }
+      } else if (near?.id === 'smelter') {
+        prompt = `<b>E</b> load ore + carbon, collect plates (${near.ore ?? 0} ore · ${near.carbon ?? 0} carbon · ${near.plates ?? 0} plates ready) · <b>X</b> pick up`;
+        if (input.hit('KeyE')) {
+          if ((near.plates ?? 0) > 0) { const n = near.plates ?? 0; const left = pack.add('iron_plate', n); near.plates = left; if (n - left > 0) { mined.iron_plate = (mined.iron_plate ?? 0) + n - left; ui.pickup(`+${n - left} Iron plate`, ITEMS.iron_plate.color); } }
+          const ore = Math.min(pack.count('iron_ore'), 20 - (near.ore ?? 0));
+          const carb = Math.min(pack.count('carbon'), 10 - (near.carbon ?? 0));
+          if (ore > 0) { pack.remove('iron_ore', ore); near.ore = (near.ore ?? 0) + ore; }
+          if (carb > 0) { pack.remove('carbon', carb); near.carbon = (near.carbon ?? 0) + carb; }
+          if (ore || carb) ui.pickup(`Loaded ${ore} ore, ${carb} carbon`, ITEMS.iron_ore.color);
+          advanceGoals();
+        }
       } else if (near) {
         prompt = `${MACHINES[near.id].name} · <b>X</b> pick up`;
       } else if (atShelter) {
@@ -522,6 +536,9 @@ export async function startGame(opts: GameOptions) {
         const item = near.id as ItemId;
         if (pack.add(item, 1) === 0) {
           if (near.ice) pack.add('ice', near.ice);
+          if (near.ore) pack.add('iron_ore', near.ore);
+          if (near.carbon) pack.add('carbon', near.carbon);
+          if (near.plates) pack.add('iron_plate', near.plates);
           removeMachine(near);
           ui.pickup(`Picked up ${ITEMS[item].name}`, ITEMS[item].color);
         } else ui.toast('Backpack full');
@@ -533,7 +550,7 @@ export async function startGame(opts: GameOptions) {
       if (input.hit('KeyB')) {
         if (building) cancelBuild();
         else {
-          const item = (['electrolyzer', 'battery', 'solar_lotus'] as ItemId[]).find((i) => pack.count(i) > 0);
+          const item = (['electrolyzer', 'battery', 'smelter', 'solar_lotus'] as ItemId[]).find((i) => pack.count(i) > 0);
           if (item) startBuild(item); else ui.toast('Nothing to build — craft a machine first (Tab)');
         }
       }
@@ -672,6 +689,7 @@ export async function startGame(opts: GameOptions) {
       for (const [m, v] of machineViews) {
         if (m.id === 'battery') v.setLevel?.(res.capacity > 0 ? base.stored / res.capacity : 0);
         if (m.id === 'electrolyzer') v.setActive?.(res.making);
+        if (m.id === 'smelter') { v.setActive?.((m.burn ?? 0) > 0); v.root.userData.smoke && ((v.root.userData.smoke as THREE.Points).visible = (m.burn ?? 0) > 0); }
       }
       const baseNight = 1 - daylight(sunElevation(days, P(domeDir)));
       if (baseNight > 0.8 && !wasNight) { wasNight = true; ui.sarathi(SARATHI_EVENTS.nightFalls); if (goalIndex >= 8) flags.sawNight = true; }

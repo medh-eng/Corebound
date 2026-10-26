@@ -2,7 +2,7 @@
 // and a simple power grid (solar → battery → electrolyzer, suit charging).
 import { MACHINES, SURVIVAL, type MachineId } from '../data/items';
 
-export interface PlacedMachine { id: MachineId; pos: { x: number; y: number; z: number }; ice?: number; burn?: number }
+export interface PlacedMachine { id: MachineId; pos: { x: number; y: number; z: number }; yaw?: number; ice?: number; burn?: number; ore?: number; carbon?: number; plates?: number }
 
 export interface BaseState {
   oxygen: number;        // suit, 0..1
@@ -23,7 +23,7 @@ export interface Tick {
   nearShelter: (p: { x: number; y: number; z: number }) => boolean;
 }
 
-export interface TickResult { blackout: boolean; produceKW: number; useKW: number; capacity: number; making: boolean }
+export interface TickResult { blackout: boolean; produceKW: number; useKW: number; capacity: number; making: boolean; smelting: boolean }
 
 export function newBase(): BaseState {
   return { oxygen: SURVIVAL.startOxygen, power: 1, shelterO2: 0, stored: 0, machines: [], blackouts: 0 };
@@ -45,7 +45,10 @@ export function tickBase(b: BaseState, t: Tick): TickResult {
   let making = false;
   const wantSuit = t.inShelter && b.power < 1 ? SURVIVAL.suitChargeKW : 0;
   const wantElec = electrolyzers.filter((e) => (e.ice ?? 0) > 0 || (e.burn ?? 0) > 0).length * -MACHINES.electrolyzer.powerKW;
-  const demand = wantSuit + wantElec;
+  const smelters = grid.filter((m) => m.id === 'smelter');
+  const canSmelt = (s: PlacedMachine) => (s.burn ?? 0) > 0 || ((s.ore ?? 0) >= 2 && (s.carbon ?? 0) >= 1);
+  const wantSmelt = smelters.filter(canSmelt).length * -MACHINES.smelter.powerKW;
+  const demand = wantSuit + wantElec + wantSmelt;
   // Use solar first, then batteries; surplus charges batteries.
   const fromBattery = Math.max(0, demand - produce);
   const canDraw = b.stored / Math.max(hours, 1e-6);
@@ -62,6 +65,17 @@ export function tickBase(b: BaseState, t: Tick): TickResult {
       e.burn = Math.max(0, (e.burn ?? 0) - step);
       b.shelterO2 = Math.min(SURVIVAL.shelterO2Capacity, b.shelterO2 + (SURVIVAL.o2PerIce / SURVIVAL.iceBurnSeconds) * step);
       making = true;
+    }
+  }
+
+  // Smelters: 2 ore + 1 carbon → 1 plate while powered.
+  let smelting = false;
+  for (const s of smelters) {
+    if ((s.burn ?? 0) <= 0 && (s.ore ?? 0) >= 2 && (s.carbon ?? 0) >= 1) { s.ore = (s.ore ?? 0) - 2; s.carbon = (s.carbon ?? 0) - 1; s.burn = SURVIVAL.smeltSeconds; }
+    if ((s.burn ?? 0) > 0 && ratio > 0.2) {
+      s.burn = Math.max(0, (s.burn ?? 0) - dt * ratio);
+      smelting = true;
+      if (s.burn === 0) s.plates = (s.plates ?? 0) + 1;
     }
   }
 
@@ -84,5 +98,5 @@ export function tickBase(b: BaseState, t: Tick): TickResult {
     b.oxygen = SURVIVAL.wakeOxygen;
     b.power = Math.max(b.power, 0.3);
   }
-  return { blackout, produceKW: produce, useKW: use, capacity, making };
+  return { blackout, produceKW: produce, useKW: use, capacity, making, smelting };
 }
