@@ -4,7 +4,7 @@
 
 A 3D survival-factory game on small, living planets. Walk all the way around each world, dig toward its core, and build the machines that keep you alive and carry you onward. Every machine changes the world: skies haze, forests wilt, creatures flee, and colossal Guardians wake. You win them over with engineering, never weapons.
 
-Built by Claude from an original idea, for release on the web, itch.io and Steam.
+**A game by Medhanshu Shahane**, for release on the web, itch.io and Steam.
 
 ---
 
@@ -16,7 +16,12 @@ Built by Claude from an original idea, for release on the web, itch.io and Steam
 | --- | --- |
 | [Game Design Document](docs/GDD.md) | How the game looks and plays: systems, worlds, story, endings |
 | [Roadmap](docs/ROADMAP.md) | Milestones M0–M10, what each delivers, publishing plan |
-| [CLAUDE.md](CLAUDE.md) | Working rules for every build session |
+| [Status](docs/STATUS.md) | Where everything stands, updated every session |
+| [Prompt Pack](docs/PROMPTS.md) | Prompts for every image, 3D model, music track, sound and voice |
+| [Team](docs/TEAM.md) | Commander, Director and AI workers: who does what |
+| [Task board](tasks/BOARD.md) | Every task and who has it |
+| [AGENTS.md](AGENTS.md) | Rules for AI workers (ChatGPT, Sarvam AI) |
+| [CLAUDE.md](CLAUDE.md) | Working rules for the Director |
 | [art-inbox](art-inbox/README.md) | Where to upload art, models, video and audio |
 
 ## Play it

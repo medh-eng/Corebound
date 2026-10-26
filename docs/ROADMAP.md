@@ -4,9 +4,9 @@ Chapter 1 (Jivagraha) is built all the way to a polished free demo before worlds
 
 ## How each milestone runs
 
-1. Claude builds it, tests it, screenshots it, and updates the playable link. Placeholder shapes stand in for art not yet delivered.
-2. The owner plays it and generates the art for the next milestone from the Prompt Pack (shared Claude doc, "Prompt Pack" tab), uploading files to `art-inbox/`.
-3. Claude fixes, tunes and swaps in the art before the next milestone. Owner feedback outranks this plan.
+1. The Director (Claude) splits the milestone into tasks in `tasks/` for ChatGPT, Sarvam AI and the Commander (see [TEAM.md](TEAM.md)), and builds the hard systems itself.
+2. Workers deliver through pull requests or `team-inbox/`; the Director reviews, plays, screenshots and merges, then updates the playable link and [STATUS.md](STATUS.md).
+3. The Commander (owner) plays it, generates art, models, music and sound from [PROMPTS.md](PROMPTS.md) into `art-inbox/`, and has the final say. Commander feedback outranks this plan.
 
 ## Chapter 1: Jivagraha
 
@@ -33,22 +33,36 @@ Chapter 1 (Jivagraha) is built all the way to a polished free demo before worlds
 - **Art (owner):** creature sheet, plant concepts; Jivagraha music and SFX.
 
 ### M4 Chapter 1 demo
-- **Build:** Root Guardian (procedural body and animation, wake rules, dormant zone, three-step puzzle, ally bonus); vehicle bay and rover; SARATHI drone and dialogue; 8–10 memory logs; in-engine orbital-fall intro; Fragment chamber; launch sequence; first-hour hook pass (goals, pacing); settings, difficulty, photo mode; Electron build; itch.io and Steam page materials.
+- **Build:** Root Guardian (procedural body and animation, wake rules, dormant zone, closed-off region, three-step puzzle, ally bonus); vehicle bay and rover; SARATHI drone and dialogue; cryo-pod wake-up intro in the crashed escape module; Prof. Huxley's first hologram and the translator; 8–10 memory logs; Fragment chamber; launch pad and the starter ship's first lift-off as the demo's cliffhanger; credits ("A game by Medhanshu Shahane"); first-hour hook pass (goals, pacing); settings, difficulty, photo mode; Electron build; itch.io and Steam page materials.
 - **Art (owner):** Root Guardian concept (calm + agitated), rover GLB, SARATHI concept, teaser clips, logo ideas, store art.
 
 **Gate — hook test:** five first-time players play the first 30 minutes while the owner watches; fix every bored or lost moment. Then publish the free demo on itch.io and open a Steam page for wishlists.
 
 ## After the demo
 
-### M5–M8 Worlds 2 to 5
-One world per milestone: Himasagara (fluids, cold, submarine, Ice Leviathan), Taptashila (heat, lava, geothermal, drones, heat crawler, Magma Serpent), Vayudweep (floating islands, wind, jetpack/glider, cargo rockets, Storm Bird), Shunyapath (the wreck, drill pod, SARATHI's directive, both endings, epilogues). Owner supplies per-world concept art, sky, textures, models and music.
+### M5 Spaceflight and Taptashila
+Flyable starter ship, star-system scene, assisted landing, fuel and fuel depot; the asteroid with Alion Voss's quest, the translator and the resonance emitter; Taptashila (metals, refinery tiers, heat shield, rock crabs, Magma Serpent); research station tier 3; truck.
+
+### M6 Marubhumi
+Sand, savannah, oil, liquid drill, fuel processor and biofuel power, haulers, buggy, Szynthar packs, the Dune Leviathan; Scavenger ship; first alien community with trade and quests at full depth.
+
+### M7 Himasagara and Vayumandala
+The ice moon and its hidden ocean (submarine, under-ice base, Ice Leviathan) and the gas giant's cloud reefs (helicopter, gas harvesting, Storm Bird); space station and space elevator; Mk2 Voyager.
+
+### M8 Vishamegha
+Toxic air and acid rain, toxin filters, air chemistry, Haze Weaver; Freighter and automated freighter routes between worlds; the ship's manual and full memory.
+
+### M9 Shunyapath and the endings
+The biggest wreck, drill pod, the seeds and the terraforming engine, SARATHI's directive, the Harvest and Covenant endings, per-world epilogues.
+
+Each world brings its own concept art, sky, textures, models, music and sound from the Commander, writing from ChatGPT, names and translations from Sarvam AI.
 
 **Gate — content complete:** the whole story plays from start to finish.
 
-### M9 Launch
-Balancing across worlds; settings and accessibility; sandbox mode; Steam achievements and cloud saves; Steam Deck pass; gameplay trailer (owner records, Claude edits); launch screenshots; store pages; AI-content disclosure text.
+### M10 Launch
+Hindi and Marathi translations (Sarvam AI); balancing across worlds; settings and accessibility; sandbox mode; Steam achievements and cloud saves; Steam Deck pass; gameplay trailer (owner records, Claude edits); launch screenshots; store pages; AI-content disclosure text.
 
-### M10 Beyond (optional)
+### M11 Beyond (optional)
 Co-op, translations, more worlds — chosen from player feedback. Human artist polish pass if sales justify it.
 
 ## Publishing
@@ -63,5 +77,4 @@ Co-op, translations, more worlds — chosen from player feedback. Human artist p
 
 - Human-made art polish pass
 - Recorded orchestral soundtrack
-- Hindi, Marathi and other translations
 - Console ports
