@@ -4,7 +4,7 @@
 
 ## 2026-10-27
 
-**Playable:** https://medh-eng.github.io/Corebound/ (press Ctrl+F5 after an update)
+**Playable: NOT updating.** The repository was made **private** on 2026-10-26, and free GitHub accounts can only publish GitHub Pages from a public repository, so Pages was switched off. Every build since then passes, but publishing fails. The Commander chooses: make the repo public again (free), pay for GitHub Pro (private repo, public game page), or publish elsewhere (for example an itch.io draft page). Until then the link shows the last version before the repo went private, or nothing.
 
 **Reviewed and merged**
 - **T-003 Credits screen (ChatGPT Codex), PR #1:** clean code, only the allowed files, tests and build passed; checked in the running game. ✓
