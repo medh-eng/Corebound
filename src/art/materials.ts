@@ -13,7 +13,15 @@ export const shared = {
   uTime: { value: 0 },
   uNight: { value: 0 },        // 0 day .. 1 night, at the player's location
   uWind: { value: 1 },
+  // Painted ground textures (owner art), applied as triplanar detail on terrain.
+  uDetail: { value: 0 },
+  uTexGrass: { value: null as THREE.Texture | null }, uTexSoil: { value: null as THREE.Texture | null },
+  uTexRock: { value: null as THREE.Texture | null }, uTexSand: { value: null as THREE.Texture | null },
+  uTexMean: { value: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)] },
 };
+
+/** Low quality skips the texture detail on terrain (set before building materials). */
+export const quality = { detail: true };
 
 export interface StylisedOptions {
   roughness?: number;
@@ -31,7 +39,17 @@ export interface StylisedOptions {
   mottle?: number;             // world-space colour variation (terrain detail)
   map?: THREE.Texture | null;
   cutBoxes?: 'ground';          // hide this mesh inside dug-out regions (voxel chunks draw there)
+  detail?: 'ground' | 'dug';    // triplanar painted textures chosen from the vertex colour
 }
+
+const DETAIL_GLSL = /* glsl */ `
+  uniform sampler2D uTexGrass, uTexSoil, uTexRock, uTexSand;
+  uniform vec3 uTexMean[4];
+  uniform float uDetail;
+  varying vec3 vDetP; varying vec3 vDetN;
+  vec3 tri(sampler2D t, vec3 p, vec3 w, float s) {
+    return texture2D(t, p.yz * s).rgb * w.x + texture2D(t, p.zx * s).rgb * w.y + texture2D(t, p.xy * s).rgb * w.z;
+  }`;
 
 let key = 0;
 
@@ -52,7 +70,8 @@ export function stylised(o: StylisedOptions = {}): THREE.MeshStandardMaterial {
   const swayH = o.swayHeight ?? 1;
   const mottle = o.mottle ?? 0;
   const id = ++key;
-  m.customProgramCacheKey = () => `stylised-${o.glow ? 1 : 0}-${sway > 0 ? 1 : 0}-${mottle > 0 ? 1 : 0}-${o.cutBoxes ? 1 : 0}-${id}`;
+  const detail = quality.detail ? o.detail : undefined;
+  m.customProgramCacheKey = () => `stylised-${o.glow ? 1 : 0}-${sway > 0 ? 1 : 0}-${mottle > 0 ? 1 : 0}-${o.cutBoxes ? 1 : 0}-${detail ?? ''}-${id}`;
   m.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = shared.uTime;
     shader.uniforms.uNight = shared.uNight;
@@ -111,6 +130,37 @@ export function stylised(o: StylisedOptions = {}): THREE.MeshStandardMaterial {
         float mt = vnoise(vWorldP * 0.55) * 0.6 + vnoise(vWorldP * 2.3) * 0.4;
         diffuseColor.rgb *= 1.0 + (mt - 0.5) * ${(mottle * 2).toFixed(3)};`,
       );
+    }
+    if (detail) {
+      for (const k of ['uDetail', 'uTexGrass', 'uTexSoil', 'uTexRock', 'uTexSand', 'uTexMean'] as const) shader.uniforms[k] = shared[k];
+      vDecl.push('varying vec3 vDetP; varying vec3 vDetN;');
+      fDecl.push(DETAIL_GLSL);
+      vs = vs.replace('#include <begin_vertex>', '#include <begin_vertex>\n vDetP = (modelMatrix * vec4(transformed, 1.0)).xyz; vDetN = normalize(mat3(modelMatrix) * objectNormal);');
+      const pick = detail === 'ground'
+        ? `float gW = smoothstep(0.01, 0.10, c.g - max(c.r, c.b));
+           float sW = (1.0 - gW) * smoothstep(0.30, 0.55, lum);
+           vec4 wts = vec4(gW, 1.0 - gW - sW, 0.0, sW);`
+        : `float sat = max(c.r, max(c.g, c.b)) - min(c.r, min(c.g, c.b));
+           float rW = 1.0 - smoothstep(0.04, 0.14, sat);
+           float sW = (1.0 - rW) * smoothstep(0.28, 0.5, lum);
+           vec4 wts = vec4(0.0, 1.0 - rW - sW, rW, sW);
+           k *= 1.0 - smoothstep(0.0, 0.08, c.b - c.r);   // ice keeps its own look`;
+      fs = fs.replace('#include <color_fragment>', `#include <color_fragment>
+        if (uDetail > 0.5) {
+          vec3 c = diffuseColor.rgb;
+          float lum = dot(c, vec3(0.3, 0.59, 0.11));
+          float k = 0.75;
+          ${pick}
+          vec3 w = pow(abs(normalize(vDetN)), vec3(4.0)); w /= (w.x + w.y + w.z);
+          vec3 d = vec3(0.0);
+          if (wts.x > 0.01) d += wts.x * tri(uTexGrass, vDetP, w, 0.34) / uTexMean[0];
+          if (wts.y > 0.01) d += wts.y * tri(uTexSoil, vDetP, w, 0.40) / uTexMean[1];
+          if (wts.z > 0.01) d += wts.z * tri(uTexRock, vDetP, w, 0.33) / uTexMean[2];
+          if (wts.w > 0.01) d += wts.w * tri(uTexSand, vDetP, w, 0.25) / uTexMean[3];
+          float dl = dot(d, vec3(0.3, 0.59, 0.11));
+          d = mix(vec3(dl), d, 0.45);                 // keep the pattern, tame the texture's own colours
+          diffuseColor.rgb = c * mix(vec3(1.0), d, k);
+        }`);
     }
     shader.vertexShader = vDecl.join('\n') + '\n' + vs;
     shader.fragmentShader = fDecl.join('\n') + '\n' + fs;
@@ -175,4 +225,32 @@ export function applyWaterCut(m: THREE.MeshStandardMaterial) {
     shader.fragmentShader = 'varying vec3 vCutP;\n' + CUT_GLSL + '\n' + shader.fragmentShader.replace('void main() {', 'void main() {\n if (insideCut(vCutP, true)) discard;');
   };
   m.customProgramCacheKey = () => 'water-cut';
+}
+
+/** Loads the painted ground textures and turns on terrain detail. */
+export function loadGroundTextures(url: (name: string) => string) {
+  if (!quality.detail) return;
+  const names = ['jiva_grass', 'jiva_soil', 'jiva_rock', 'jiva_sandstone'] as const;
+  const slots = [shared.uTexGrass, shared.uTexSoil, shared.uTexRock, shared.uTexSand];
+  let left = names.length;
+  names.forEach((n, i) => {
+    new THREE.TextureLoader().load(url(n), (t) => {
+      t.colorSpace = THREE.SRGBColorSpace;
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      t.anisotropy = 8;
+      // Average colour (linear), so the texture adds pattern without shifting the terrain's palette.
+      const img = t.image as HTMLImageElement;
+      const cv = document.createElement('canvas'); cv.width = cv.height = 16;
+      const cx = cv.getContext('2d');
+      if (cx) {
+        cx.drawImage(img, 0, 0, 16, 16);
+        const px = cx.getImageData(0, 0, 16, 16).data;
+        const m = [0, 0, 0];
+        for (let j = 0; j < px.length; j += 4) for (let c = 0; c < 3; c++) m[c] += Math.pow(px[j + c] / 255, 2.2);
+        shared.uTexMean.value[i].set(m[0] / 256, m[1] / 256, m[2] / 256);
+      }
+      slots[i].value = t;
+      if (--left === 0) shared.uDetail.value = 1;
+    });
+  });
 }

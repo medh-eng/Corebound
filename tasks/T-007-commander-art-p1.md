@@ -1,7 +1,7 @@
 # T-007: P1 images: Jivagraha textures and night sky
 
 - **Assigned to:** Commander (Gemini)
-- **Status:** todo
+- **Status:** done (textures and night sky in the game 2026-10-27)
 - **Priority:** P1 (the last open items of M1)
 - **Deliver to:** `art-inbox/textures/`, `art-inbox/sky/`
 

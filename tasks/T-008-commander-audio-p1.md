@@ -1,7 +1,7 @@
 # T-008: P1 music and sound effects
 
 - **Assigned to:** Commander (Suno, ElevenLabs or similar)
-- **Status:** todo
+- **Status:** doing: 37 sound files received and processed; music and some effects still to come
 - **Priority:** P1
 - **Deliver to:** `art-inbox/audio/music/`, `art-inbox/audio/sfx/`
 

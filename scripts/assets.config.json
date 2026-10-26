@@ -34,6 +34,41 @@
       "targetTriangles": 40000,
       "height": 1.85,
       "textureSize": 1024
+    },
+    "auto_drill": {
+      "targetTriangles": 15000,
+      "height": 2.5,
+      "textureSize": 1024
+    },
+    "storage_silo": {
+      "targetTriangles": 12000,
+      "height": 3.0,
+      "textureSize": 1024
+    },
+    "research_station": {
+      "targetTriangles": 15000,
+      "height": 2.4,
+      "textureSize": 1024
+    },
+    "coal_burner": {
+      "targetTriangles": 15000,
+      "height": 2.2,
+      "textureSize": 1024
+    },
+    "silicon_furnace": {
+      "targetTriangles": 15000,
+      "height": 2.4,
+      "textureSize": 1024
+    },
+    "bio_filter": {
+      "targetTriangles": 15000,
+      "height": 2.0,
+      "textureSize": 1024
+    },
+    "conveyor_straight": {
+      "targetTriangles": 6000,
+      "height": 0.55,
+      "textureSize": 1024
     }
   },
   "images": {
@@ -51,6 +86,44 @@
     "key_art": {
       "src": "style/key_art.png",
       "width": 1920
+    },
+    "jiva_grass": {
+      "src": "textures/jiva_grass.png",
+      "width": 1024,
+      "dir": "textures",
+      "unmark": true
+    },
+    "jiva_soil": {
+      "src": "textures/jiva_soil.png",
+      "width": 1024,
+      "dir": "textures",
+      "unmark": true
+    },
+    "jiva_rock": {
+      "src": "textures/jiva_rock.png",
+      "width": 1024,
+      "dir": "textures",
+      "unmark": true
+    },
+    "jiva_sandstone": {
+      "src": "textures/jiva_sandstone.png",
+      "width": 1024,
+      "dir": "textures",
+      "unmark": true
+    },
+    "jiva_night_sky": {
+      "src": "sky/jiva_night_sky.png",
+      "width": 4096,
+      "dir": "sky",
+      "unmark": true,
+      "pano": true
+    },
+    "system_space": {
+      "src": "sky/system_space.png",
+      "width": 4096,
+      "dir": "sky",
+      "unmark": true,
+      "pano": true
     }
   }
 }

@@ -424,11 +424,22 @@ Clips wanted: **Custodian** ✓ plus `Dance` (celebration emote), `Pick Up`, `Ty
 
 **Direction (from Medhanshu's blueprint):** ambient synth-wave mixed with organic, natural sounds for the alien flora; warm Indian instruments (bansuri flute, santoor, tanpura drone, sitar, tabla) for heart; **industrial, rhythmic layers** for factories that contrast with nature.
 
+**Free options that allow a game that is sold** (checked October 2026; always read the current terms before release):
+
+| Option | Cost | What to know |
+| --- | --- | --- |
+| **ElevenLabs Music** (elevenlabs.io) | Free: about 5 downloads a day | Commercial use allowed on the free plan **if you credit ElevenLabs**. Paste the same style line and description. |
+| **Pixabay Music** (pixabay.com/music) | Free | Ready-made tracks, no credit needed; you choose existing music instead of generating it. Search "ambient sitar", "synthwave ambient", "flute meditation". |
+| **Udio** (udio.com) | Free tier | Said to allow commercial use with credit to Udio; confirm on their site. |
+| **Suno** | Paid Pro/Premier needed | The free plan is for personal, non-commercial use only, so free Suno tracks **cannot** go in the game. |
+
+If a tool needs a credit line, tell the Director: it goes on the Credits screen under "Music". This is a licence requirement, not a team credit.
+
 **How to make them:**
-- In Suno, choose **Instrumental**. Paste the style line into the style box and the description into the prompt.
+- In Suno (paid) or ElevenLabs Music, choose **Instrumental**. Paste the style line into the style box and the description into the prompt.
 - Keep **BPM and key exactly as written**: tracks of one world share tempo and key so Claude can layer them (the factory layers play on top of the world music as your factory grows).
 - 2–4 minutes each. Download **WAV** if your plan allows, else MP3 (320 kbps). If Suno offers **stems**, download them too.
-- Save to `art-inbox/audio/music/<file>.wav`.
+- Save to `art-inbox/audio/music/<file>.wav` and write the tool's name in the commit message.
 
 | File | Priority | BPM / key | Style line | Description |
 | --- | --- | --- | --- | --- |

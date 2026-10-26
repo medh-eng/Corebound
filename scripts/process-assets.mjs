@@ -10,7 +10,7 @@ import sharp from 'sharp';
 import { readFileSync, existsSync, mkdirSync, statSync } from 'node:fs';
 
 const config = JSON.parse(readFileSync(new URL('./assets.config.json', import.meta.url)));
-const only = process.argv[2];
+const only = process.argv.length > 2 ? new Set(process.argv.slice(2)) : null;
 
 const io = new NodeIO()
   .registerExtensions(ALL_EXTENSIONS)
@@ -34,7 +34,7 @@ await MeshoptSimplifier.ready;
 await MeshoptEncoder.ready;
 
 for (const [name, cfg] of Object.entries(config.models)) {
-  if (only && only !== name) continue;
+  if (only && !only.has(name)) continue;
   const src = `art-inbox/models/${name}.glb`;
   if (!existsSync(src)) { console.log(`- ${name}: no file in art-inbox yet`); continue; }
   const doc = await io.read(src);
@@ -79,13 +79,22 @@ for (const [name, cfg] of Object.entries(config.models)) {
 // Images for menus and loading screens.
 mkdirSync('public/assets/ui', { recursive: true });
 for (const [name, cfg] of Object.entries(config.images ?? {})) {
-  if (only && only !== name) continue;
+  if (only && !only.has(name)) continue;
   const src = `art-inbox/${cfg.src}`;
   if (!existsSync(src)) { console.log(`- ${name}: no file in art-inbox yet`); continue; }
   let img = sharp(src);
   if (cfg.crop) img = img.extract({ left: cfg.crop[0], top: cfg.crop[1], width: cfg.crop[2], height: cfg.crop[3] });
   if (cfg.trim) img = img.trim({ threshold: 28 });
-  const out = `public/assets/ui/${name}.webp`;
+  const dir = `public/assets/${cfg.dir ?? 'ui'}`;
+  mkdirSync(dir, { recursive: true });
+  const out = `${dir}/${name}.webp`;
+  if (cfg.unmark || cfg.pano) {
+    const { data, info } = await img.removeAlpha().raw().toBuffer({ resolveWithObject: true });
+    let buf = data, w = info.width, h = info.height;
+    if (cfg.unmark) unmark(buf, w, h);
+    if (cfg.pano) ({ buf, w, h } = panorama(buf, w, h));
+    img = sharp(buf, { raw: { width: w, height: h, channels: 3 } });
+  }
   img = img.resize({ width: cfg.width, withoutEnlargement: true });
   if (cfg.alphaFromBlack) {
     // Logos made on black: turn darkness into transparency so they sit over the game.
@@ -102,4 +111,40 @@ for (const [name, cfg] of Object.entries(config.images ?? {})) {
   }
   await img.webp({ quality: 90, alphaQuality: 95 }).toFile(out);
   console.log(`- ${name}: ${Math.round(statSync(out).size / 1024)} KB`);
+}
+
+/** Paints out the small sparkle watermark AI image tools put in the bottom-right corner,
+ *  by copying nearby picture over it through a soft round mask. */
+function unmark(buf, w, h) {
+  // The mark is a see-through four-point star, ~96 px wide, centred ~112 px in from the corner.
+  const cx = w - 112, cy = h - 112, r = 60;
+  const dx = -Math.round(r * 2.8), dy = -Math.round(r * 2.8);
+  for (let y = Math.floor(cy - r * 1.6); y <= cy + r * 1.6; y++) for (let x = Math.floor(cx - r * 1.6); x <= cx + r * 1.6; x++) {
+    if (x < 0 || y < 0 || x >= w || y >= h) continue;
+    const d = Math.hypot(x - cx, y - cy) / r;
+    const a = d < 1 ? 1 : d < 1.6 ? 1 - (d - 1) / 0.6 : 0;
+    if (a <= 0) continue;
+    const i = (y * w + x) * 3, j = (((y + dy + h) % h) * w + ((x + dx + w) % w)) * 3;
+    for (let c = 0; c < 3; c++) buf[i + c] = Math.round(buf[i + c] * (1 - a) + buf[j + c] * a);
+  }
+}
+
+/** Makes a sky picture usable all the way round: crops to 2:1 and blends the left and right
+ *  edges into each other so there is no seam behind you. */
+function panorama(buf, w, h) {
+  let H = Math.round(w / 2), top = Math.max(0, Math.floor((h - H) / 2));
+  if (H > h) H = h;
+  const out = Buffer.alloc(w * H * 3);
+  for (let y = 0; y < H; y++) buf.copy(out, y * w * 3, ((y + top) * w) * 3, ((y + top) * w + w) * 3);
+  const N = Math.floor(w * 0.1);
+  for (let y = 0; y < H; y++) for (let k = 0; k < N; k++) {
+    const t = 0.5 * (1 - k / N); const a = (y * w + k) * 3, b = (y * w + (w - 1 - k)) * 3;
+    for (let c = 0; c < 3; c++) {
+      const va = out[a + c], vb = out[b + c];
+      out[a + c] = Math.round(va * (1 - t) + vb * t);
+      out[b + c] = Math.round(vb * (1 - t) + va * t);
+    }
+  }
+  console.log(`  panorama ${w}×${H} (cropped ${top}px top and bottom, edges blended)`);
+  return { buf: out, w, h: H };
 }

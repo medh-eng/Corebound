@@ -355,4 +355,9 @@ Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manua
 | 2026-10-26 | Resource tree, regions, buildings and vehicles from the blueprint | Commander's decision |
 | 2026-10-26 | Credits: "A game by Medhanshu Shahane" only; name stays Corebound | Commander's decision |
 | 2026-10-26 | AI team: Commander (owner, final say), Director (Claude), ChatGPT and Sarvam AI as workers via tasks in `tasks/`, Gemini for art; see TEAM.md | Commander's decision |
+| 2026-10-27 | Owner sound effects are cut, levelled and looped by `scripts/process-audio.py` (recipes in `scripts/audio.config.json`); missing effects are derived from uploads, then code-made sounds as a last fallback; footsteps follow the surface | Owner asked to reuse uploaded effects for missing ones |
+| 2026-10-27 | Painted ground textures applied as triplanar detail over the terrain's vertex colours (pattern kept, colours softened); off on low quality | Owner textures arrived; keeps the terrain palette readable |
+| 2026-10-27 | The painted night-sky panorama replaces the code-made ringed planet after dusk; the code planet stays by day | Owner panorama has its own gas giant; avoids two planets |
+| 2026-10-27 | Emotes: G dances (two dances), the Custodian salutes when a goal is completed | Owner supplied the animations |
+| 2026-10-27 | Music must come from a source that allows selling the game (free Suno does not); credit lines required by a licence go on the Credits screen under "Music" | Licence check |
 | Open | Names for Guardians, alien peoples and creatures (Sarvam task T-004); which world is the Szynthars' homeworld पादकानन (proposal: Marubhumi's savannah); price; repo visibility at launch; final art direction sign-off | **owner** |

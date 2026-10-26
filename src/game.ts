@@ -17,10 +17,10 @@ import { OreField, ORE_ITEM, type OreNode } from './render/ore';
 import { LaserView } from './render/laser';
 import { buildMachine, ghostOf, preloadMachines, type MachineView } from './render/machines';
 import { buildSky } from './art/sky';
-import { shared } from './art/materials';
+import { shared, quality as matQuality, loadGroundTextures } from './art/materials';
 import { paintModel } from './art/paint';
 import { chimney, chimneySmoke } from './art/smoke';
-import { loadModel } from './render/assets';
+import { assetUrl, loadModel } from './render/assets';
 import { PlayerView } from './render/player';
 import { CameraRig } from './render/cameraRig';
 import { buildPostFX } from './render/postfx';
@@ -75,6 +75,8 @@ export async function startGame(opts: GameOptions) {
   const world = JIVAGRAHA;
   const ui = new UI();
   const low = opts.quality === 'low';
+  matQuality.detail = !low;
+  loadGroundTextures((n) => assetUrl(`textures/${n}.webp`));
 
   const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance', preserveDrawingBuffer: opts.shot });
   renderer.setPixelRatio(Math.min(devicePixelRatio, low ? 1 : 1.5));
@@ -174,6 +176,7 @@ export async function startGame(opts: GameOptions) {
   sky.ringed.position.copy(rDir.multiplyScalar(rp.distance));
   sky.ringed.lookAt(0, 0, 0);
   sky.ringed.rotateZ(0.5);
+  if (!low) new THREE.TextureLoader().load(assetUrl('sky/jiva_night_sky.webp'), (t) => sky.setPanorama(t, [0.70, 0.42], sky.ringed.position));
 
   const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3(), tmpC = new THREE.Vector3();
   const Y_AXIS = new THREE.Vector3(0, 1, 0), X_AXIS = new THREE.Vector3(1, 0, 0);
@@ -362,7 +365,7 @@ export async function startGame(opts: GameOptions) {
   const advanceGoals = () => {
     let moved = false;
     while (goalIndex < CHAPTER1_GOALS.length - 1 && goalDone(CHAPTER1_GOALS[goalIndex].id)) { goalIndex++; moved = true; }
-    if (moved) { ui.sarathi(CHAPTER1_GOALS[goalIndex].sarathi, 9); ui.toast('Goal complete'); sound.goal(); save(); }
+    if (moved) { ui.sarathi(CHAPTER1_GOALS[goalIndex].sarathi, 9); ui.toast('Goal complete'); sound.goal(); player.startEmote('salute'); save(); }
     ui.goals(goalsView());
   };
 
@@ -388,8 +391,8 @@ export async function startGame(opts: GameOptions) {
     }
   };
   ui.onPlace = (id) => startBuild(id);
-  const openPack = () => { ui.renderPack(pack.slots, (r) => pack.canCraft(r)); ui.setPack(true); if (document.pointerLockElement) document.exitPointerLock(); };
-  const closePack = () => { ui.setPack(false); if (playing && !opts.shot) input.lock(); };
+  const openPack = () => { sound.uiOpen(); ui.renderPack(pack.slots, (r) => pack.canCraft(r)); ui.setPack(true); if (document.pointerLockElement) document.exitPointerLock(); };
+  const closePack = () => { sound.uiClose(); ui.setPack(false); if (playing && !opts.shot) input.lock(); };
 
   // ── State and loop ────────────────────────────────────
   let playing = false;
@@ -399,7 +402,7 @@ export async function startGame(opts: GameOptions) {
   let last = performance.now();
   let acc = 0;
   let digTimer = 0, oreTimer = 0, goalTimer = 0, saveTimer = 20;
-  let wasNight = false, lowWarned = false, resTimer = 0;
+  let wasNight = false, lowWarned = false, resTimer = 0, lampOn = false;
 
   const begin = (resume: boolean) => {
     sound.start();
@@ -514,6 +517,8 @@ export async function startGame(opts: GameOptions) {
     acc += dt;
     const STEP = 1 / 60;
     let first = true;
+    const wasGrounded = me.grounded;
+    const fallSpeed = -(me.vel.x * me.pos.x + me.vel.y * me.pos.y + me.vel.z * me.pos.z) / Math.max(1, Math.hypot(me.pos.x, me.pos.y, me.pos.z));
     while (acc >= STEP) {
       stepMover(me, {
         forward: fwd, right: side, sprint, jump: jumpHit && first, jet: walk && input.down('Space') && base.power > 0.02, yaw: first ? yaw : 0,
@@ -522,6 +527,8 @@ export async function startGame(opts: GameOptions) {
       acc -= STEP;
     }
     if (first && yaw) me.heading = P(V(me.heading).applyAxisAngle(V(me.pos).normalize(), yaw));
+    if (wasGrounded && !me.grounded && jumpHit) sound.jump();
+    if (!wasGrounded && me.grounded && fallSpeed > 1.5) sound.land(fallSpeed);
     const pos = V(me.pos);
     const up = tmpUp.copy(pos).normalize();
     const heading = V(me.heading);
@@ -567,11 +574,13 @@ export async function startGame(opts: GameOptions) {
           if (near.carbon) pack.add('carbon', near.carbon);
           if (near.plates) pack.add('iron_plate', near.plates);
           removeMachine(near);
+          sound.pickupMachine();
           ui.pickup(`Picked up ${ITEMS[item].name}`, ITEMS[item].color);
         } else ui.toast('Backpack full');
       }
+      if (input.hit('KeyG')) player.startEmote(player.emoting === 'dance' ? 'dance_silly' : 'dance');
       if (input.hit('KeyQ')) {
-        if (pack.remove('o2_canister', 1)) { base.oxygen = Math.min(1, base.oxygen + 0.4); ui.pickup('Breathed an O₂ canister', ITEMS.o2_canister.color); }
+        if (pack.remove('o2_canister', 1)) { sound.canister(); base.oxygen = Math.min(1, base.oxygen + 0.4); ui.pickup('Breathed an O₂ canister', ITEMS.o2_canister.color); }
         else ui.toast('No O₂ canisters — craft them from ice');
       }
       if (input.hit('KeyB')) {
@@ -620,11 +629,13 @@ export async function startGame(opts: GameOptions) {
     // Mining laser.
     let lasering = false;
     let laserTo: THREE.Vector3 | null = null, laserN: THREE.Vector3 | null = null;
+    let laserHit: 'rock' | 'crystal' | null = null;
     if (walk && !building && (input.down('Mouse0') || opts.shot && (window as unknown as { __laser?: boolean }).__laser) && base.power > 0.01) {
       const a = aim();
       if (a) {
         lasering = true;
         laserTo = a.point; laserN = a.normal;
+        laserHit = a.node?.kind === 'ice' ? 'crystal' : 'rock';
         if (a.node) {
           oreTimer += dt;
           ui.progress(Math.min(1, oreTimer / 0.45));
@@ -702,7 +713,10 @@ export async function startGame(opts: GameOptions) {
     renderer.toneMappingExposure = 1.05 + night * 0.3;
     // Helmet lamp: on at night and underground.
     const underground = voxels.edited(me.pos) && pos.length() < terrain.groundRadius(P(up)) - 1.2;
-    helmet.intensity = THREE.MathUtils.lerp(helmet.intensity, (night > 0.6 || underground) ? 40 : 0, 1 - Math.exp(-4 * dt));
+    const lampWanted = night > 0.6 || underground;
+    if (lampWanted !== lampOn) { lampOn = lampWanted; if (playing) sound.lamp(); }
+    helmet.intensity = THREE.MathUtils.lerp(helmet.intensity, lampWanted ? 40 : 0, 1 - Math.exp(-4 * dt));
+    sound.surface = underground || voxels.edited(me.pos) ? 'rock' : atShelter ? 'metal' : 'grass';
     helmet.position.copy(pos).addScaledVector(up, 1.7);
     helmet.target.position.copy(pos).addScaledVector(up, 1.0).addScaledVector(camera.getWorldDirection(camDir), 6);
 
@@ -728,6 +742,7 @@ export async function startGame(opts: GameOptions) {
         me.vel = { x: 0, y: 0, z: 0 };
         ui.sarathi(SARATHI_EVENTS.blackout, 8);
         ui.toast('Blackout');
+        sound.blackout();
       }
       if (base.oxygen < 0.25 && !lowWarned) { ui.sarathi(SARATHI_EVENTS.lowOxygen); sound.alarm(); lowWarned = true; }
       if (base.oxygen > 0.4) lowWarned = false;
@@ -764,8 +779,14 @@ export async function startGame(opts: GameOptions) {
       }
       ui.tags(tags);
     }
-    sound.laser(lasering);
+    sound.laser(lasering, laserHit);
     sound.jet(me.jetting);
+    sound.breathing(playing && base.oxygen < 0.25 && !atShelter);
+    {
+      let near: number | null = null;
+      for (const m of base.machines) if (m.id === 'smelter' && (m.burn ?? 0) > 0) { const d = V(m.pos).distanceTo(pos); if (near === null || d < near) near = d; }
+      sound.smelter(near);
+    }
     sound.update(dt, night, me.grounded ? Math.hypot(me.vel.x, me.vel.y, me.vel.z) : 0);
     resTimer -= dt;
     if (resTimer <= 0 && playing) {

@@ -40,6 +40,7 @@ A 3D survival-factory game on small, living planets. Walk all the way around eac
 | E / X | Use / pick up a machine |
 | Q | Breathe an O₂ canister |
 | M | Planet view |
+| G | Dance (press again for another dance) |
 | N (hold) | Speed up time to see night and the aurora |
 | Mouse wheel | Camera distance |
 | F3 | Performance info |

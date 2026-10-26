@@ -1,7 +1,7 @@
 # T-004: Names for Guardians, peoples and creatures
 
 - **Assigned to:** Sarvam AI
-- **Status:** todo
+- **Status:** done (merged 2026-10-27; waiting for the Commander to choose names)
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-004-names.md`
 - **Depends on:** nothing

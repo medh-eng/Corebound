@@ -19,6 +19,9 @@ export interface Sky {
   update(camera: THREE.Camera): void;
   /** A sky-only copy (no stars) used to light metals and water. */
   envScene: THREE.Scene;
+  /** Use a painted 360° night sky (equirectangular). Its painted gas giant at (u, v) is turned
+   *  to face `planetDir` and replaces the code-made ringed planet at night. */
+  setPanorama(tex: THREE.Texture, planetUV: [number, number], planetDir: THREE.Vector3): void;
 }
 
 export function buildSky(world: WorldDef): Sky {
@@ -36,7 +39,9 @@ export function buildSky(world: WorldDef): Sky {
     setZ: { value: lin(P.skySunsetZenith) }, setH: { value: lin(P.skySunsetHorizon) },
     nightZ: { value: lin(P.skyNightZenith) }, nightH: { value: lin(P.skyNightHorizon) },
     spaceC: { value: lin(P.space) }, auroraC: { value: lin(P.aurora) },
+    uPano: { value: null as THREE.Texture | null }, uPanoOn: { value: 0 }, uPanoRot: { value: new THREE.Matrix3() },
   };
+  const hide = { value: 0 };   // 1 = the painted sky's planet has taken over
 
   const skyVert = /* glsl */ `
     varying vec3 vDir;
@@ -48,7 +53,8 @@ export function buildSky(world: WorldDef): Sky {
     }`;
   const skyFrag = (withAurora: boolean) => /* glsl */ `
     uniform vec3 uSun, uUp, dayZ, dayH, setZ, setH, nightZ, nightH, spaceC, auroraC;
-    uniform float uSpace, uNight, uTime;
+    uniform float uSpace, uNight, uTime, uPanoOn;
+    uniform sampler2D uPano; uniform mat3 uPanoRot;
     varying vec3 vDir;
     void main() {
       vec3 d = normalize(vDir);
@@ -84,7 +90,14 @@ export function buildSky(world: WorldDef): Sky {
         }
       }` : ''}
       col = mix(col, spaceC + vec3(1.0, 0.9, 0.7) * smoothstep(0.9993, 0.9997, sd) * 14.0, uSpace);
-      ${withAurora ? '' : 'col = mix(col, vec3(dot(col, vec3(0.3333))) * vec3(1.08, 1.0, 0.86), 0.6);'}
+      ${withAurora ? `
+      if (uPanoOn > 0.5) {
+        vec3 q = uPanoRot * d;
+        vec2 uv = vec2(atan(q.z, q.x) / 6.2831853 + 0.5, 1.0 - acos(clamp(q.y, -1.0, 1.0)) / 3.1415927);
+        float vis = max(uNight * smoothstep(-0.03, 0.14, h), uSpace);
+        vis *= 1.0 - smoothstep(0.72, 0.93, abs(q.y));   // equirect pictures smear at the poles
+        col += texture2D(uPano, uv).rgb * vis * 0.95;
+      }` : 'col = mix(col, vec3(dot(col, vec3(0.3333))) * vec3(1.08, 1.0, 0.86), 0.6);'}
       gl_FragColor = vec4(col, 1.0);
     }`;
 
@@ -148,14 +161,16 @@ export function buildSky(world: WorldDef): Sky {
   // The ringed planet: a violet gas giant that hangs in Jivagraha's sky.
   const ringed = new THREE.Group();
   const gasMat = new THREE.ShaderMaterial({
-    uniforms: { uSun: uniforms.uSun, uTime: shared.uTime },
+    uniforms: { uSun: uniforms.uSun, uTime: shared.uTime, uHide: hide },
+    transparent: true,
     vertexShader: /* glsl */ `
       varying vec3 vP; varying vec3 vN;
       void main() { vP = position; vN = normalize(mat3(modelMatrix) * normal);
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
     fragmentShader: /* glsl */ `
-      uniform vec3 uSun; varying vec3 vP; varying vec3 vN;
+      uniform vec3 uSun; uniform float uHide; varying vec3 vP; varying vec3 vN;
       void main() {
+        if (uHide > 0.999) discard;
         float lat = normalize(vP).y;
         float b = sin(lat * 26.0 + sin(lat * 7.0 + vP.x * 0.004) * 1.6) * 0.5 + 0.5;
         float b2 = sin(lat * 61.0 + vP.z * 0.003) * 0.5 + 0.5;
@@ -164,24 +179,24 @@ export function buildSky(world: WorldDef): Sky {
         float l = dot(normalize(vN), uSun);
         float lit = smoothstep(-0.25, 0.6, l);
         vec3 shade = col * (0.22 + 1.6 * lit) + vec3(1.0, 0.6, 0.4) * pow(1.0 - abs(l), 8.0) * 0.08;
-        gl_FragColor = vec4(shade, 1.0);
+        gl_FragColor = vec4(shade, 1.0 - uHide);
       }`,
   });
   const giant = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 32), gasMat);
   const ringMat = new THREE.ShaderMaterial({
-    uniforms: { uSun: uniforms.uSun },
+    uniforms: { uSun: uniforms.uSun, uHide: hide },
     vertexShader: /* glsl */ `
       varying vec2 vUv; varying vec3 vP;
       void main() { vUv = uv; vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
     fragmentShader: /* glsl */ `
-      varying vec3 vP;
+      varying vec3 vP; uniform float uHide;
       void main() {
         float r = length(vP.xy);
         float t = (r - 1.45) / (2.35 - 1.45);
         float bands = 0.55 + 0.45 * sin(t * 62.0) * sin(t * 17.0 + 1.0);
         float a = smoothstep(0.0, 0.06, t) * (1.0 - smoothstep(0.9, 1.0, t)) * bands * 0.75;
         if (t > 0.55 && t < 0.6) a *= 0.15;
-        gl_FragColor = vec4(vec3(0.82, 0.74, 1.0) * 1.6, min(1.0, a * 1.3));
+        gl_FragColor = vec4(vec3(0.82, 0.74, 1.0) * 1.6, min(1.0, a * 1.3) * (1.0 - uHide));
       }`,
     transparent: true, side: THREE.DoubleSide, depthWrite: false,
   });
@@ -230,7 +245,20 @@ export function buildSky(world: WorldDef): Sky {
 
   return {
     group, ringed, atmosphere, uniforms, envScene,
+    setPanorama(tex, [u, v], planetDir) {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.generateMipmaps = false; tex.minFilter = THREE.LinearFilter;
+      tex.wrapS = THREE.RepeatWrapping;
+      const phi = (u - 0.5) * Math.PI * 2, th = v * Math.PI;
+      const p0 = new THREE.Vector3(Math.sin(th) * Math.cos(phi), Math.cos(th), Math.sin(th) * Math.sin(phi));
+      // Rotation taking world directions into the picture's directions: planetDir -> p0.
+      const q = new THREE.Quaternion().setFromUnitVectors(planetDir.clone().normalize(), p0);
+      skyUniforms.uPanoRot.value.setFromMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(q));
+      skyUniforms.uPano.value = tex;
+      skyUniforms.uPanoOn.value = 1;
+    },
     update(camera: THREE.Camera) {
+      if (skyUniforms.uPanoOn.value > 0.5) hide.value = THREE.MathUtils.smoothstep(Math.max(uniforms.uNight.value, uniforms.uSpace.value), 0.45, 0.8);
       group.position.copy(camera.position);
       const alt = camera.position.length() - R;
       atmMat.uniforms.uAlt.value = THREE.MathUtils.smoothstep(alt, R * 0.25, R * 0.9);

@@ -1,6 +1,7 @@
-// Sound and music made in code (Web Audio) until recorded tracks arrive in art-inbox/audio.
-// Music: slow D-minor pads with sparse bell notes (80 BPM feel), softer at night.
-// Effects: laser, pickups, placing, footsteps, jetpack, alarms, goal chime.
+// Sound and music (Web Audio).
+// Recorded effects come from public/assets/audio/sfx (made from art-inbox/audio/sfx by
+// scripts/process-audio.py and listed in index.json). Anything without a recording falls back
+// to a sound made in code. Music is code-made (D-minor pads and bells) until owner tracks arrive.
 
 export interface AudioSettings { master: number; music: number; sfx: number }
 
@@ -16,6 +17,11 @@ export class Sound {
   private musicTimer = 0;
   private chord = 0;
   private stepPhase = 0;
+  private buffers = new Map<string, AudioBuffer>();
+  private loops = new Map<string, { src: AudioBufferSourceNode; gain: GainNode }>();
+  private lastStep = '';
+  /** Surface under the player's feet, for footsteps: grass, rock, metal, sand, snow. */
+  surface = 'grass';
   settings: AudioSettings;
 
   constructor() {
@@ -50,6 +56,64 @@ export class Sound {
     src.connect(bp).connect(g).connect(this.musicBus);
     src.start(); lfo.start();
     this.wind = g;
+    void this.loadSamples();
+  }
+
+  private async loadSamples() {
+    const base = `${import.meta.env.BASE_URL}assets/audio/sfx/`;
+    try {
+      const list = (await (await fetch(`${base}index.json`)).json()) as string[];
+      await Promise.all(list.map(async (f) => {
+        try {
+          const buf = await this.ctx!.decodeAudioData(await (await fetch(base + f)).arrayBuffer());
+          this.buffers.set(f.replace(/\.(mp3|wav|ogg)$/, ''), buf);
+        } catch { /* skip a broken file; the code-made sound stays */ }
+      }));
+    } catch { /* no recordings yet */ }
+  }
+
+  has(name: string) { return this.buffers.has(name); }
+
+  /** Plays a recorded one-shot. Returns false when it is missing (caller can fall back). */
+  play(name: string, vol = 1, rate = 1, jitter = 0): boolean {
+    const buf = this.buffers.get(name);
+    if (!this.ctx || !buf) return false;
+    const src = this.ctx.createBufferSource(); src.buffer = buf;
+    src.playbackRate.value = rate * (1 + (Math.random() * 2 - 1) * jitter);
+    const g = this.ctx.createGain(); g.gain.value = vol;
+    src.connect(g).connect(this.sfxBus); src.start();
+    return true;
+  }
+
+  /** Starts or stops a recorded loop, fading in and out. `vol` can change while it plays. */
+  loop(name: string, on: boolean, vol = 1, fade = 0.08): boolean {
+    const buf = this.buffers.get(name);
+    if (!this.ctx || !buf) return false;
+    const cur = this.loops.get(name);
+    const t = this.ctx.currentTime;
+    if (on && !cur) {
+      const src = this.ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+      const gain = this.ctx.createGain(); gain.gain.value = 0;
+      gain.gain.setTargetAtTime(vol, t, fade);
+      src.connect(gain).connect(this.sfxBus); src.start(t, Math.random() * buf.duration);
+      this.loops.set(name, { src, gain });
+    } else if (on && cur) {
+      cur.gain.gain.setTargetAtTime(vol, t, 0.1);
+    } else if (!on && cur) {
+      cur.gain.gain.setTargetAtTime(0, t, fade);
+      cur.src.stop(t + fade * 6);
+      this.loops.delete(name);
+    }
+    return true;
+  }
+
+  private step() {
+    const n = [1, 2, 3, 4, 5, 6].filter((i) => this.buffers.has(`step_${this.surface}_${i}`) && `step_${this.surface}_${i}` !== this.lastStep);
+    if (n.length) {
+      const name = `step_${this.surface}_${n[Math.floor(Math.random() * n.length)]}`;
+      this.lastStep = name;
+      this.play(name, 0.9, 1, 0.06);
+    } else this.burst(380 + Math.random() * 120, 0.8, 0.12, 0.09);
   }
 
   set(s: Partial<AudioSettings>) {
@@ -118,13 +182,23 @@ export class Sound {
     // Footsteps follow walking speed.
     if (walking > 0.4) {
       this.stepPhase += dt * (1.6 + walking * 0.28);
-      if (this.stepPhase >= 1) { this.stepPhase = 0; this.burst(380 + Math.random() * 120, 0.8, 0.12, 0.09); }
+      if (this.stepPhase >= 1) { this.stepPhase = 0; this.step(); }
     }
   }
 
   // ── Effects ───────────────────────────────────────────
-  laser(on: boolean) {
+  /** Laser on/off; `hit` is what the beam touches ('rock', 'crystal' or null for nothing). */
+  laser(on: boolean, hit: 'rock' | 'crystal' | null = null) {
     if (!this.ctx) return;
+    if (this.has('laser_loop')) {
+      const was = this.loops.has('laser_loop');
+      if (on && !was) this.play('laser_start', 0.8);
+      if (!on && was) this.play('laser_stop', 0.8);
+      this.loop('laser_loop', on, 0.7);
+      this.loop('laser_hit_rock', on && hit === 'rock', 0.8);
+      this.loop('laser_hit_crystal', on && hit === 'crystal', 0.8);
+      return;
+    }
     if (on && !this.laserNodes) {
       const ctx = this.ctx;
       const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 96;
@@ -143,6 +217,13 @@ export class Sound {
 
   jet(on: boolean) {
     if (!this.ctx) return;
+    if (this.has('jetpack_loop')) {
+      const was = this.loops.has('jetpack_loop');
+      if (on && !was) this.play('jetpack_start', 0.7);
+      if (!on && was) this.play('jetpack_stop', 0.5);
+      this.loop('jetpack_loop', on, 0.6, 0.12);
+      return;
+    }
     if (on && !this.jetNodes) {
       const ctx = this.ctx;
       const n = ctx.createBufferSource(); n.buffer = this.noise; n.loop = true;
@@ -154,10 +235,24 @@ export class Sound {
   }
 
   pickup() { this.tone(880, 'sine', 0.12, 0.005, 0.18, this.sfxBus); this.tone(1320, 'sine', 0.08, 0.005, 0.22, this.sfxBus, 0.06); }
-  dig() { this.burst(700, 0.7, 0.18, 0.12); }
-  place() { this.tone(70, 'sine', 0.4, 0.005, 0.35, this.sfxBus); this.burst(300, 0.6, 0.2, 0.18); }
-  click() { this.tone(1500, 'square', 0.04, 0.002, 0.04, this.sfxBus); }
+  dig() { if (!this.play('dig_chunk', 0.7, 1, 0.12)) this.burst(700, 0.7, 0.18, 0.12); }
+  place() { if (!this.play('place_machine', 0.9)) { this.tone(70, 'sine', 0.4, 0.005, 0.35, this.sfxBus); this.burst(300, 0.6, 0.2, 0.18); } }
+  click() { if (!this.play('ui_click', 0.8)) this.tone(1500, 'square', 0.04, 0.002, 0.04, this.sfxBus); }
   goal() { [0, 0.12, 0.24].forEach((w, i) => this.tone(this.midi(74 + [0, 3, 7][i]), 'sine', 0.12, 0.01, 1.4, this.sfxBus, w)); }
-  alarm() { this.tone(988, 'square', 0.06, 0.005, 0.12, this.sfxBus); this.tone(740, 'square', 0.06, 0.005, 0.12, this.sfxBus, 0.18); }
+  alarm() { if (!this.play('o2_low', 0.8)) { this.tone(988, 'square', 0.06, 0.005, 0.12, this.sfxBus); this.tone(740, 'square', 0.06, 0.005, 0.12, this.sfxBus, 0.18); } }
+  jump() { this.play('jump', 0.6, 1, 0.05); }
+  land(strength: number) { this.play('land', Math.min(1, 0.3 + strength * 0.12), 1, 0.05); }
+  canister() { this.play('canister_breathe', 0.8); }
+  blackout() { this.play('blackout', 0.8); }
+  lamp() { this.play('helmet_lamp', 0.5); }
+  uiOpen() { this.play('ui_open', 0.6); }
+  uiClose() { this.play('ui_close', 0.6); }
+  pickupMachine() { this.play('pickup_machine', 0.8); }
+  powerOut() { this.play('power_out', 0.8); }
+  powerOn() { this.play('power_on', 0.7); }
+  /** Heavy breathing while oxygen is low. */
+  breathing(on: boolean) { this.loop('breath_low', on, 0.55, 0.6); }
+  /** A working smelter nearby: volume falls with distance (metres). */
+  smelter(dist: number | null) { this.loop('smelter_loop', dist !== null && dist < 14, dist === null ? 0 : Math.max(0, 1 - dist / 14) * 0.8, 0.4); }
   get started() { return !!this.ctx; }
 }

@@ -20,7 +20,7 @@ export class DigRenderer {
   readonly group = new THREE.Group();
   private meshes = new Map<string, THREE.Mesh>();
   private order: string[] = [];
-  private material = stylised({ vertexColors: true, glow: true, roughness: 0.9, mottle: 0.1, glowDay: 0.3, glowNight: 1.2 });
+  private material = stylised({ vertexColors: true, glow: true, roughness: 0.9, mottle: 0.1, glowDay: 0.3, glowNight: 1.2, detail: 'dug' });
   private pal: ReturnType<typeof surfacePalette>;
 
   constructor(private world: VoxelWorld, private terrain: Terrain, private def: WorldDef) {

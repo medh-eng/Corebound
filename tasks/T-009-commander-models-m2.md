@@ -1,7 +1,7 @@
 # T-009: Machine models for M2
 
 - **Assigned to:** Commander (Gemini for the image, then Hunyuan3D / TRELLIS)
-- **Status:** todo (the Commander is already preparing machine models)
+- **Status:** done (7 models processed 2026-10-27, ready for M2)
 - **Priority:** P1
 - **Deliver to:** `art-inbox/turnaround/` (images), `art-inbox/models/` (GLB)
 

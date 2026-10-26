@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { loadAnimated, loadModel } from './assets';
 
-type Anim = 'idle' | 'idle_stance' | 'walk' | 'run' | 'walk_back' | 'turn_left' | 'turn_right' | 'jump';
+type Anim = 'idle' | 'idle_stance' | 'walk' | 'run' | 'walk_back' | 'turn_left' | 'turn_right' | 'jump' | 'dance' | 'dance_silly' | 'salute';
 
 export class PlayerView {
   readonly root = new THREE.Group();
@@ -18,6 +18,8 @@ export class PlayerView {
   private actions = new Map<string, THREE.AnimationAction>();
   private current: Anim | null = null;
   private idleTime = 0;
+  private emote: Anim | null = null;
+  private emoteTime = 0;
   ready = false;
   animated = false;
   /** The mining laser tool; added to the scene by the game and placed in the right hand each frame. */
@@ -115,7 +117,7 @@ export class PlayerView {
       this.mixer = new THREE.AnimationMixer(scene);
       for (const c of clips) {
         const a = this.mixer.clipAction(c);
-        if (c.name === 'jump') { a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; }
+        if (c.name === 'jump' || c.name === 'salute') { a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; }
         this.actions.set(c.name, a);
       }
       this.body.clear();
@@ -151,6 +153,15 @@ export class PlayerView {
     this.current = want as Anim;
   }
 
+  /** Plays a celebration (salute once; dances loop until you move). Returns false if missing. */
+  startEmote(name: 'dance' | 'dance_silly' | 'salute'): boolean {
+    if (!this.actions.has(name)) return false;
+    this.emote = name; this.emoteTime = 0;
+    if (this.current === name) { this.actions.get(name)!.reset().play(); }
+    return true;
+  }
+  get emoting() { return this.emote; }
+
   /** pos: feet position; up: local up; vel: velocity; heading: camera forward; flags from movement. */
   update(dt: number, pos: THREE.Vector3, up: THREE.Vector3, vel: THREE.Vector3, heading: THREE.Vector3, grounded: boolean, jetting: boolean, time: number) {
     if (!this.faceSet) { this.face.copy(heading); this.faceSet = true; }
@@ -181,8 +192,11 @@ export class PlayerView {
     this.root.position.copy(pos);
     this.root.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, up, z));
 
+    if (this.emote && (speed > 0.4 || !grounded || this.aim)) this.emote = null;
+    if (this.emote === 'salute' && this.emoteTime > 2.7) this.emote = null;
     if (this.animated && this.mixer) {
-      if (!grounded) this.play('jump', 0.15);
+      if (this.emote) { this.emoteTime += dt; this.play(this.emote, 0.3); }
+      else if (!grounded) this.play('jump', 0.15);
       else if (backwards) this.play('walk_back', 0.25, Math.min(1.4, speed / 3));
       else if (speed > 6) this.play('run', 0.25, speed / 7.5);
       else if (speed > 0.4) this.play('walk', 0.25, Math.max(0.7, speed / 4.2));

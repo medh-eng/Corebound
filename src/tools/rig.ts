@@ -9,6 +9,7 @@ declare global { interface Window { __rig?: { b64: string; clips: string[]; info
 const CLIPS: [string, string][] = [
   ['idle', 'Idle'], ['idle_stance', 'Idle (1)'], ['walk', 'Walking'], ['run', 'Running'], ['jump', 'Jump'],
   ['walk_back', 'Standing Walk Back'], ['turn_left', 'Left Turn'], ['turn_right', 'Right Turn'],
+  ['dance', 'Hip Hop Dancing'], ['dance_silly', 'Silly Dancing'], ['salute', 'Salute'],
 ];
 
 async function main() {
