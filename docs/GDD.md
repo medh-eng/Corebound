@@ -258,4 +258,6 @@ Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manua
 | 2026-10-26 | The Custodian holds a visible mining laser and raises it toward the crosshair; the camera sits over the right shoulder | Owner playtest: no laser gun was visible and the head hid the target |
 | 2026-10-26 | Resource counts shown at the top right; gear button and Esc open a menu with save, load, music, sound effects, master volume and mouse sensitivity | Owner request |
 | 2026-10-26 | Music and effects are made in code (D-minor pads, bells, wind, laser hum) until the owner's audio arrives | Sound was missing from M1 |
+| 2026-10-26 | Finished machine output (iron plates) goes into the backpack automatically when you walk up; floating tags show "plates ready", "needs ice", "needs ore + carbon" | Owner could not find how to collect plates |
+| 2026-10-26 | Menu gains Main menu and a Shadows setting (High / Low / Off); sun shadows are snapped to the shadow-map grid with tighter depth range and more bias | Owner saw flickering stripes on the ground |
 | Open | Guardian names; price; repo visibility at launch; name subtitle; final art direction sign-off | **owner** |

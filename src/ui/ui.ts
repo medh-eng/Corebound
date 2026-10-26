@@ -42,13 +42,14 @@ export class UI {
       </div>
       <div id="pause" class="hidden"><div class="card">
         <h2>Paused</h2>
-        <div class="menu-btns"><button class="btn" id="resume">Resume</button><button class="btn small" id="save">Save game</button><button class="btn small" id="load">Load last save</button></div>
+        <div class="menu-btns"><button class="btn" id="resume">Resume</button><button class="btn small" id="save">Save game</button><button class="btn small" id="load">Load last save</button><button class="btn small" id="home">Main menu</button></div>
         <div id="saved-note" class="note"></div>
         <h3>Settings</h3>
         <label class="slider"><span>Music</span><input type="range" id="vol-music" min="0" max="1" step="0.05"></label>
         <label class="slider"><span>Sound effects</span><input type="range" id="vol-sfx" min="0" max="1" step="0.05"></label>
         <label class="slider"><span>Master volume</span><input type="range" id="vol-master" min="0" max="1" step="0.05"></label>
         <label class="slider"><span>Mouse sensitivity</span><input type="range" id="sens" min="0.0008" max="0.005" step="0.0002"></label>
+        <label class="slider"><span>Shadows</span><select id="shadows"><option value="2">High</option><option value="1">Low</option><option value="0">Off</option></select></label>
         <details><summary>Controls</summary><div class="keys">${keys}</div></details>
       </div></div>
       <div id="pack" class="hidden"><div class="card">
@@ -73,6 +74,7 @@ export class UI {
         <div id="prompt" class="hidden"></div>
         <div id="sarathi" class="hidden"><span class="who">SARATHI</span><span class="line"></span></div>
         <div id="pickups"></div>
+        <div id="tags"></div>
       </div>`);
     ($('#pack') as HTMLElement).addEventListener('click', (e) => {
       const t = e.target as HTMLElement;
@@ -101,15 +103,20 @@ export class UI {
 
   /** Hooks for the pause menu. */
   menu: {
-    save: () => string; load: () => void; settings: () => { music: number; sfx: number; master: number; sens: number };
-    change: (k: 'music' | 'sfx' | 'master' | 'sens', v: number) => void;
-  } = { save: () => '', load: () => {}, settings: () => ({ music: 0.5, sfx: 0.8, master: 0.8, sens: 0.0022 }), change: () => {} };
+    save: () => string; load: () => void; home: () => void;
+    settings: () => { music: number; sfx: number; master: number; sens: number; shadows: number };
+    change: (k: 'music' | 'sfx' | 'master' | 'sens' | 'shadows', v: number) => void;
+  } = { save: () => '', load: () => {}, home: () => {}, settings: () => ({ music: 0.5, sfx: 0.8, master: 0.8, sens: 0.0022, shadows: 2 }), change: () => {} };
 
   showPause(onResume: () => void) {
     $('#pause').classList.remove('hidden');
     ($('#resume') as HTMLButtonElement).onclick = () => { this.hidePause(); onResume(); };
     ($('#save') as HTMLButtonElement).onclick = () => { $('#saved-note').textContent = this.menu.save(); };
     ($('#load') as HTMLButtonElement).onclick = () => this.menu.load();
+    ($('#home') as HTMLButtonElement).onclick = () => this.menu.home();
+    const sh = $('#shadows') as HTMLSelectElement;
+    sh.value = String(this.menu.settings().shadows);
+    sh.onchange = () => this.menu.change('shadows', Number(sh.value));
     const s = this.menu.settings();
     for (const k of ['music', 'sfx', 'master'] as const) {
       const el = $(`#vol-${k}`) as HTMLInputElement;
@@ -126,6 +133,16 @@ export class UI {
 
   resources(counts: { name: string; color: string; n: number }[]) {
     $('#res').innerHTML = counts.map((c) => `<div class="r"><i style="background:${c.color}"></i><span>${c.name}</span><b>${c.n}</b></div>`).join('');
+  }
+  /** Small labels floating over machines (screen position in pixels). */
+  tags(list: { x: number; y: number; text: string }[]) {
+    const box = $('#tags');
+    while (box.children.length < list.length) box.appendChild(document.createElement('div'));
+    [...box.children].forEach((el, i) => {
+      const e = el as HTMLElement; const t = list[i];
+      e.style.display = t ? '' : 'none';
+      if (t) { e.className = 'tag'; e.style.transform = `translate(${t.x}px, ${t.y}px) translate(-50%, -100%)`; if (e.textContent !== t.text) e.textContent = t.text; }
+    });
   }
   hidePause() { $('#pause').classList.add('hidden'); }
   get paused() { return !$('#pause').classList.contains('hidden'); }

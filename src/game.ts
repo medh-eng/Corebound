@@ -175,14 +175,28 @@ export async function startGame(opts: GameOptions) {
   sky.ringed.lookAt(0, 0, 0);
   sky.ringed.rotateZ(0.5);
 
+  const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3(), tmpC = new THREE.Vector3();
+  const Y_AXIS = new THREE.Vector3(0, 1, 0), X_AXIS = new THREE.Vector3(1, 0, 0);
   const sun = new THREE.DirectionalLight('#fff1d6', 3);
   sun.castShadow = true;
   sun.shadow.mapSize.set(low ? 1024 : 2048, low ? 1024 : 2048);
   const sc = sun.shadow.camera;
-  sc.left = -38; sc.right = 38; sc.top = 38; sc.bottom = -38; sc.near = 1; sc.far = 400;
-  sun.shadow.bias = -0.0004;
-  sun.shadow.normalBias = 0.05;
+  sc.left = -38; sc.right = 38; sc.top = 38; sc.bottom = -38; sc.near = 70; sc.far = 230;
+  sun.shadow.bias = -0.0006;
+  sun.shadow.normalBias = 0.14;
   scene.add(sun, sun.target);
+  // Shadows setting: 2 high, 1 low, 0 off.
+  let shadowLevel = low ? 1 : 2;
+  try { const v = localStorage.getItem('corebound.shadows'); if (v !== null) shadowLevel = Number(v); } catch { /* default */ }
+  const setShadows = (lvl: number) => {
+    const wasOn = sun.castShadow;
+    shadowLevel = lvl;
+    sun.castShadow = lvl > 0;
+    const size = lvl === 1 ? 1024 : 2048;
+    if (sun.shadow.mapSize.x !== size) { sun.shadow.mapSize.set(size, size); sun.shadow.map?.dispose(); sun.shadow.map = null; }
+    if (wasOn !== sun.castShadow) scene.traverse((o) => { const m = (o as THREE.Mesh).material; if (m) (Array.isArray(m) ? m : [m]).forEach((x) => (x.needsUpdate = true)); });
+  };
+  setShadows(shadowLevel);
   const hemi = new THREE.HemisphereLight('#fff1e2', '#6f8a3a', 0.45);
   scene.add(hemi);
   const nightFill = new THREE.DirectionalLight('#8f86ff', 0.0);
@@ -525,9 +539,14 @@ export async function startGame(opts: GameOptions) {
           else ui.toast(pack.count('ice') ? 'Electrolyzer is full' : 'You have no ice');
         }
       } else if (near?.id === 'smelter') {
-        prompt = `<b>E</b> load ore + carbon, collect plates (${near.ore ?? 0} ore · ${near.carbon ?? 0} carbon · ${near.plates ?? 0} plates ready) · <b>X</b> pick up`;
+        // Finished plates go straight into the backpack when you walk up.
+        if ((near.plates ?? 0) > 0) {
+          const n = near.plates ?? 0; const left = pack.add('iron_plate', n); near.plates = left;
+          if (n - left > 0) { mined.iron_plate = (mined.iron_plate ?? 0) + n - left; ui.pickup(`+${n - left} Iron plate`, ITEMS.iron_plate.color); sound.pickup(); advanceGoals(); }
+          else if (!flags.fullWarned) { ui.toast('Backpack full — plates wait in the smelter'); flags.fullWarned = true; setTimeout(() => (flags.fullWarned = false), 8000); }
+        }
+        prompt = `Smelter · ${near.ore ?? 0} ore, ${near.carbon ?? 0} carbon inside · <b>E</b> load ore + carbon · <b>X</b> pick up`;
         if (input.hit('KeyE')) {
-          if ((near.plates ?? 0) > 0) { const n = near.plates ?? 0; const left = pack.add('iron_plate', n); near.plates = left; if (n - left > 0) { mined.iron_plate = (mined.iron_plate ?? 0) + n - left; ui.pickup(`+${n - left} Iron plate`, ITEMS.iron_plate.color); } }
           const ore = Math.min(pack.count('iron_ore'), 20 - (near.ore ?? 0));
           const carb = Math.min(pack.count('carbon'), 10 - (near.carbon ?? 0));
           if (ore > 0) { pack.remove('iron_ore', ore); near.ore = (near.ore ?? 0) + ore; }
@@ -659,11 +678,20 @@ export async function startGame(opts: GameOptions) {
     sky.uniforms.uNight.value = night;
     sky.update(camera);
 
-    sun.position.copy(pos).addScaledVector(sd, 150);
-    sun.target.position.copy(pos);
+    {
+      // Snap the shadow area to whole shadow-map texels so shadows stay still while you walk.
+      const texel = (sc.right - sc.left) / sun.shadow.mapSize.x;
+      const ax = tmpA.copy(sd).cross(Math.abs(sd.y) < 0.95 ? Y_AXIS : X_AXIS).normalize();
+      const ay = tmpB.copy(ax).cross(sd).normalize();
+      const px = pos.dot(ax), py = pos.dot(ay), pz = pos.dot(sd);
+      const c = tmpC.copy(ax).multiplyScalar(Math.round(px / texel) * texel)
+        .addScaledVector(ay, Math.round(py / texel) * texel).addScaledVector(sd, pz);
+      sun.position.copy(c).addScaledVector(sd, 150);
+      sun.target.position.copy(c);
+    }
     const sunset = 1 - THREE.MathUtils.smoothstep(Math.abs(elev - 0.05), 0, 0.3);
     sun.color.setRGB(1, 0.93 - sunset * 0.25, 0.82 - sunset * 0.42);
-    sun.intensity = 5.0 * THREE.MathUtils.smoothstep(elev, -0.06, 0.12);
+    sun.intensity = 4.3 * THREE.MathUtils.smoothstep(elev, -0.06, 0.12);
     hemi.position.copy(up);
     hemi.intensity = 0.5 + 0.25 * day;
     hemi.color.set('#fff1e2').lerp(new THREE.Color('#5a4fb0'), night * 0.8);
@@ -719,6 +747,23 @@ export async function startGame(opts: GameOptions) {
       if (saveTimer <= 0) { save(); saveTimer = 20; }
     }
     ui.prompt(playing ? prompt : null);
+    // Status tags over machines that need you.
+    {
+      const tags: { x: number; y: number; text: string }[] = [];
+      const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight;
+      if (walk) for (const m of base.machines) {
+        let text = '';
+        if (m.id === 'smelter') text = (m.plates ?? 0) > 0 ? `${m.plates} iron plate${m.plates === 1 ? '' : 's'} ready` : (m.ore ?? 0) < 2 || (m.carbon ?? 0) < 1 ? 'Needs ore + carbon' : '';
+        else if (m.id === 'electrolyzer') text = (m.ice ?? 0) <= 0 && !(m.burn ?? 0) ? 'Needs ice' : '';
+        if (!text) continue;
+        const mp = V(m.pos);
+        if (mp.distanceTo(pos) > 45) continue;
+        const sp = tmpC.copy(mp).addScaledVector(mp.clone().normalize(), m.id === 'smelter' ? 3.2 : 2.4).project(camera);
+        if (sp.z > 1 || Math.abs(sp.x) > 1.1 || Math.abs(sp.y) > 1.1) continue;
+        tags.push({ x: (sp.x * 0.5 + 0.5) * w, y: (-sp.y * 0.5 + 0.5) * h, text });
+      }
+      ui.tags(tags);
+    }
     sound.laser(lasering);
     sound.jet(me.jetting);
     sound.update(dt, night, me.grounded ? Math.hypot(me.vel.x, me.vel.y, me.vel.z) : 0);
@@ -745,7 +790,7 @@ export async function startGame(opts: GameOptions) {
     setTime: (offsetDays: number) => { days = t0 + offsetDays; envTimer = 0; },
     teleport: (fw: number, rt: number) => { const d = along(fw, rt); me.pos = P(d.multiplyScalar(terrain.groundRadius(P(d)) + 0.1)); },
     stats: () => ({ calls: renderer.info.render.calls, triangles: renderer.info.render.triangles }),
-    state: () => ({ pos: { ...me.pos }, grounded: me.grounded, fuel: me.jetFuel, alt: altitude(me, groundR), oxygen: base.oxygen, power: base.power, shelterO2: base.shelterO2, goal: CHAPTER1_GOALS[goalIndex].id, pack: pack.slots, machines: base.machines.length }),
+    state: () => ({ pos: { ...me.pos }, grounded: me.grounded, fuel: me.jetFuel, alt: altitude(me, groundR), oxygen: base.oxygen, power: base.power, shelterO2: base.shelterO2, goal: CHAPTER1_GOALS[goalIndex].id, pack: pack.slots, machines: base.machines.length, smelters: base.machines.filter((m) => m.id === 'smelter').map((m) => ({ ore: m.ore, carbon: m.carbon, plates: m.plates, burn: m.burn })) }),
     dig: (fw: number, rt: number, depth: number, r: number) => {
       const d = along(fw, rt); const g = terrain.groundRadius(P(d));
       for (let k = 0; k <= depth; k += 0.8) doDig(d.clone().multiplyScalar(g - k), r);
@@ -765,9 +810,11 @@ export async function startGame(opts: GameOptions) {
   ui.menu = {
     save: () => { save(); return `Saved at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`; },
     load: () => { try { sessionStorage.setItem('corebound.autoload', '1'); } catch { /* ignore */ } location.reload(); },
-    settings: () => ({ ...sound.settings, sens: input.sensitivity }),
+    home: () => { save(); location.reload(); },
+    settings: () => ({ ...sound.settings, sens: input.sensitivity, shadows: shadowLevel }),
     change: (k, v) => {
       if (k === 'sens') { input.sensitivity = v; try { localStorage.setItem('corebound.sens', String(v)); } catch { /* ignore */ } }
+      else if (k === 'shadows') { setShadows(v); try { localStorage.setItem('corebound.shadows', String(v)); } catch { /* ignore */ } }
       else sound.set({ [k]: v });
     },
   };

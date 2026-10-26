@@ -38,7 +38,7 @@ Built by Claude from an original idea, for release on the web, itch.io and Steam
 | N (hold) | Speed up time to see night and the aurora |
 | Mouse wheel | Camera distance |
 | F3 | Performance info |
-| Esc or ⚙ | Menu: save, load, music, sound, mouse sensitivity |
+| Esc or ⚙ | Menu: save, load, main menu, music, sound, mouse sensitivity, shadows |
 
 Slow computer? Add `?q=low` to the address.
 
