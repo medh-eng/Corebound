@@ -1,7 +1,7 @@
 # T-003: Credits screen
 
 - **Assigned to:** ChatGPT (Codex)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P1 (small first task to test the pull request workflow)
 - **Deliver to:** pull request from branch `chatgpt/T-003-credits`
 - **Depends on:** nothing

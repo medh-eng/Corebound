@@ -1,5 +1,6 @@
 // Menus and heads-up display (plain DOM over the 3D canvas).
 import { assetUrl } from '../render/assets';
+import { CREDITS } from '../data/credits';
 import { ITEMS, RECIPES, type ItemId, type Recipe } from '../data/items';
 import type { Slot } from '../systems/inventory';
 
@@ -37,12 +38,12 @@ export class UI {
       </div>
       <div id="title" class="hidden">
         <div class="top"><img alt="Corebound" src="${assetUrl('ui/logo.webp')}"><div class="tag">Build · Automate · Survive · Preserve</div></div>
-        <div class="bottom"><div class="btns"><button class="btn" id="continue">Continue</button><button class="btn" id="begin">New game</button></div>
+        <div class="bottom"><div class="btns"><button class="btn" id="continue">Continue</button><button class="btn" id="begin">New game</button><button class="btn" id="title-credits">${CREDITS.button}</button></div>
         <div class="note">Chapter 1 · Jivagraha · dig, build and breathe on a living world</div></div>
       </div>
       <div id="pause" class="hidden"><div class="card">
         <h2>Paused</h2>
-        <div class="menu-btns"><button class="btn" id="resume">Resume</button><button class="btn small" id="save">Save game</button><button class="btn small" id="load">Load last save</button><button class="btn small" id="home">Main menu</button></div>
+        <div class="menu-btns"><button class="btn" id="resume">Resume</button><button class="btn small" id="save">Save game</button><button class="btn small" id="load">Load last save</button><button class="btn small" id="home">Main menu</button><button class="btn small" id="pause-credits">${CREDITS.button}</button></div>
         <div id="saved-note" class="note"></div>
         <h3>Settings</h3>
         <label class="slider"><span>Music</span><input type="range" id="vol-music" min="0" max="1" step="0.05"></label>
@@ -51,6 +52,12 @@ export class UI {
         <label class="slider"><span>Mouse sensitivity</span><input type="range" id="sens" min="0.0008" max="0.005" step="0.0002"></label>
         <label class="slider"><span>Shadows</span><select id="shadows"><option value="2">High</option><option value="1">Low</option><option value="0">Off</option></select></label>
         <details><summary>Controls</summary><div class="keys">${keys}</div></details>
+      </div></div>
+      <div id="credits" class="hidden" role="dialog" aria-modal="true" aria-label="${CREDITS.button}"><div class="card">
+        <img alt="${CREDITS.logoAlt}" src="${assetUrl('ui/logo.webp')}">
+        <p>${CREDITS.title}</p><h2>${CREDITS.author}</h2>
+        ${CREDITS.lines.map((line) => `<p>${line}</p>`).join('')}
+        <button class="btn" id="credits-close">${CREDITS.close}</button>
       </div></div>
       <div id="pack" class="hidden"><div class="card">
         <h2>Backpack</h2><div class="slots"></div><div class="note" id="pack-note">8 slots. Anything you need in bulk, you will automate later.</div>
@@ -76,6 +83,34 @@ export class UI {
         <div id="pickups"></div>
         <div id="tags"></div>
       </div>`);
+    const credits = $('#credits');
+    const close = $('#credits-close');
+    let creditsOpener: HTMLElement | null = null;
+    const closeCredits = () => {
+      credits.classList.add('hidden');
+      creditsOpener?.focus();
+    };
+    for (const id of ['title-credits', 'pause-credits']) {
+      const opener = $(`#${id}`);
+      opener.onclick = () => {
+        creditsOpener = opener;
+        credits.classList.remove('hidden');
+        close.focus();
+      };
+    }
+    close.onclick = closeCredits;
+    // Capture Escape before the game's pause handler can also consume it.
+    window.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || credits.classList.contains('hidden')) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      closeCredits();
+    }, true);
+    credits.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      e.preventDefault();
+      close.focus();
+    });
     ($('#pack') as HTMLElement).addEventListener('click', (e) => {
       const t = e.target as HTMLElement;
       const r = t.closest('[data-recipe]') as HTMLElement | null;
