@@ -40,10 +40,18 @@ canvas { display: block; }
 
 /* Pause */
 #pause { position: fixed; inset: 0; z-index: 25; display: grid; place-items: center; background: rgba(11, 10, 28, 0.45); backdrop-filter: blur(3px); }
-#pause .card { background: var(--panel); border: 1px solid var(--edge); border-radius: 16px; padding: 28px 34px; min-width: min(420px, 86vw); text-align: center; }
+#pause .card, #credits .card { background: var(--panel); border: 1px solid var(--edge); border-radius: 16px; padding: 28px 34px; min-width: min(420px, 86vw); text-align: center; }
 #pause h2 { margin: 0 0 18px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; font-size: 18px; }
 .keys { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; text-align: left; font-size: 14px; margin: 0 0 22px; }
 .keys b { color: var(--amber); font-weight: 600; white-space: nowrap; }
+
+/* Credits */
+#credits { position: fixed; inset: 0; z-index: 26; display: grid; place-items: center; padding: 16px; background: rgba(11, 10, 28, 0.85); backdrop-filter: blur(3px); }
+#credits .card { box-sizing: border-box; min-width: 0; width: min(520px, 100%); max-height: 100%; overflow: auto; }
+#credits img { display: block; width: 100%; max-width: 380px; margin: 0 auto 24px; }
+#credits p { color: var(--ink-dim); line-height: 1.5; }
+#credits h2 { margin: 8px 0 24px; font-size: clamp(24px, 5vw, 34px); font-weight: 600; color: var(--amber); }
+#credits .btn { margin-top: 16px; }
 
 /* HUD */
 #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; font-size: 13px; }
