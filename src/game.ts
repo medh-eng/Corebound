@@ -28,6 +28,7 @@ import { Input } from './systems/input';
 import { Backpack, type Slot } from './systems/inventory';
 import { newBase, tickBase, type BaseState, type PlacedMachine } from './systems/base';
 import { UI, type Goal } from './ui/ui';
+import { Sound } from './audio/sound';
 
 declare global {
   interface Window { __ready?: boolean; __stats?: unknown; __game?: unknown }
@@ -88,6 +89,9 @@ export async function startGame(opts: GameOptions) {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.1, 9000);
   const input = new Input(renderer.domElement);
+  input.alwaysLocked = opts.shot;
+  try { const sv = Number(localStorage.getItem('corebound.sens')); if (sv > 0) input.sensitivity = sv; } catch { /* default */ }
+  const sound = new Sound();
 
   // ── World ─────────────────────────────────────────────
   ui.loading('Shaping the planet', 0.1); await nextFrame();
@@ -202,7 +206,7 @@ export async function startGame(opts: GameOptions) {
   ui.loading('Waking the Custodian', 0.85); await nextFrame();
   const player = new PlayerView();
   await player.load();
-  scene.add(player.root);
+  scene.add(player.root, player.tool);
   const me: MoverState = {
     pos: P(spawnPoint.clone().addScaledVector(up0, 0.05)), vel: { x: 0, y: 0, z: 0 },
     heading: P(forward), grounded: true, jetFuel: 1, jetting: false,
@@ -284,6 +288,7 @@ export async function startGame(opts: GameOptions) {
     const left = pack.add(id, n);
     const got = n - left;
     if (got > 0) {
+      sound.pickup();
       if (from === 'mine') mined[id] = (mined[id] ?? 0) + got;
       ui.pickup(`+${got} ${ITEMS[id].name}`, ITEMS[id].color);
     }
@@ -343,7 +348,7 @@ export async function startGame(opts: GameOptions) {
   const advanceGoals = () => {
     let moved = false;
     while (goalIndex < CHAPTER1_GOALS.length - 1 && goalDone(CHAPTER1_GOALS[goalIndex].id)) { goalIndex++; moved = true; }
-    if (moved) { ui.sarathi(CHAPTER1_GOALS[goalIndex].sarathi, 9); ui.toast('Goal complete'); save(); }
+    if (moved) { ui.sarathi(CHAPTER1_GOALS[goalIndex].sarathi, 9); ui.toast('Goal complete'); sound.goal(); save(); }
     ui.goals(goalsView());
   };
 
@@ -360,6 +365,7 @@ export async function startGame(opts: GameOptions) {
   };
   const cancelBuild = () => { if (building) { scene.remove(building.ghost); building = null; } };
   ui.onCraft = (r: Recipe) => {
+    sound.click();
     if (pack.craft(r)) {
       crafted[r.out] = (crafted[r.out] ?? 0) + r.n;
       ui.pickup(`Crafted ${ITEMS[r.out].name}`, ITEMS[r.out].color);
@@ -379,9 +385,10 @@ export async function startGame(opts: GameOptions) {
   let last = performance.now();
   let acc = 0;
   let digTimer = 0, oreTimer = 0, goalTimer = 0, saveTimer = 20;
-  let wasNight = false, lowWarned = false;
+  let wasNight = false, lowWarned = false, resTimer = 0;
 
   const begin = (resume: boolean) => {
+    sound.start();
     const d = resume ? readSave() : null;
     if (d) load(d);
     else { try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ } }
@@ -413,6 +420,7 @@ export async function startGame(opts: GameOptions) {
   document.addEventListener('pointerlockchange', () => {
     if (!document.pointerLockElement && playing && !opts.shot && !ui.packOpen) { save(); ui.showPause(() => input.lock()); }
   });
+  renderer.domElement.addEventListener('click', () => { sound.start(); });
   renderer.domElement.addEventListener('click', () => { if (playing && !input.locked && !opts.shot && !ui.packOpen) { ui.hidePause(); input.lock(); } });
   addEventListener('keydown', (e) => {
     if (!playing) return;
@@ -582,6 +590,7 @@ export async function startGame(opts: GameOptions) {
         base.machines.push(m);
         addMachineView(m, building.yaw);
         ui.pickup(`Placed ${ITEMS[building.item].name}`, ITEMS[building.item].color);
+        sound.place();
         if (V(m.pos).distanceTo(domePoint) > SURVIVAL.gridRadius) ui.sarathi('That is too far from the shelter to share its power.');
         cancelBuild();
         advanceGoals();
@@ -610,6 +619,7 @@ export async function startGame(opts: GameOptions) {
             if (tooClose) { if (!flags.closeWarned) { ui.sarathi(SARATHI_EVENTS.tooClose); flags.closeWarned = true; } }
             else {
               const removed = doDig(a.point, 0.9);
+              sound.dig();
               for (const [mat, vol] of removed) {
                 const y = YIELD[mat as Mat];
                 if (!y) continue;
@@ -621,11 +631,18 @@ export async function startGame(opts: GameOptions) {
             }
           }
         }
+      } else {
+        // Nothing in reach: still raise the tool and fire a short beam, so the player sees it works.
+        camera.getWorldDirection(camDir);
+        lasering = true;
+        laserTo = camera.position.clone().addScaledVector(camDir, rig.dist + 7);
+        laserN = null;
+        digTimer = 0; oreTimer = 0; ui.progress(0);
+        if (!flags.rangeHint) { ui.toast('Too far — walk closer and aim at the ground or a crystal'); flags.rangeHint = true; }
       }
     }
     if (!lasering) { digTimer = 0; oreTimer = 0; ui.progress(0); }
-    const hand = pos.clone().addScaledVector(up, 1.15).addScaledVector(new THREE.Vector3().crossVectors(up, player.facing).normalize(), -0.38).addScaledVector(player.facing, 0.35);
-    laser.update(dt, laserTo ? hand : null, laserTo, laserN);
+    player.setAim(laserTo);
 
     // Sun, sky and light for the place you stand.
     const sd = V(sunDir(days));
@@ -684,7 +701,7 @@ export async function startGame(opts: GameOptions) {
         ui.sarathi(SARATHI_EVENTS.blackout, 8);
         ui.toast('Blackout');
       }
-      if (base.oxygen < 0.25 && !lowWarned) { ui.sarathi(SARATHI_EVENTS.lowOxygen); lowWarned = true; }
+      if (base.oxygen < 0.25 && !lowWarned) { ui.sarathi(SARATHI_EVENTS.lowOxygen); sound.alarm(); lowWarned = true; }
       if (base.oxygen > 0.4) lowWarned = false;
       for (const [m, v] of machineViews) {
         if (m.id === 'battery') v.setLevel?.(res.capacity > 0 ? base.stored / res.capacity : 0);
@@ -702,8 +719,19 @@ export async function startGame(opts: GameOptions) {
       if (saveTimer <= 0) { save(); saveTimer = 20; }
     }
     ui.prompt(playing ? prompt : null);
+    sound.laser(lasering);
+    sound.jet(me.jetting);
+    sound.update(dt, night, me.grounded ? Math.hypot(me.vel.x, me.vel.y, me.vel.z) : 0);
+    resTimer -= dt;
+    if (resTimer <= 0 && playing) {
+      resTimer = 0.25;
+      ui.resources((['ice', 'iron_ore', 'silica', 'carbon', 'iron_plate', 'o2_canister'] as ItemId[])
+        .filter((id, i) => i < 4 || pack.count(id) > 0)
+        .map((id) => ({ name: ITEMS[id].name, color: ITEMS[id].color, n: pack.count(id) })));
+    }
 
     player.update(dt, pos, up, V(me.vel), heading, me.grounded, me.jetting, shared.uTime.value);
+    laser.update(dt, laserTo ? player.muzzle : null, laserTo, laserN);
     rig.update(dt, pos, up, heading);
   };
 
@@ -733,10 +761,25 @@ export async function startGame(opts: GameOptions) {
     face: (fw: number, rt: number) => { const t = along(fw, rt).multiplyScalar(R).sub(V(me.pos)); const u = V(me.pos).normalize(); t.addScaledVector(u, -t.dot(u)).normalize(); me.heading = P(t); },
   };
 
+  // Pause menu: save, load, volumes, mouse sensitivity.
+  ui.menu = {
+    save: () => { save(); return `Saved at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`; },
+    load: () => { try { sessionStorage.setItem('corebound.autoload', '1'); } catch { /* ignore */ } location.reload(); },
+    settings: () => ({ ...sound.settings, sens: input.sensitivity }),
+    change: (k, v) => {
+      if (k === 'sens') { input.sensitivity = v; try { localStorage.setItem('corebound.sens', String(v)); } catch { /* ignore */ } }
+      else sound.set({ [k]: v });
+    },
+  };
+  ui.onGear(() => { if (document.pointerLockElement) document.exitPointerLock(); else if (playing) { save(); ui.showPause(() => input.lock()); } });
+
   ui.loading('Ready', 1);
   await nextFrame();
   ui.hideLoading();
-  if (!opts.skipTitle) ui.showTitle(!!readSave(), () => begin(false), () => begin(true));
+  let autoload = false;
+  try { autoload = sessionStorage.getItem('corebound.autoload') === '1'; sessionStorage.removeItem('corebound.autoload'); } catch { /* ignore */ }
+  if (autoload && readSave() && !opts.skipTitle) { rig.mode = 'follow'; rig.titleFrame = 0; rig.autoSpin = 0; begin(true); ui.showPause(() => input.lock()); }
+  else if (!opts.skipTitle) ui.showTitle(!!readSave(), () => begin(false), () => begin(true));
 
   const loop = () => {
     const now = performance.now();

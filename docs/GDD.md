@@ -255,4 +255,7 @@ Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manua
 | 2026-10-26 | Custodian uses the owner's Mixamo rig: idle, stance idle, walk, run, walk back, turns, jump (root motion removed; the game moves the character) | Real animation replaces the procedural waddle |
 | 2026-10-26 | Owner's battery, electrolyzer and smelter models replace the code-built ones | Owner art |
 | 2026-10-26 | Smelter and iron plates brought forward from M2; the solar lotus now needs iron plates | Owner supplied the smelter; gives the first hour a step toward factories |
+| 2026-10-26 | The Custodian holds a visible mining laser and raises it toward the crosshair; the camera sits over the right shoulder | Owner playtest: no laser gun was visible and the head hid the target |
+| 2026-10-26 | Resource counts shown at the top right; gear button and Esc open a menu with save, load, music, sound effects, master volume and mouse sensitivity | Owner request |
+| 2026-10-26 | Music and effects are made in code (D-minor pads, bells, wind, laser hum) until the owner's audio arrives | Sound was missing from M1 |
 | Open | Guardian names; price; repo visibility at launch; name subtitle; final art direction sign-off | **owner** |

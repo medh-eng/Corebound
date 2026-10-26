@@ -23,12 +23,21 @@ export class Input {
       this.mouseDX += e.movementX;
       this.mouseDY += e.movementY;
     });
-    addEventListener('mousedown', (e) => { if (this.locked && e.button === 0) this.pressed.add('Mouse0'); });
+    addEventListener('mousedown', (e) => {
+      if (!this.locked && !this.alwaysLocked) return;
+      this.pressed.add(`Mouse${e.button}`);
+      this.keys.add(`Mouse${e.button}`);
+    });
+    addEventListener('mouseup', (e) => this.keys.delete(`Mouse${e.button}`));
+    document.addEventListener('pointerlockchange', () => { if (!document.pointerLockElement) { this.keys.delete('Mouse0'); this.keys.delete('Mouse2'); } });
     addEventListener('wheel', (e) => { this.wheel += Math.sign(e.deltaY); }, { passive: true });
     document.addEventListener('pointerlockchange', () => { this.locked = document.pointerLockElement === this.canvas; });
   }
 
   lock() { this.canvas.requestPointerLock?.(); }
+
+  /** Testing: treat the mouse as captured without pointer lock. */
+  alwaysLocked = false;
 
   down(code: string) { return this.keys.has(code); }
   hit(code: string) { return this.pressed.has(code); }
@@ -39,7 +48,7 @@ export class Input {
     const p = pads.find((x) => x);
     if (!p) return { lx: 0, ly: 0, rx: 0, ry: 0 };
     const dz = (v: number) => (Math.abs(v) < 0.15 ? 0 : v);
-    const map: [number, string][] = [[0, 'Space'], [1, 'ShiftLeft'], [3, 'KeyM'], [10, 'ShiftLeft'], [9, 'Escape']];
+    const map: [number, string][] = [[0, 'Space'], [1, 'ShiftLeft'], [2, 'KeyE'], [3, 'KeyM'], [4, 'KeyB'], [5, 'KeyQ'], [7, 'Mouse0'], [8, 'Tab'], [10, 'ShiftLeft'], [9, 'Escape']];
     for (const [i, code] of map) {
       const b = !!p.buttons[i]?.pressed;
       if (b && !this.padPrev[i]) this.pressed.add(code);

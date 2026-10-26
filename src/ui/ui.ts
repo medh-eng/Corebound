@@ -40,7 +40,17 @@ export class UI {
         <div class="bottom"><div class="btns"><button class="btn" id="continue">Continue</button><button class="btn" id="begin">New game</button></div>
         <div class="note">Chapter 1 · Jivagraha · dig, build and breathe on a living world</div></div>
       </div>
-      <div id="pause" class="hidden"><div class="card"><h2>Paused</h2><div class="keys">${keys}</div><button class="btn" id="resume">Continue</button></div></div>
+      <div id="pause" class="hidden"><div class="card">
+        <h2>Paused</h2>
+        <div class="menu-btns"><button class="btn" id="resume">Resume</button><button class="btn small" id="save">Save game</button><button class="btn small" id="load">Load last save</button></div>
+        <div id="saved-note" class="note"></div>
+        <h3>Settings</h3>
+        <label class="slider"><span>Music</span><input type="range" id="vol-music" min="0" max="1" step="0.05"></label>
+        <label class="slider"><span>Sound effects</span><input type="range" id="vol-sfx" min="0" max="1" step="0.05"></label>
+        <label class="slider"><span>Master volume</span><input type="range" id="vol-master" min="0" max="1" step="0.05"></label>
+        <label class="slider"><span>Mouse sensitivity</span><input type="range" id="sens" min="0.0008" max="0.005" step="0.0002"></label>
+        <details><summary>Controls</summary><div class="keys">${keys}</div></details>
+      </div></div>
       <div id="pack" class="hidden"><div class="card">
         <h2>Backpack</h2><div class="slots"></div><div class="note" id="pack-note">8 slots. Anything you need in bulk, you will automate later.</div>
         <h3>Craft</h3><div class="recipes"></div>
@@ -54,6 +64,8 @@ export class UI {
           <div class="row small"><span id="clock">06:00</span><span id="grid"></span></div>
         </div>
         <div id="goals" class="panel"></div>
+        <div id="res" class="panel"></div>
+        <button id="gear" title="Menu (Esc)" aria-label="Menu">⚙</button>
         <div id="help" class="panel"><div class="keys">${keys}</div></div>
         <div id="stats" class="panel hidden"></div>
         <div id="toast"></div>
@@ -87,9 +99,33 @@ export class UI {
   }
   hideTitle() { $('#title').classList.add('hidden'); }
 
+  /** Hooks for the pause menu. */
+  menu: {
+    save: () => string; load: () => void; settings: () => { music: number; sfx: number; master: number; sens: number };
+    change: (k: 'music' | 'sfx' | 'master' | 'sens', v: number) => void;
+  } = { save: () => '', load: () => {}, settings: () => ({ music: 0.5, sfx: 0.8, master: 0.8, sens: 0.0022 }), change: () => {} };
+
   showPause(onResume: () => void) {
     $('#pause').classList.remove('hidden');
     ($('#resume') as HTMLButtonElement).onclick = () => { this.hidePause(); onResume(); };
+    ($('#save') as HTMLButtonElement).onclick = () => { $('#saved-note').textContent = this.menu.save(); };
+    ($('#load') as HTMLButtonElement).onclick = () => this.menu.load();
+    const s = this.menu.settings();
+    for (const k of ['music', 'sfx', 'master'] as const) {
+      const el = $(`#vol-${k}`) as HTMLInputElement;
+      el.value = String(s[k]);
+      el.oninput = () => this.menu.change(k, Number(el.value));
+    }
+    const sens = $('#sens') as HTMLInputElement;
+    sens.value = String(s.sens);
+    sens.oninput = () => this.menu.change('sens', Number(sens.value));
+    $('#saved-note').textContent = '';
+  }
+
+  onGear(f: () => void) { ($('#gear') as HTMLButtonElement).onclick = f; }
+
+  resources(counts: { name: string; color: string; n: number }[]) {
+    $('#res').innerHTML = counts.map((c) => `<div class="r"><i style="background:${c.color}"></i><span>${c.name}</span><b>${c.n}</b></div>`).join('');
   }
   hidePause() { $('#pause').classList.add('hidden'); }
   get paused() { return !$('#pause').classList.contains('hidden'); }

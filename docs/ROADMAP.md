@@ -19,7 +19,8 @@ Chapter 1 (Jivagraha) is built all the way to a polished free demo before worlds
 ### M1 Dig and survive — first version built 2026-10-25
 - **Delivered:** laser digging anywhere (pits and tunnels, with sandstone, iron, ice and carbon underground), surface deposits near the base, 8-slot backpack with crafting (electrolyzer, battery, solar lotus, O₂ canister), placing and picking up machines, oxygen and suit power, shelter air from the electrolyzer, solar + battery power through the night, blackout, helmet lamp, guided goals with SARATHI lines, autosave and Continue.
 - **Added 2026-10-26:** the owner's rigged Custodian with 8 animations; owner models for battery, electrolyzer and smelter; the smelter makes iron plates (2 ore + 1 carbon, 3 kW, smoke).
-- **Still to do in M1:** texture and sky images from the owner, sound.
+- **Added after the first playtest (2026-10-26):** mouse mining fixed, visible laser tool, resource counter, settings menu (save, load, volumes, sensitivity), code-made music and sound.
+- **Still to do in M1:** texture and sky images from the owner; owner audio to replace the code-made sound.
 - **Build:** smooth diggable terrain (density field + marching cubes in workers); mining laser with VFX; ore pickup; backpack (8 stacks) and crafting; oxygen and suit power; blackout and wake; shelter dome, solar lotus, battery, electrolyzer; day/night consequences; autosave and save slots.
 - **Art (owner):** Custodian concept + turnaround + rigged GLB; Chapter 1 textures; Jivagraha sky.
 

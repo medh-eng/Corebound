@@ -20,6 +20,7 @@ export class CameraRig {
   orbitDist: number;
   autoSpin = 0;         // radians per second of slow orbit drift (title screen)
   titleFrame = 0;       // 1 = pull back and drop the planet low in the frame, under the logo
+  shoulder = 0.75;      // metres to the right of the Custodian
   private from: Pose | null = null;
   private t = 1;
   private dur = 1.2;
@@ -42,7 +43,9 @@ export class CameraRig {
   get transitioning() { return this.t < 1; }
 
   private followPose(target: THREE.Vector3, up: THREE.Vector3, heading: THREE.Vector3): Pose {
-    const look = target.clone().addScaledVector(up, 1.55);
+    // Over the right shoulder, so the Custodian never hides the crosshair.
+    const rightV = new THREE.Vector3().crossVectors(heading, up).normalize();
+    const look = target.clone().addScaledVector(up, 1.55).addScaledVector(rightV, this.shoulder);
     const back = heading.clone().negate();
     const dir = back.multiplyScalar(Math.cos(this.pitch)).addScaledVector(up, Math.sin(this.pitch)).normalize();
     const pos = look.clone().addScaledVector(dir, this.dist);
