@@ -1,6 +1,7 @@
 // Menus and heads-up display (plain DOM over the 3D canvas).
 import { assetUrl } from '../render/assets';
 import { CREDITS } from '../data/credits';
+import { TIPS } from '../data/tips';
 import { ITEMS, RECIPES, type ItemId, type Recipe } from '../data/items';
 import { RESEARCH, type ResearchNode } from '../data/research';
 import type { Slot } from '../systems/inventory';
@@ -35,12 +36,13 @@ export class UI {
   onResearch: (id: string) => void = () => {};
   onResearchLoad: () => void = () => {};
   private sarathiTimer = 0;
+  private loadingTipTimer = 0;
 
   constructor() {
     const keys = KEYS.map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
     document.body.insertAdjacentHTML('beforeend', `
       <div id="loading" style="background-image:url('${assetUrl('ui/key_art.webp')}')">
-        <div class="box"><img alt="Corebound" src="${assetUrl('ui/logo.webp')}"><div class="msg">Preparing Jivagraha</div><div class="bar"><i></i></div></div>
+        <div class="box"><img alt="Corebound" src="${assetUrl('ui/logo.webp')}"><div class="msg">Preparing Jivagraha</div><div class="bar"><i></i></div><div class="tip"></div></div>
       </div>
       <div id="title" class="hidden">
         <div class="top"><img alt="Corebound" src="${assetUrl('ui/logo.webp')}"><div class="tag">Build · Automate · Survive · Preserve</div></div>
@@ -97,6 +99,26 @@ export class UI {
         <div id="pickups"></div>
         <div id="tags"></div>
       </div>`);
+    const tip = $('#loading .tip');
+    let remaining: string[] = [];
+    let lastTip = '';
+    const nextTip = () => {
+      if (!remaining.length) {
+        remaining = [...TIPS];
+        for (let i = remaining.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
+        }
+        // Avoid repeating the last tip at the boundary between shuffled rounds.
+        if (remaining.length > 1 && remaining[remaining.length - 1] === lastTip) {
+          [remaining[0], remaining[remaining.length - 1]] = [remaining[remaining.length - 1], remaining[0]];
+        }
+      }
+      lastTip = remaining.pop() ?? '';
+      tip.textContent = lastTip;
+    };
+    nextTip();
+    this.loadingTipTimer = window.setInterval(nextTip, 5000);
     const credits = $('#credits');
     const close = $('#credits-close');
     let creditsOpener: HTMLElement | null = null;
@@ -148,7 +170,11 @@ export class UI {
     $('#loading .msg').textContent = text;
     ($('#loading .bar i') as HTMLElement).style.width = `${Math.round(progress * 100)}%`;
   }
-  hideLoading() { $('#loading').classList.add('hidden'); }
+  hideLoading() {
+    window.clearInterval(this.loadingTipTimer);
+    this.loadingTipTimer = 0;
+    $('#loading').classList.add('hidden');
+  }
 
   showTitle(hasSave: boolean, onNew: () => void, onContinue: () => void) {
     $('#title').classList.remove('hidden');

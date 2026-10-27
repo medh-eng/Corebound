@@ -1,0 +1,17 @@
+export const TIPS: string[] = [
+  'Blue crystals hold ice. Mine some to keep your electrolyzer supplied.',
+  'Keep the electrolyzer powered and fed with ice to refill shelter oxygen.',
+  'Return to the shelter airlock before your oxygen runs low.',
+  'Press Q to use an oxygen canister from your backpack.',
+  'Solar lotuses need daylight. Charge a battery before night falls.',
+  'A battery stores power; it cannot make power on its own.',
+  'Feed the smelter iron ore and carbon to make iron plates.',
+  'Walk up to a machine and press E to load it or collect its output.',
+  'Dig below the grass for sandstone, ice pockets and deeper carbon seams.',
+  'Press Tab to open your backpack and craft useful equipment.',
+  'Press B to open the build menu and choose a machine to place.',
+  'Press C to lay a conveyor belt between two machines.',
+  'Research needs parts and power. Press E at the research station to begin.',
+  'An auto-drill needs room for its output. Give it a belt or empty it.',
+  'Press G to dance. Press it again to try another dance.',
+];
