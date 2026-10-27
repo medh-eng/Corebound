@@ -1,7 +1,7 @@
 # T-010: Unit tests for the backpack and crafting
 
 - **Assigned to:** ChatGPT (Codex)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P1
 - **Deliver to:** pull request from branch `chatgpt/T-010-inventory-tests`
 - **Depends on:** nothing
