@@ -10,7 +10,7 @@ A 3D survival-factory game on small, living planets. Walk all the way around eac
 
 ## Status
 
-**M1 Dig and survive is playable** (October 2026): dig and mine with the laser, craft and place machines, keep your shelter breathing through the night, smelt iron plates. The Custodian is fully animated. Next: owner playtest, then **M2 Build and automate**.
+**M2 Build and automate is playable** (October 2026): research new machines, place auto-drills on rich ground, lay conveyors, store, smelt and bake silicon, and carry power out with pylons — on top of M1's digging and survival. Next: owner playtest, then **M3 Harmony and life**.
 
 | Document | What it holds |
 | --- | --- |
@@ -36,8 +36,9 @@ A 3D survival-factory game on small, living planets. Walk all the way around eac
 | Space | Jump; hold in the air for the jetpack |
 | Left mouse (hold) | Mining laser |
 | Tab | Backpack and crafting |
-| B / R | Build mode / turn the machine |
-| E / X | Use / pick up a machine |
+| B / R | Build menu / turn the machine |
+| C | Lay a conveyor: click the sending machine, then the receiving one |
+| E / X | Use a machine (load it, research, take from a silo) / pick it up |
 | Q | Breathe an O₂ canister |
 | M | Planet view |
 | G | Dance (press again for another dance) |

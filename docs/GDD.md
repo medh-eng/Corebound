@@ -200,7 +200,8 @@ Rendered through sky/fog colour, vegetation shader parameters, water tint, parti
   - *Szynthar packs* (Marubhumi): wolf-like pack animals that chase you out of their territory. If they catch you, they bowl you over and you drop part of what you carry (you can pick it up again). Outrun them in the buggy, go around, or turn them back with the resonance emitter.
   - Each world has one or two more (owner and Medhanshu to name; see PROMPTS.md).
 - **Resonance emitter:** Alion Voss's high-frequency radio device. It never hurts anything: creatures dislike the sound and turn away, and it is one of the tools used to calm Guardians.
-- **Alien people:** each world has a small community with its own look, culture and needs. They trade, give quests and share clues about the "luminous object" that appeared centuries ago. You talk to them with the translator.
+- **Alien peoples** (names from Sarvam AI, chosen 2026-10-27; full list with Devanagari and pronunciation in `src/data/names.ts`): **Deepajana** (lamp-folk, Jivagraha), **Khanaka** (miners, Taptashila), **Maruyatri** (desert travellers, Marubhumi), **Jalabandhu** (water-friends, Himasagara), **Patangajana** (kite-folk, Vayumandala), **Shvasajana** (breath-folk, Vishamegha). Creatures include the Golakarka (rock crab), Szynthar, Lambagriva (long-necked grazer), Marumina (sand-fish), Tarakajala (light jellyfish) and Jyotipatang (glow-moth). The Szynthars call their grassland belt on Marubhumi **Padakanan** (पादकानन, Medhanshu's word).
+- **Alien people (detail):** each world has a small community with its own look, culture and needs. They trade, give quests and share clues about the "luminous object" that appeared centuries ago. You talk to them with the translator.
 - **Scanner + Codex:** scan flora, fauna, rocks, ruins → Codex entry, research data, SARATHI line.
 - **Collectibles:** memory logs, Quantum shards (suit upgrades), decoration sets (jaali screens, lantern strings, rangoli floor lights).
 - **Base customisation:** paint, decorate, name outposts.
@@ -214,14 +215,14 @@ Rendered through sky/fog colour, vegetation shader parameters, water tint, parti
 - Calmed ("stunned" in the blueprint) by a three-step science puzzle using systems you know, often with the resonance emitter; it becomes an ally with a world bonus.
 - **Bodies built and animated procedurally** (root growth, spline-driven serpent/leviathan bodies, cloth/particle wings) from owner-supplied concept art.
 
-| World | Guardian (English placeholder; Sanskrit name: **owner**) | Puzzle | Ally bonus |
+| World | Guardian (name, meaning) | Puzzle | Ally bonus |
 | --- | --- | --- | --- |
-| Jivagraha | Root Guardian | Seismic scan → move drills off its roots; bio-filters clear smog; replant bloom spores | Flora absorbs 2× |
-| Taptashila | Magma Serpent | Ease vent pressure; re-route lava channels; plant heat lichen | Geothermal +50% |
-| Marubhumi | Dune Leviathan (silica-shelled, swims through sand) | Resonance emitter to steer it; restore an old oasis; stop drills shaking its dunes | Sandstorms reveal buried ore |
-| Himasagara | Ice Leviathan (deep, bioluminescent) | Sonar beacons to guide it; restore vent heat; feed an algae cycle | Free heat near vents |
-| Vayumandala | Storm Bird | Rebuild wind channels; ground lightning; seed clouds | Storms charge batteries |
-| Vishamegha | Haze Weaver (lives in the acid clouds) | Scrub the acid layer; balance CO2; grow cloud algae | Clean air pockets; cheaper toxin filters |
+| Jivagraha | Root Guardian: **Mooladri** (root-mountain) | Seismic scan → move drills off its roots; bio-filters clear smog; replant bloom spores | Flora absorbs 2× |
+| Taptashila | Magma Serpent: **Shailasarpa** (rock-serpent) | Ease vent pressure; re-route lava channels; plant heat lichen | Geothermal +50% |
+| Marubhumi | Dune Leviathan: **Balukavela** (sand-tide; silica-shelled, swims through sand) | Resonance emitter to steer it; restore an old oasis; stop drills shaking its dunes | Sandstorms reveal buried ore |
+| Himasagara | Ice Leviathan: **Himavela** (ice-tide; deep, bioluminescent) | Sonar beacons to guide it; restore vent heat; feed an algae cycle | Free heat near vents |
+| Vayumandala | Storm Bird: **Meghapakshi** (cloud-bird) | Rebuild wind channels; ground lightning; seed clouds | Storms charge batteries |
+| Vishamegha | Haze Weaver: **Tantukari** (thread-maker; lives in the acid clouds) | Scrub the acid layer; balance CO2; grow cloud algae | Clean air pockets; cheaper toxin filters |
 | Shunyapath | SARATHI's directive | Prove a closed-loop power network can run the terraformer | Unlocks the Covenant ending |
 
 ## 13. Worlds
@@ -360,4 +361,11 @@ Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manua
 | 2026-10-27 | The painted night-sky panorama replaces the code-made ringed planet after dusk; the code planet stays by day | Owner panorama has its own gas giant; avoids two planets |
 | 2026-10-27 | Emotes: G dances (two dances), the Custodian salutes when a goal is completed | Owner supplied the animations |
 | 2026-10-27 | Music must come from a source that allows selling the game (free Suno does not); credit lines required by a licence go on the Credits screen under "Music" | Licence check |
-| Open | Names for Guardians, alien peoples and creatures (Sarvam task T-004); which world is the Szynthars' homeworld पादकानन (proposal: Marubhumi's savannah); price; repo visibility at launch; final art direction sign-off | **owner** |
+| 2026-10-27 | M2 factory: machines are placed freely on the ground (no foundation pads yet); building stays in third person with a ghost (no top-down build camera yet) | Placement already works well on a small sphere; revisit if playtests need precision |
+| 2026-10-27 | Conveyors run point to point from one machine to another along the ground (2 m per conveyor item, up to 30 m, one belt out and up to three in per machine); slopes need no lifts | Simple to lay on a sphere; reads clearly |
+| 2026-10-27 | Auto-drills mine whatever lies beneath them (sampled 1–8 m down); ore beats plain rock; richness sets the speed; they never run out | Gives ground "regions" a purpose before the scanner exists |
+| 2026-10-27 | Power networks: the shelter powers 30 m around it; pylons carry power 14 m further and link up to 26 m apart; each network balances its own solar, coal and batteries | GDD §8 under-supply rule, extended to pylons |
+| 2026-10-27 | Research tiers 1–2: parts are loaded into the research station by hand or by belt, then it works while powered | Matches "research station" in Medhanshu's blueprint |
+| 2026-10-27 | Scanner and Codex moved from M2 to M3 (they need the science cards, T-002) | Content not delivered yet |
+| 2026-10-27 | Names chosen by the Director on the Commander's instruction from Sarvam's options (`src/data/names.ts`); पादकानन (Padakanan) is the Szynthars' name for Marubhumi's grassland belt | Commander: "choose your names" |
+| Open | price; repo visibility at launch; final art direction sign-off | **owner** |

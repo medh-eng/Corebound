@@ -12,7 +12,13 @@ export const CHAPTER1_GOALS: StoryGoal[] = [
   { id: 'battery', text: 'Find carbon (black rocks), craft a battery and place it', sarathi: 'Night is coming. Solar power will fall to zero. I recommend a battery. And perhaps a blanket.' },
   { id: 'night', text: 'Survive your first night on Jivagraha', sarathi: 'The forest is glowing. I have never seen anything like it. Or… I do not remember seeing it.' },
   { id: 'smelter', text: 'Craft a smelter, load it with iron ore and carbon (E), and collect 4 iron plates', sarathi: 'Iron plates mean real machines. Careful — smelting makes smoke, and this world notices.' },
-  { id: 'done', text: 'Explore, dig deeper, and keep your shelter breathing', sarathi: 'Seismic activity below us. Something very large is… waking. We should be ready.' },
+  { id: 'research_station', text: 'Craft a research station and place it near the shelter (B)', sarathi: 'Carrying everything by hand will not scale. A research station can work out machines that do it for us.' },
+  { id: 'research_drill', text: 'Research the auto-drill: press E at the station, choose it, load the parts', sarathi: 'Give the station the parts it asks for. It needs power while it thinks.' },
+  { id: 'place_drill', text: 'Craft an auto-drill and place it on rich ground — it shows what lies beneath', sarathi: 'The drill mines whatever is under it. Iron veins run in thin stripes; look for rich ground.' },
+  { id: 'research_belt', text: 'Research conveyors at the research station', sarathi: 'A drill that nobody empties will fill up and stop. We need belts.' },
+  { id: 'belt', text: 'Craft conveyors, press C, click the drill, then click the smelter', sarathi: 'A belt from the drill to the smelter, and the smelter never waits for you again.' },
+  { id: 'auto_plates', text: 'Make 5 iron plates from ore that came by belt (keep the smelter fed with carbon)', sarathi: 'Iron plates, made while you were not looking. I believe this is called a factory.' },
+  { id: 'done', text: 'Explore, research, automate — and keep your shelter breathing', sarathi: 'Seismic activity below us. Something very large is… waking. We should be ready.' },
 ];
 
 export const SARATHI_EVENTS = {
@@ -22,4 +28,7 @@ export const SARATHI_EVENTS = {
   sunrise: 'Sunrise. Solar power returning.',
   backpackFull: 'Your backpack is full. Craft something, or we will need machines to carry more.',
   tooClose: 'Not here — I will not let you dig under the shelter.',
+  researched: 'Research complete:',
+  noPower: 'That machine has no power. Build it within 30 m of the shelter, or carry power out with pylons.',
+  drillFull: 'A drill is full and has stopped. Empty it, or give it a belt.',
 };

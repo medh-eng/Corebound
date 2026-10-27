@@ -2,7 +2,8 @@
 import * as THREE from 'three';
 import { JIVAGRAHA } from './data/worlds';
 import { START_BASE } from './data/base';
-import { ITEMS, YIELD, MACHINES, SURVIVAL, type ItemId, type MachineId, type Recipe } from './data/items';
+import { ITEMS, YIELD, MACHINES, SURVIVAL, RECIPES, type ItemId, type MachineId, type Recipe } from './data/items';
+import { researchById } from './data/research';
 import { CHAPTER1_GOALS, SARATHI_EVENTS } from './data/story';
 import { Terrain } from './core/terrain';
 import { VoxelWorld, type Dig } from './core/voxels';
@@ -16,6 +17,7 @@ import { DigRenderer } from './render/digRender';
 import { OreField, ORE_ITEM, type OreNode } from './render/ore';
 import { LaserView } from './render/laser';
 import { buildMachine, ghostOf, preloadMachines, type MachineView } from './render/machines';
+import { BeltRenderer, beltPath, pathLength } from './render/belts';
 import { buildSky } from './art/sky';
 import { shared, quality as matQuality, loadGroundTextures } from './art/materials';
 import { paintModel } from './art/paint';
@@ -26,7 +28,10 @@ import { CameraRig } from './render/cameraRig';
 import { buildPostFX } from './render/postfx';
 import { Input } from './systems/input';
 import { Backpack, type Slot } from './systems/inventory';
-import { newBase, tickBase, type BaseState, type PlacedMachine } from './systems/base';
+import {
+  newBase, tickBase, migrateBase, addMachine, removeMachine as removeFromBase, addBelt, beltProblem, beltCost, startResearch, accept,
+  powerNetworks, researchReady, total, type BaseState, type PlacedMachine,
+} from './systems/base';
 import { UI, type Goal } from './ui/ui';
 import { Sound } from './audio/sound';
 
@@ -247,7 +252,18 @@ export async function startGame(opts: GameOptions) {
   // ── Game state ────────────────────────────────────────
   const pack = new Backpack(8);
   let base = newBase();
-  base.machines.push({ id: 'solar_lotus', pos: P(lotusPoint) });
+  addMachine(base, { id: 'solar_lotus', pos: P(lotusPoint) });
+  const belts = new BeltRenderer();
+  scene.add(belts.group);
+  const beltGround = (d: THREE.Vector3) => terrain.groundRadius(P(d));
+  const nearShelter = (p: V3) => V(p).distanceTo(domePoint) < SURVIVAL.gridRadius;
+  /** Redraws belts and pylon cables after the factory changes. */
+  const refreshFactory = () => {
+    belts.sync(base.belts, base.machines, beltGround);
+    const { links } = powerNetworks(base, nearShelter);
+    belts.setCables(links.map(([a, b]) => [a ? V(a.pos) : domePoint.clone().addScaledVector(domeDir, 0.2), V(b.pos)] as [THREE.Vector3, THREE.Vector3]));
+    if (base.research.done.includes('backpack_plus')) pack.resize(12);
+  };
   const machineViews = new Map<PlacedMachine, MachineView>();
   let goalIndex = 0;
   const mined: Partial<Record<ItemId, number>> = {};
@@ -263,18 +279,22 @@ export async function startGame(opts: GameOptions) {
     const dir = V(m.pos).normalize();
     v.root.applyMatrix4(surfaceMatrix(terrain, dir, yaw, 1, 0.03, 0, domePoint.clone().sub(V(m.pos))));
     v.root.position.copy(V(m.pos));
-    if (m.id === 'smelter') { const sm = chimneySmoke(); sm.position.set(0, 2.7, 0); v.root.add(sm); v.root.userData.smoke = sm; }
+    const smokeAt: Partial<Record<MachineId, number>> = { smelter: 2.7, coal_burner: 2.3, silicon_furnace: 2.5 };
+    if (smokeAt[m.id] !== undefined) { const sm = chimneySmoke(); sm.position.set(0, smokeAt[m.id]!, 0); v.root.add(sm); v.root.userData.smoke = sm; }
     m.yaw = yaw;
     scene.add(v.root);
     machineViews.set(m, v);
     colliders.push(machineCollider(m));
   };
+  /** Takes a machine away (with its belts) and returns what it held. */
   const removeMachine = (m: PlacedMachine) => {
     const v = machineViews.get(m);
     if (v) { scene.remove(v.root); machineViews.delete(m); }
-    base.machines = base.machines.filter((x) => x !== m);
+    const back = removeFromBase(base, m);
     const ci = colliders.findIndex((c) => c.pos === m.pos);
     if (ci >= 0) colliders.splice(ci, 1);
+    refreshFactory();
+    return back;
   };
 
   // Flora sitting in a freshly dug hole is removed with the soil.
@@ -310,7 +330,7 @@ export async function startGame(opts: GameOptions) {
       ui.pickup(`+${got} ${ITEMS[id].name}`, ITEMS[id].color);
     }
     if (left > 0 && !flags.fullWarned) { ui.sarathi(SARATHI_EVENTS.backpackFull); flags.fullWarned = true; setTimeout(() => (flags.fullWarned = false), 20000); }
-    if (ui.packOpen) ui.renderPack(pack.slots, (r) => pack.canCraft(r));
+    if (ui.packOpen) ui.renderPack(pack.slots, (r) => pack.canCraft(r), unlocked);
   };
 
   // ── Saving ────────────────────────────────────────────
@@ -325,8 +345,9 @@ export async function startGame(opts: GameOptions) {
   const load = (d: SaveData) => {
     days = d.days;
     me.pos = d.me.pos; me.heading = d.me.heading; me.vel = { x: 0, y: 0, z: 0 };
+    base = migrateBase(d.base);
+    if (base.research.done.includes('backpack_plus')) pack.resize(12);
     pack.load(d.pack);
-    base = d.base;
     voxels.replay(d.digs);
     dug.rebuild(voxels.chunks.keys());
     for (const g of d.digs) clearFlora(V(g), g.r);
@@ -334,6 +355,7 @@ export async function startGame(opts: GameOptions) {
     goalIndex = d.goal;
     Object.assign(mined, d.mined); Object.assign(crafted, d.crafted); Object.assign(flags, d.flags);
     for (const m of base.machines) addMachineView(m, m.yaw ?? 0);
+    refreshFactory();
   };
   addEventListener('beforeunload', save);
 
@@ -346,11 +368,17 @@ export async function startGame(opts: GameOptions) {
       case 'silica': return (mined.silica ?? 0) >= 4;
       case 'craft_elec': return (crafted.electrolyzer ?? 0) >= 1 || has('electrolyzer');
       case 'place_elec': return has('electrolyzer');
-      case 'load_ice': return base.machines.some((m) => m.id === 'electrolyzer' && ((m.ice ?? 0) > 0 || (m.burn ?? 0) > 0)) || base.shelterO2 > 0;
+      case 'load_ice': return base.machines.some((m) => m.id === 'electrolyzer' && ((m.inv?.ice ?? 0) > 0 || (m.burn ?? 0) > 0)) || base.shelterO2 > 0;
       case 'breathe': return !!flags.breathed;
       case 'battery': return has('battery');
       case 'night': return !!flags.survivedNight;
       case 'smelter': return (mined.iron_plate ?? 0) >= 4;
+      case 'research_station': return has('research_station') || base.machines.some((m) => m.id === 'research_station');
+      case 'research_drill': return base.research.done.includes('auto_drill');
+      case 'place_drill': return base.machines.some((m) => m.id === 'auto_drill' && !!m.mine);
+      case 'research_belt': return base.research.done.includes('conveyor');
+      case 'belt': return base.belts.length > 0;
+      case 'auto_plates': return base.machines.filter((m) => m.id === 'smelter' && (m.fedByBelt ?? 0) > 0).reduce((s, m) => s + (m.made ?? 0), 0) >= 5;
       default: return false;
     }
   };
@@ -370,7 +398,41 @@ export async function startGame(opts: GameOptions) {
   };
 
   // ── UI actions ────────────────────────────────────────
-  let building: { id: MachineId; item: ItemId; ghost: THREE.Group; yaw: number; ok: boolean; pos: THREE.Vector3 } | null = null;
+  const unlocked = (r: Recipe) => !r.research || base.research.done.includes(r.research);
+  const recipeFor = (id: ItemId) => RECIPES.find((r) => r.out === id);
+  const needsText = (r?: Recipe) => r ? Object.entries(r.needs).map(([id, n]) => `${n} ${ITEMS[id as ItemId].name.toLowerCase()}`).join(' + ') : '';
+
+  /** What lies under a drill: the best ore in a column 1–8 m down, and how rich it is. */
+  const drillSample = (p: THREE.Vector3): { item: ItemId; rich: number } => {
+    const up = p.clone().normalize();
+    const side = new THREE.Vector3().crossVectors(up, Math.abs(up.y) < 0.9 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0)).normalize();
+    const side2 = new THREE.Vector3().crossVectors(up, side);
+    const counts = new Map<ItemId, number>();
+    let n = 0;
+    for (const [a, b] of [[0, 0], [0.8, 0], [-0.8, 0], [0, 0.8], [0, -0.8]]) {
+      const d = p.clone().addScaledVector(side, a).addScaledVector(side2, b).normalize();
+      const g = terrain.groundRadius(P(d));
+      for (let depth = 1; depth <= 8; depth++) {
+        const mat = voxels.geology.at(P(d.clone().multiplyScalar(g - depth)), depth);
+        const y = YIELD[mat];
+        n++;
+        if (y && mat !== Mat.Soil) counts.set(y.item, (counts.get(y.item) ?? 0) + 1);
+      }
+    }
+    // Ores beat plain rock (silica) if there is a fair amount of them.
+    let best: ItemId = 'silica', bestN = counts.get('silica') ?? 0;
+    let oreN = 0;
+    for (const [k, c] of counts) if (k !== 'silica' && c >= 4 && c > oreN) { best = k; bestN = c; oreN = c; }
+    const rich = best === 'silica' ? Math.min(0.6, bestN / n) : Math.min(1, (bestN / n) * 3);
+    return { item: best, rich: Math.max(0.25, rich) };
+  };
+
+  let building: { id: MachineId; item: ItemId; ghost: THREE.Group; yaw: number; ok: boolean; pos: THREE.Vector3; sample?: { item: ItemId; rich: number } } | null = null;
+  let beltFrom: PlacedMachine | null = null;
+  let beltMode = false;
+  let beltPreview: THREE.Line | null = null;
+  const beltPreviewMat = new THREE.LineBasicMaterial({ color: '#5cffd6' });
+  const endBelt = () => { beltMode = false; beltFrom = null; if (beltPreview) { scene.remove(beltPreview); beltPreview = null; } };
   const startBuild = (item: ItemId) => {
     const mid = ITEMS[item].placeable;
     if (!mid || pack.count(item) < 1) return;
@@ -381,17 +443,60 @@ export async function startGame(opts: GameOptions) {
     ui.toast(`Placing ${ITEMS[item].name}`);
   };
   const cancelBuild = () => { if (building) { scene.remove(building.ghost); building = null; } };
+  const placeables = (): ItemId[] => (Object.keys(ITEMS) as ItemId[]).filter((id) => {
+    if (!ITEMS[id].placeable) return false;
+    const r = recipeFor(id);
+    return pack.count(id) > 0 || (r !== undefined && unlocked(r));
+  });
+  const renderBuild = () => ui.renderBuild(placeables().map((id) => {
+    const r = recipeFor(id);
+    return { id, have: pack.count(id), canCraft: !!r && unlocked(r) && pack.canCraft(r), needs: needsText(r) };
+  }));
+  const openBuild = () => { cancelBuild(); endBelt(); sound.uiOpen(); renderBuild(); ui.setBuild(true); if (document.pointerLockElement) document.exitPointerLock(); };
+  const closeBuild = (relock = true) => { ui.setBuild(false); if (relock && playing && !opts.shot) input.lock(); };
+  ui.onBuild = (id) => {
+    if (pack.count(id) < 1) {
+      const r = recipeFor(id);
+      if (!r || !pack.craft(r)) { ui.toast('Not enough parts'); return; }
+      crafted[id] = (crafted[id] ?? 0) + r.n;
+    }
+    sound.click();
+    closeBuild();
+    startBuild(id);
+  };
+  // Research panel at a research station.
+  const renderResearch = () => {
+    const st = base.machines.find((m) => m.id === 'research_station');
+    const powered = !!st && (lastSupply.get(st.uid!) ?? 0) > 0.2;
+    ui.renderResearch(base.research, (id) => pack.count(id), powered);
+  };
+  const openResearch = () => { sound.uiOpen(); renderResearch(); ui.setResearch(true); if (document.pointerLockElement) document.exitPointerLock(); };
+  const closeResearch = () => { ui.setResearch(false); if (playing && !opts.shot) input.lock(); };
+  const loadResearchParts = () => {
+    const node = base.research.active ? researchById(base.research.active) : null;
+    const st = base.machines.find((m) => m.id === 'research_station');
+    if (!node || !st) return 0;
+    let n = 0;
+    for (const id of Object.keys(node.needs) as ItemId[]) {
+      while (pack.count(id) > 0 && accept(base, st, id)) { pack.remove(id, 1); n++; }
+    }
+    if (n) { ui.pickup(`Loaded ${n} parts`, '#5cffd6'); sound.place(); }
+    return n;
+  };
+  ui.onResearch = (id) => { if (startResearch(base, id)) { sound.click(); loadResearchParts(); renderResearch(); } };
+  ui.onResearchLoad = () => { loadResearchParts(); renderResearch(); };
+  let lastSupply = new Map<number, number>();
   ui.onCraft = (r: Recipe) => {
     sound.click();
     if (pack.craft(r)) {
       crafted[r.out] = (crafted[r.out] ?? 0) + r.n;
       ui.pickup(`Crafted ${ITEMS[r.out].name}`, ITEMS[r.out].color);
-      ui.renderPack(pack.slots, (x) => pack.canCraft(x));
+      ui.renderPack(pack.slots, (x) => pack.canCraft(x), unlocked);
       advanceGoals();
     }
   };
   ui.onPlace = (id) => startBuild(id);
-  const openPack = () => { sound.uiOpen(); ui.renderPack(pack.slots, (r) => pack.canCraft(r)); ui.setPack(true); if (document.pointerLockElement) document.exitPointerLock(); };
+  const openPack = () => { sound.uiOpen(); ui.renderPack(pack.slots, (r) => pack.canCraft(r), unlocked); ui.setPack(true); if (document.pointerLockElement) document.exitPointerLock(); };
   const closePack = () => { sound.uiClose(); ui.setPack(false); if (playing && !opts.shot) input.lock(); };
 
   // ── State and loop ────────────────────────────────────
@@ -402,7 +507,7 @@ export async function startGame(opts: GameOptions) {
   let last = performance.now();
   let acc = 0;
   let digTimer = 0, oreTimer = 0, goalTimer = 0, saveTimer = 20;
-  let wasNight = false, lowWarned = false, resTimer = 0, lampOn = false;
+  let wasNight = false, lowWarned = false, resTimer = 0, lampOn = false, researchTimer = 0;
 
   const begin = (resume: boolean) => {
     sound.start();
@@ -435,13 +540,16 @@ export async function startGame(opts: GameOptions) {
   }
 
   document.addEventListener('pointerlockchange', () => {
-    if (!document.pointerLockElement && playing && !opts.shot && !ui.packOpen) { save(); ui.showPause(() => input.lock()); }
+    if (!document.pointerLockElement && playing && !opts.shot && !ui.packOpen && !ui.buildOpen && !ui.researchOpen) { save(); ui.showPause(() => input.lock()); }
   });
   renderer.domElement.addEventListener('click', () => { sound.start(); });
-  renderer.domElement.addEventListener('click', () => { if (playing && !input.locked && !opts.shot && !ui.packOpen) { ui.hidePause(); input.lock(); } });
+  renderer.domElement.addEventListener('click', () => { if (playing && !input.locked && !opts.shot && !ui.packOpen && !ui.buildOpen && !ui.researchOpen) { ui.hidePause(); input.lock(); } });
   addEventListener('keydown', (e) => {
     if (!playing) return;
-    if (e.code === 'Tab') { e.preventDefault(); if (ui.packOpen) closePack(); else { cancelBuild(); openPack(); } }
+    if (e.code === 'Tab') { e.preventDefault(); if (ui.buildOpen) closeBuild(false); if (ui.researchOpen) ui.setResearch(false); if (ui.packOpen) closePack(); else { cancelBuild(); endBelt(); openPack(); } }
+    // Closing keys must not also count as a fresh press in the game this frame.
+    if ((e.code === 'KeyB' || e.code === 'Escape') && ui.buildOpen) { e.preventDefault(); closeBuild(); setTimeout(() => input.pressed.delete(e.code)); }
+    if ((e.code === 'KeyE' || e.code === 'Escape') && ui.researchOpen) { e.preventDefault(); closeResearch(); setTimeout(() => input.pressed.delete(e.code)); }
   });
 
   addEventListener('resize', () => {
@@ -482,6 +590,97 @@ export async function startGame(opts: GameOptions) {
     return { point: p, normal: camDir.clone().negate() };
   };
 
+  /** The machine under the crosshair (for laying belts), up to 45 m away. */
+  const aimMachine = (): PlacedMachine | null => {
+    camera.getWorldDirection(camDir);
+    const o = camera.position;
+    let best: PlacedMachine | null = null, bt = 45;
+    for (const m of base.machines) {
+      const d = MACHINES[m.id];
+      const c = V(m.pos).addScaledVector(V(m.pos).normalize(), d.height * 0.45);
+      const rr = Math.max(d.radius, d.height * 0.45) * 0.95;
+      const oc = c.clone().sub(o);
+      const t = oc.dot(camDir);
+      if (t < 0 || t > bt) continue;
+      if (oc.lengthSq() - t * t <= rr * rr) { bt = t; best = m; }
+    }
+    return best;
+  };
+  const names = (bag: Partial<Record<ItemId, number>> | undefined) => Object.entries(bag ?? {}).filter(([, n]) => (n ?? 0) > 0)
+    .map(([id, n]) => `${n} ${ITEMS[id as ItemId].name.toLowerCase()}`).join(', ');
+  /** Finished items go into the backpack. */
+  const collectOut = (m: PlacedMachine) => {
+    for (const [k, n0] of Object.entries(m.out ?? {}) as [ItemId, number][]) {
+      if (!n0) continue;
+      const left = pack.add(k, n0);
+      const got = n0 - left;
+      m.out![k] = left;
+      if (got > 0) { mined[k] = (mined[k] ?? 0) + got; ui.pickup(`+${got} ${ITEMS[k].name}`, ITEMS[k].color); sound.pickup(); }
+      else if (!flags.fullWarned) { ui.toast(`Backpack full — ${ITEMS[k].name.toLowerCase()} waits in the ${MACHINES[m.id].name.toLowerCase()}`); flags.fullWarned = true; setTimeout(() => (flags.fullWarned = false), 8000); }
+    }
+    advanceGoals();
+  };
+  const machinePrompt = (m: PlacedMachine): string => {
+    const d = MACHINES[m.id];
+    const x = ' · <b>X</b> pick up';
+    if (d.research) return `Research station${base.research.active ? ` · ${researchById(base.research.active)!.name}` : ''} · <b>E</b> research${x}`;
+    if (d.storage) return `Storage silo · ${total(m.inv)}/${d.storage}${total(m.inv) ? ` (${names(m.inv)})` : ''} · <b>E</b> take all${x}`;
+    if (d.drill) return `Auto-drill · mining ${m.mine ? ITEMS[m.mine].name.toLowerCase() : 'nothing'} (${Math.round((m.rich ?? 0) * 100)}% rich)${total(m.out) ? ` · ${total(m.out)} waiting` : ''}${x}`;
+    if (d.accepts) {
+      const what = Object.keys(d.accepts).map((k) => ITEMS[k as ItemId].name.toLowerCase()).join(' + ');
+      return `${d.name}${total(m.inv) ? ` · ${names(m.inv)} inside` : ''} · <b>E</b> load ${what}${x}`;
+    }
+    return `${d.name}${x}`;
+  };
+  const useMachine = (m: PlacedMachine) => {
+    const d = MACHINES[m.id];
+    if (d.research) { openResearch(); return; }
+    if (d.storage) {
+      let got = 0;
+      for (const [k, n] of Object.entries(m.inv ?? {}) as [ItemId, number][]) { const left = pack.add(k, n); got += n - left; m.inv![k] = left; }
+      if (got) { ui.pickup(`Took ${got} items`, '#ffcf6a'); sound.pickup(); } else ui.toast(total(m.inv) ? 'Backpack full' : 'The silo is empty');
+      return;
+    }
+    if (d.accepts) {
+      let n = 0;
+      for (const k of Object.keys(d.accepts) as ItemId[]) while (pack.count(k) > 0 && accept(base, m, k)) { pack.remove(k, 1); n++; }
+      if (n) { ui.pickup(`Loaded ${names(m.inv) ? n : n} into the ${d.name.toLowerCase()}`, '#5cffd6'); sound.place(); advanceGoals(); }
+      else ui.toast(Object.keys(d.accepts).some((k) => pack.count(k as ItemId) > 0) ? `${d.name} is full` : `You have nothing it takes (${Object.keys(d.accepts).map((k) => ITEMS[k as ItemId].name.toLowerCase()).join(', ')})`);
+    }
+  };
+  const pickUpMachine = (m: PlacedMachine) => {
+    const item = m.id as ItemId;
+    if (pack.add(item, 1) > 0) { ui.toast('Backpack full'); return; }
+    const back = removeMachine(m);
+    let lost = 0;
+    for (const [k, n] of Object.entries(back) as [ItemId, number][]) lost += pack.add(k, n);
+    sound.pickupMachine();
+    ui.pickup(`Picked up ${ITEMS[item].name}`, ITEMS[item].color);
+    if (lost) ui.toast(`Backpack full — ${lost} items were lost`);
+  };
+  /** A short status line over a machine, or '' when all is well. */
+  const machineTag = (m: PlacedMachine): string => {
+    const d = MACHINES[m.id];
+    const sup = lastSupply.get(m.uid!);
+    const feeds = base.belts.filter((b) => b.to === m.uid).length;
+    if (d.powerKW < 0 && sup === undefined) return 'No power';
+    if (d.research) {
+      if (!base.research.active) return 'Choose research (E)';
+      const node = researchById(base.research.active)!;
+      return researchReady(base) ? `${node.name} ${Math.round((base.research.progress / node.seconds) * 100)}%` : `${node.name}: needs parts`;
+    }
+    if (d.drill) return total(m.out) >= (d.outCap ?? 20) ? 'Full — collect or add a belt' : '';
+    if (d.process?.fuel) return (m.burn ?? 0) <= 0 && !(m.inv?.carbon) ? 'Needs carbon' : '';
+    if (d.process) {
+      const ready = total(m.out);
+      if (ready && !base.belts.some((b) => b.from === m.uid)) return `${ready} ${names(m.out)} ready`;
+      const missing = Object.entries(d.process.needs).filter(([k, n]) => (m.inv?.[k as ItemId] ?? 0) < (n ?? 0)).map(([k]) => ITEMS[k as ItemId].name.toLowerCase());
+      if ((m.burn ?? 0) <= 0 && missing.length && !feeds) return `Needs ${missing.join(' + ')}`;
+      if ((m.burn ?? 0) > 0 && (sup ?? 0) < 0.2) return 'Low power';
+    }
+    return '';
+  };
+
   const nearestMachine = (pos: THREE.Vector3, maxD: number) => {
     let best: PlacedMachine | null = null, bd = maxD;
     for (const m of base.machines) { const d = V(m.pos).distanceTo(pos); if (d < bd) { bd = d; best = m; } }
@@ -498,7 +697,7 @@ export async function startGame(opts: GameOptions) {
     if (input.hit('KeyH')) ui.toggleHelp();
     if (input.wheel && !building) rig.dist = THREE.MathUtils.clamp(rig.dist + input.wheel * 0.8, 3.5, 14);
 
-    const active = playing && !ui.paused && !ui.packOpen && (input.locked || opts.shot) && !rig.transitioning;
+    const active = playing && !ui.paused && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && (input.locked || opts.shot) && !rig.transitioning;
     if (active && input.hit('KeyM')) rig.setMode(rig.mode === 'follow' ? 'orbit' : 'follow', 1.4);
     const look = input.sensitivity;
     let yaw = 0;
@@ -533,65 +732,68 @@ export async function startGame(opts: GameOptions) {
     const up = tmpUp.copy(pos).normalize();
     const heading = V(me.heading);
 
-    // Machines: interact (E), pick up (X), use canister (Q).
+    // Machines: use (E), pick up (X), canister (Q), dance (G), build menu (B), conveyor (C).
     const near = nearestMachine(pos, 2.8);
     const atShelter = pos.distanceTo(domePoint) < 4.4;
     let prompt: string | null = null;
-    if (walk && !building) {
-      if (near?.id === 'electrolyzer') {
-        prompt = `<b>E</b> load ice (${near.ice ?? 0} inside) · <b>X</b> pick up`;
-        if (input.hit('KeyE')) {
-          const n = Math.min(pack.count('ice'), 20 - (near.ice ?? 0));
-          if (n > 0) { pack.remove('ice', n); near.ice = (near.ice ?? 0) + n; ui.pickup(`Loaded ${n} ice`, ITEMS.ice.color); advanceGoals(); }
-          else ui.toast(pack.count('ice') ? 'Electrolyzer is full' : 'You have no ice');
-        }
-      } else if (near?.id === 'smelter') {
-        // Finished plates go straight into the backpack when you walk up.
-        if ((near.plates ?? 0) > 0) {
-          const n = near.plates ?? 0; const left = pack.add('iron_plate', n); near.plates = left;
-          if (n - left > 0) { mined.iron_plate = (mined.iron_plate ?? 0) + n - left; ui.pickup(`+${n - left} Iron plate`, ITEMS.iron_plate.color); sound.pickup(); advanceGoals(); }
-          else if (!flags.fullWarned) { ui.toast('Backpack full — plates wait in the smelter'); flags.fullWarned = true; setTimeout(() => (flags.fullWarned = false), 8000); }
-        }
-        prompt = `Smelter · ${near.ore ?? 0} ore, ${near.carbon ?? 0} carbon inside · <b>E</b> load ore + carbon · <b>X</b> pick up`;
-        if (input.hit('KeyE')) {
-          const ore = Math.min(pack.count('iron_ore'), 20 - (near.ore ?? 0));
-          const carb = Math.min(pack.count('carbon'), 10 - (near.carbon ?? 0));
-          if (ore > 0) { pack.remove('iron_ore', ore); near.ore = (near.ore ?? 0) + ore; }
-          if (carb > 0) { pack.remove('carbon', carb); near.carbon = (near.carbon ?? 0) + carb; }
-          if (ore || carb) ui.pickup(`Loaded ${ore} ore, ${carb} carbon`, ITEMS.iron_ore.color);
-          advanceGoals();
-        }
-      } else if (near) {
-        prompt = `${MACHINES[near.id].name} · <b>X</b> pick up`;
+    const wasBelt = beltMode;
+    if (walk && !building && !beltMode) {
+      if (near) {
+        if (near.out && total(near.out) > 0 && !base.belts.some((b) => b.from === near.uid)) collectOut(near);
+        prompt = machinePrompt(near);
+        if (input.hit('KeyE')) useMachine(near);
+        if (input.hit('KeyX')) pickUpMachine(near);
       } else if (atShelter) {
         prompt = base.shelterO2 > 0 ? 'Shelter airlock · breathing shelter air' : 'Shelter airlock · <b>no air yet</b> — the shelter needs an electrolyzer';
-      }
-      if (near && input.hit('KeyX')) {
-        const item = near.id as ItemId;
-        if (pack.add(item, 1) === 0) {
-          if (near.ice) pack.add('ice', near.ice);
-          if (near.ore) pack.add('iron_ore', near.ore);
-          if (near.carbon) pack.add('carbon', near.carbon);
-          if (near.plates) pack.add('iron_plate', near.plates);
-          removeMachine(near);
-          sound.pickupMachine();
-          ui.pickup(`Picked up ${ITEMS[item].name}`, ITEMS[item].color);
-        } else ui.toast('Backpack full');
       }
       if (input.hit('KeyG')) player.startEmote(player.emoting === 'dance' ? 'dance_silly' : 'dance');
       if (input.hit('KeyQ')) {
         if (pack.remove('o2_canister', 1)) { sound.canister(); base.oxygen = Math.min(1, base.oxygen + 0.4); ui.pickup('Breathed an O₂ canister', ITEMS.o2_canister.color); }
         else ui.toast('No O₂ canisters — craft them from ice');
       }
-      if (input.hit('KeyB')) {
-        if (building) cancelBuild();
-        else {
-          const item = (['electrolyzer', 'battery', 'smelter', 'solar_lotus'] as ItemId[]).find((i) => pack.count(i) > 0);
-          if (item) startBuild(item); else ui.toast('Nothing to build — craft a machine first (Tab)');
-        }
+      if (input.hit('KeyB')) openBuild();
+      if (input.hit('KeyC')) {
+        if (!base.research.done.includes('conveyor')) ui.toast('Research conveyors first (at a research station)');
+        else { beltMode = true; beltFrom = null; ui.toast('Conveyor: click the machine that sends, then the one that receives'); }
       }
     } else if (walk && building) {
       if (input.hit('KeyB') || input.hit('Escape')) cancelBuild();
+    }
+
+    // Conveyor tool: click a sender, then a receiver.
+    if (beltMode && walk) {
+      const target = aimMachine();
+      if (wasBelt && (input.hit('KeyC') || input.hit('Escape'))) endBelt();
+      else if (!beltFrom) {
+        if (beltPreview) beltPreview.visible = false;
+        prompt = target ? `<b>Click</b> to send from the ${MACHINES[target.id].name.toLowerCase()} · <b>C</b> cancel` : 'Aim at the machine that sends items · <b>C</b> cancel';
+        if (target && input.hit('Mouse0')) { beltFrom = target; sound.click(); }
+      } else if (!target || target === beltFrom) {
+        if (beltPreview) beltPreview.visible = false;
+        prompt = `Sending from the ${MACHINES[beltFrom.id].name.toLowerCase()} — aim at the machine that receives · <b>C</b> cancel`;
+      } else {
+        const pts = beltPath(beltFrom, target, beltGround);
+        const len = pathLength(pts);
+        const problem = beltProblem(base, beltFrom, target, len);
+        const cost = beltCost(len);
+        const short = pack.count('conveyor') < cost;
+        if (!beltPreview) { beltPreview = new THREE.Line(new THREE.BufferGeometry(), beltPreviewMat); scene.add(beltPreview); }
+        beltPreview.geometry.dispose();
+        beltPreview.geometry = new THREE.BufferGeometry().setFromPoints(pts.map((q) => q.clone().addScaledVector(q.clone().normalize(), 0.25)));
+        beltPreview.visible = true;
+        beltPreviewMat.color.set(problem || short ? '#ff6a5a' : '#5cffd6');
+        prompt = problem ?? (short ? `Needs ${cost} conveyors — you have ${pack.count('conveyor')} (craft them from iron plates)` : `<b>Click</b> to lay ${Math.round(len)} m of belt (${cost} conveyors) · <b>C</b> cancel`);
+        if (!problem && !short && input.hit('Mouse0')) {
+          pack.remove('conveyor', cost);
+          const belt = addBelt(base, beltFrom, target, len);
+          belts.add(belt, pts);
+          sound.place();
+          ui.pickup(`Belt: ${MACHINES[beltFrom.id].name} → ${MACHINES[target.id].name}`, ITEMS.conveyor.color);
+          endBelt();
+          advanceGoals();
+          save();
+        }
+      }
     }
 
     // Build mode: a ghost on the ground ahead of you.
@@ -602,6 +804,7 @@ export async function startGame(opts: GameOptions) {
       const gr = groundR(P(target), pos.length() + 1);
       building.pos.copy(target).multiplyScalar(gr);
       const r = MACHINES[building.id].radius;
+      if (building.id === 'auto_drill') building.sample = drillSample(building.pos);
       const clear = colliders.every((c) => V(c.pos).distanceTo(building!.pos) > c.radius + r + 0.2);
       const dry = terrain.height(target.x, target.y, target.z) > world.seaLevel + 0.2;
       building.ok = clear && dry && building.pos.distanceTo(domePoint) > 3.9;
@@ -611,15 +814,16 @@ export async function startGame(opts: GameOptions) {
       g.applyMatrix4(surfaceMatrix(terrain, target, building.yaw, 1, 0.03, 0, domePoint.clone().sub(building.pos)));
       g.position.copy(building.pos);
       (g.userData.ghostMat as THREE.MeshBasicMaterial).color.set(building.ok ? '#5cffd6' : '#ff6a5a');
-      prompt = building.ok ? '<b>Click</b> to place · <b>R</b> turn · <b>B</b> cancel' : 'Too close to something, or in water';
+      const mines = building.sample ? ` · mines <b>${ITEMS[building.sample.item].name.toLowerCase()}</b>, ${Math.round(building.sample.rich * 100)}% rich` : '';
+      prompt = building.ok ? `<b>Click</b> to place${mines} · <b>R</b> turn · <b>B</b> cancel` : 'Too close to something, or in water';
       if (walk && input.hit('Mouse0') && building.ok && pack.remove(building.item, 1)) {
-        const m: PlacedMachine = { id: building.id, pos: P(building.pos) };
-        if (m.id === 'electrolyzer') m.ice = 0;
-        base.machines.push(m);
+        const m = addMachine(base, { id: building.id, pos: P(building.pos) });
+        if (building.sample) { m.mine = building.sample.item; m.rich = building.sample.rich; }
         addMachineView(m, building.yaw);
+        refreshFactory();
         ui.pickup(`Placed ${ITEMS[building.item].name}`, ITEMS[building.item].color);
         sound.place();
-        if (V(m.pos).distanceTo(domePoint) > SURVIVAL.gridRadius) ui.sarathi('That is too far from the shelter to share its power.');
+        if (MACHINES[m.id].powerKW < 0 && !powerNetworks(base, nearShelter).netOf.has(m.uid!)) ui.sarathi(SARATHI_EVENTS.noPower);
         cancelBuild();
         advanceGoals();
         save();
@@ -630,7 +834,7 @@ export async function startGame(opts: GameOptions) {
     let lasering = false;
     let laserTo: THREE.Vector3 | null = null, laserN: THREE.Vector3 | null = null;
     let laserHit: 'rock' | 'crystal' | null = null;
-    if (walk && !building && (input.down('Mouse0') || opts.shot && (window as unknown as { __laser?: boolean }).__laser) && base.power > 0.01) {
+    if (walk && !building && !beltMode && (input.down('Mouse0') || opts.shot && (window as unknown as { __laser?: boolean }).__laser) && base.power > 0.01) {
       const a = aim();
       if (a) {
         lasering = true;
@@ -733,8 +937,17 @@ export async function startGame(opts: GameOptions) {
       const res = tickBase(base, {
         dt, inShelter: atShelter, running: sprint && (fwd !== 0 || side !== 0), lasering, jetting: me.jetting,
         sunAt: (p) => daylight(sunElevation(days, P(V(p).normalize()))),
-        nearShelter: (p) => V(p).distanceTo(domePoint) < SURVIVAL.gridRadius,
+        nearShelter,
       });
+      lastSupply = res.supply;
+      if (res.researched) {
+        const node = researchById(res.researched)!;
+        ui.toast(`Research complete: ${node.name}`);
+        ui.sarathi(`${SARATHI_EVENTS.researched} ${node.name}. ${node.note}`, 8);
+        sound.goal();
+        refreshFactory();
+        advanceGoals();
+      }
       if (atShelter && base.oxygen > o2Before && !flags.breathed) { flags.breathed = true; advanceGoals(); }
       if (res.blackout) {
         const wake = domePoint.clone().addScaledVector(doorDir, 4.2).normalize();
@@ -747,10 +960,21 @@ export async function startGame(opts: GameOptions) {
       if (base.oxygen < 0.25 && !lowWarned) { ui.sarathi(SARATHI_EVENTS.lowOxygen); sound.alarm(); lowWarned = true; }
       if (base.oxygen > 0.4) lowWarned = false;
       for (const [m, v] of machineViews) {
-        if (m.id === 'battery') v.setLevel?.(res.capacity > 0 ? base.stored / res.capacity : 0);
-        if (m.id === 'electrolyzer') v.setActive?.(res.making);
-        if (m.id === 'smelter') { v.setActive?.((m.burn ?? 0) > 0); v.root.userData.smoke && ((v.root.userData.smoke as THREE.Points).visible = (m.burn ?? 0) > 0); }
+        const d = MACHINES[m.id];
+        const sup = res.supply.get(m.uid!) ?? 0;
+        let on = false;
+        if (m.id === 'battery') { v.setLevel?.((m.charge ?? 0) / (d.storeKWh ?? 20)); continue; }
+        if (m.id === 'power_pylon') on = res.supply.has(m.uid!);
+        else if (d.process?.fuel) on = (m.burn ?? 0) > 0;
+        else if (d.process) on = (m.burn ?? 0) > 0 && sup > 0.2;
+        else if (d.drill) on = !!m.mine && sup > 0.2 && total(m.out) < (d.outCap ?? 20);
+        else if (d.research) on = researchReady(base) && sup > 0.2;
+        else if (d.storage) on = total(m.inv) > 0;
+        v.setActive?.(on);
+        if (v.root.userData.smoke) (v.root.userData.smoke as THREE.Points).visible = on;
       }
+      researchTimer -= dt;
+      if (ui.researchOpen && researchTimer <= 0) { renderResearch(); researchTimer = 0.4; }
       const baseNight = 1 - daylight(sunElevation(days, P(domeDir)));
       if (baseNight > 0.8 && !wasNight) { wasNight = true; ui.sarathi(SARATHI_EVENTS.nightFalls); if (goalIndex >= 8) flags.sawNight = true; }
       if (baseNight < 0.3 && wasNight) { wasNight = false; ui.sarathi(SARATHI_EVENTS.sunrise); if (flags.sawNight) { flags.survivedNight = true; advanceGoals(); } }
@@ -767,31 +991,30 @@ export async function startGame(opts: GameOptions) {
       const tags: { x: number; y: number; text: string }[] = [];
       const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight;
       if (walk) for (const m of base.machines) {
-        let text = '';
-        if (m.id === 'smelter') text = (m.plates ?? 0) > 0 ? `${m.plates} iron plate${m.plates === 1 ? '' : 's'} ready` : (m.ore ?? 0) < 2 || (m.carbon ?? 0) < 1 ? 'Needs ore + carbon' : '';
-        else if (m.id === 'electrolyzer') text = (m.ice ?? 0) <= 0 && !(m.burn ?? 0) ? 'Needs ice' : '';
-        if (!text) continue;
         const mp = V(m.pos);
-        if (mp.distanceTo(pos) > 45) continue;
-        const sp = tmpC.copy(mp).addScaledVector(mp.clone().normalize(), m.id === 'smelter' ? 3.2 : 2.4).project(camera);
+        if (mp.distanceTo(pos) > 40) continue;
+        const text = machineTag(m);
+        if (!text) continue;
+        const sp = tmpC.copy(mp).addScaledVector(mp.clone().normalize(), MACHINES[m.id].height + 0.5).project(camera);
         if (sp.z > 1 || Math.abs(sp.x) > 1.1 || Math.abs(sp.y) > 1.1) continue;
         tags.push({ x: (sp.x * 0.5 + 0.5) * w, y: (-sp.y * 0.5 + 0.5) * h, text });
       }
-      ui.tags(tags);
+      ui.tags(tags.slice(0, 10));
     }
+    belts.updateItems(base.belts, camera);
     sound.laser(lasering, laserHit);
     sound.jet(me.jetting);
     sound.breathing(playing && base.oxygen < 0.25 && !atShelter);
     {
       let near: number | null = null;
-      for (const m of base.machines) if (m.id === 'smelter' && (m.burn ?? 0) > 0) { const d = V(m.pos).distanceTo(pos); if (near === null || d < near) near = d; }
+      for (const m of base.machines) if ((m.id === 'smelter' || m.id === 'coal_burner' || m.id === 'silicon_furnace') && (m.burn ?? 0) > 0) { const d = V(m.pos).distanceTo(pos); if (near === null || d < near) near = d; }
       sound.smelter(near);
     }
     sound.update(dt, night, me.grounded ? Math.hypot(me.vel.x, me.vel.y, me.vel.z) : 0);
     resTimer -= dt;
     if (resTimer <= 0 && playing) {
       resTimer = 0.25;
-      ui.resources((['ice', 'iron_ore', 'silica', 'carbon', 'iron_plate', 'o2_canister'] as ItemId[])
+      ui.resources((['ice', 'iron_ore', 'silica', 'carbon', 'iron_plate', 'silicon', 'conveyor', 'o2_canister'] as ItemId[])
         .filter((id, i) => i < 4 || pack.count(id) > 0)
         .map((id) => ({ name: ITEMS[id].name, color: ITEMS[id].color, n: pack.count(id) })));
     }
@@ -811,7 +1034,27 @@ export async function startGame(opts: GameOptions) {
     setTime: (offsetDays: number) => { days = t0 + offsetDays; envTimer = 0; },
     teleport: (fw: number, rt: number) => { const d = along(fw, rt); me.pos = P(d.multiplyScalar(terrain.groundRadius(P(d)) + 0.1)); },
     stats: () => ({ calls: renderer.info.render.calls, triangles: renderer.info.render.triangles }),
-    state: () => ({ pos: { ...me.pos }, grounded: me.grounded, fuel: me.jetFuel, alt: altitude(me, groundR), oxygen: base.oxygen, power: base.power, shelterO2: base.shelterO2, goal: CHAPTER1_GOALS[goalIndex].id, pack: pack.slots, machines: base.machines.length, smelters: base.machines.filter((m) => m.id === 'smelter').map((m) => ({ ore: m.ore, carbon: m.carbon, plates: m.plates, burn: m.burn })) }),
+    state: () => ({ pos: { ...me.pos }, grounded: me.grounded, fuel: me.jetFuel, alt: altitude(me, groundR), oxygen: base.oxygen, power: base.power, shelterO2: base.shelterO2, goal: CHAPTER1_GOALS[goalIndex].id, pack: pack.slots, machines: base.machines.length, smelters: base.machines.filter((m) => m.id === 'smelter').map((m) => ({ inv: m.inv, out: m.out, burn: m.burn, made: m.made, fed: m.fedByBelt })) }),
+    base: () => base,
+    remove: (i: number) => { removeMachine(base.machines[i]); },
+    research: (id: string) => { if (!base.research.done.includes(id)) base.research.done.push(id); refreshFactory(); advanceGoals(); },
+    belt: (a: number, b: number) => {
+      const f = base.machines[a], t = base.machines[b];
+      const pts = beltPath(f, t, beltGround); const len = pathLength(pts);
+      const problem = beltProblem(base, f, t, len);
+      if (problem) return problem;
+      belts.add(addBelt(base, f, t, len), pts); advanceGoals(); return 'ok';
+    },
+    goalIndex: (i: number) => { goalIndex = i; ui.goals(goalsView()); },
+    /** Runs the factory for `seconds` of game time at once (tests run at a few frames per second). */
+    simulate: (seconds: number) => {
+      for (let t = 0; t < seconds; t += 0.25) {
+        base.oxygen = 1;
+        const r = tickBase(base, { dt: 0.25, inShelter: false, running: false, lasering: false, jetting: false, sunAt: (p) => daylight(sunElevation(days, P(V(p).normalize()))), nearShelter });
+        lastSupply = r.supply;
+      }
+      advanceGoals();
+    },
     dig: (fw: number, rt: number, depth: number, r: number) => {
       const d = along(fw, rt); const g = terrain.groundRadius(P(d));
       for (let k = 0; k <= depth; k += 0.8) doDig(d.clone().multiplyScalar(g - k), r);
@@ -819,11 +1062,14 @@ export async function startGame(opts: GameOptions) {
     give: (id: ItemId, n: number) => give(id, n, 'mine'),
     craft: (id: ItemId) => { const r = Backpack.recipes().find((x) => x.out === id); if (r) ui.onCraft(r); },
     place: (id: MachineId, fw: number, rt: number) => {
-      const d = along(fw, rt); const m: PlacedMachine = { id, pos: P(d.multiplyScalar(terrain.groundRadius(P(d)))) };
-      if (id === 'electrolyzer') m.ice = 0;
-      base.machines.push(m); addMachineView(m);
+      const d = along(fw, rt); const p = d.multiplyScalar(terrain.groundRadius(P(d)));
+      const m = addMachine(base, { id, pos: P(p) });
+      if (id === 'auto_drill') { const smp = drillSample(p); m.mine = smp.item; m.rich = smp.rich; }
+      addMachineView(m); refreshFactory();
+      return base.machines.length - 1;
     },
-    loadIce: (n: number) => { for (const m of base.machines) if (m.id === 'electrolyzer') m.ice = (m.ice ?? 0) + n; },
+    loadIce: (n: number) => { for (const m of base.machines) if (m.id === 'electrolyzer') { m.inv ??= {}; m.inv.ice = (m.inv.ice ?? 0) + n; } },
+    fill: (i: number, id: ItemId, n: number) => { const m = base.machines[i]; m.inv ??= {}; m.inv[id] = (m.inv[id] ?? 0) + n; },
     face: (fw: number, rt: number) => { const t = along(fw, rt).multiplyScalar(R).sub(V(me.pos)); const u = V(me.pos).normalize(); t.addScaledVector(u, -t.dot(u)).normalize(); me.heading = P(t); },
   };
 

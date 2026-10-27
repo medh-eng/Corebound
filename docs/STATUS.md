@@ -2,6 +2,25 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
+## 2026-10-27 (M2)
+
+**Playable:** waits for GitHub Pages to be turned on again (Settings → Pages → Source: GitHub Actions). The repository is public again.
+
+**M2 Build and automate: first version built**
+- **Build menu (B):** every machine you can place, with its cost; click to craft and place in one go.
+- **Research station:** load the parts (by hand with E, or by belt); with power it researches. Tier 1: auto-drill, conveyors, power pylons, storage silo, coal burner. Tier 2: silicon furnace, bigger backpack (+4 slots), faster drills, silicon lotus cells (+25% solar).
+- **Auto-drill:** place it anywhere; it samples the ground 1–8 m down and mines the best ore there forever (iron veins, ice, carbon, or plain rock for silica). The placement ghost tells you what it will mine and how rich.
+- **Conveyors (C):** click the sending machine, then the receiving one; the belt follows the ground (your conveyor model) and items ride along it. 2 m of belt per conveyor item; up to 30 m.
+- **Storage silo** (300 items, E takes all), **coal burner** (5 kW from carbon, day and night), **silicon furnace** (silica + carbon → silicon), **power pylons** (carry power 14 m, link 26 m, copper cables).
+- **Status tags** over machines: no power, needs carbon, plates ready, research progress, drill full.
+- **New goals** after the smelter: research station → research the auto-drill → place a drill → research conveyors → lay a belt → 5 plates from belt-fed ore.
+- **Names** chosen (Mooladri, Shailasarpa, Balukavela, Himavela, Meghapakshi, Tantukari; Deepajana, Khanaka, Maruyatri, Jalabandhu, Patangajana, Shvasajana; creatures) and stored in `src/data/names.ts` and the GDD.
+- **Checked:** 31 unit tests (11 new for the factory), an automated M2 playtest (station → research → drill finds iron 60% rich → belt → smelter makes plates → belt → silo), the M1 mouse playtest, screenshots of the build menu, research panel, belts and pylons.
+
+**Moved to M3:** scanner and Codex (need the science cards, T-002); foundation pads and a top-down build camera are not needed yet.
+
+**Waiting for the Commander:** turn Pages on; play M2; machine sound loops and music (T-008); M3 art (T-015); give T-010, T-011, T-013 to ChatGPT Codex, T-001, T-002, T-014 to ChatGPT chat, T-012 to Sarvam; record the voice test (T-005).
+
 ## 2026-10-27
 
 **Playable: NOT updating.** The repository was made **private** on 2026-10-26, and free GitHub accounts can only publish GitHub Pages from a public repository, so Pages was switched off. Every build since then passes, but publishing fails. The Commander chooses: make the repo public again (free), pay for GitHub Pro (private repo, public game page), or publish elsewhere (for example an itch.io draft page). Until then the link shows the last version before the repo went private, or nothing.

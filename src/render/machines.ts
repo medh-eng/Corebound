@@ -1,4 +1,4 @@
-// Machines you craft and place: battery and electrolyzer are built in code; the solar lotus uses your model.
+// Machines you craft and place: owner models where they exist; battery, electrolyzer and pylon also have code-built versions.
 import * as THREE from 'three';
 import type { MachineId } from '../data/items';
 import { loadModel } from './assets';
@@ -65,12 +65,57 @@ function electrolyzer(): MachineView {
 }
 
 const models = new Map<MachineId, THREE.Group>();
+export let conveyorModel: THREE.Group | null = null;
+
+// Where each model's working light sits, and its colour.
+const LIGHTS: Partial<Record<MachineId, { color: string; y: number; z: number; range: number; on: number; flicker?: boolean }>> = {
+  smelter: { color: '#ff8a3a', y: 0.7, z: 0.9, range: 6, on: 6, flicker: true },
+  coal_burner: { color: '#ff7a2a', y: 0.8, z: 0.9, range: 6, on: 5, flicker: true },
+  silicon_furnace: { color: '#fff1d0', y: 1.3, z: 0.6, range: 5, on: 4, flicker: true },
+  auto_drill: { color: '#ffb347', y: 1.4, z: 0.7, range: 4, on: 2.5 },
+  research_station: { color: '#5cffd6', y: 1.9, z: 0.2, range: 4, on: 3 },
+  storage_silo: { color: '#ffcf6a', y: 2.0, z: 0.9, range: 3, on: 1.5 },
+};
+
+/** A copper power pylon with a ceramic lotus top and an amber lamp. */
+function pylon(): MachineView {
+  const root = new THREE.Group();
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.12, 4.0, 10), copper());
+  pole.position.y = 2.0;
+  const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.4, 0.2, 16), ceramic());
+  foot.position.y = 0.1;
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.07, 0.07), copper());
+  arm.position.y = 3.75;
+  root.add(pole, foot, arm);
+  for (const x of [-0.5, 0.5]) {
+    const ins = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.18, 8), ceramic());
+    ins.position.set(x, 3.88, 0);
+    root.add(ins);
+  }
+  const petals = new THREE.Group();
+  for (let i = 0; i < 6; i++) {
+    const p = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 6).scale(0.55, 1.2, 0.3), ceramic());
+    const a = (i / 6) * Math.PI * 2;
+    p.position.set(Math.cos(a) * 0.12, 4.15, Math.sin(a) * 0.12);
+    p.rotation.set(Math.sin(a) * 0.5, 0, -Math.cos(a) * 0.5);
+    petals.add(p);
+  }
+  const lampMat = new THREE.MeshStandardMaterial({ color: '#ffcf6a', emissive: '#ffb347', emissiveIntensity: 2.5 });
+  const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 8), lampMat);
+  lamp.position.y = 4.2;
+  root.add(petals, lamp);
+  root.traverse((o) => { o.castShadow = true; });
+  return { root, setActive: (on) => { lampMat.emissiveIntensity = on ? 2.5 : 0.2; } };
+}
+
+/** Where a pylon's cables attach (local coordinates). */
+export const PYLON_TOP = 3.88;
 
 /** Loads the owner's machine models; any that are missing fall back to code-built versions. */
 export async function preloadMachines() {
-  for (const id of ['solar_lotus', 'battery', 'electrolyzer', 'smelter'] as MachineId[]) {
-    try { models.set(id, await loadModel(id)); } catch { /* fallback below */ }
-  }
+  const ids: MachineId[] = ['solar_lotus', 'battery', 'electrolyzer', 'smelter', 'auto_drill', 'storage_silo', 'research_station', 'coal_burner', 'silicon_furnace'];
+  await Promise.all(ids.map(async (id) => { try { models.set(id, await loadModel(id)); } catch { /* fallback below */ } }));
+  try { conveyorModel = await loadModel('conveyor_straight'); } catch { conveyorModel = null; }
 }
 
 function fromModel(id: MachineId): MachineView | null {
@@ -81,12 +126,13 @@ function fromModel(id: MachineId): MachineView | null {
   copy.traverse((o) => { const mesh = o as THREE.Mesh; if (mesh.isMesh) (mesh.material as THREE.MeshStandardMaterial).envMapIntensity = 1.2; });
   root.add(copy);
   // A light that shows the machine is working (inside tanks, furnace mouth, charge meter).
-  const light = new THREE.PointLight(id === 'smelter' ? '#ff8a3a' : '#5cffd6', 0, id === 'smelter' ? 6 : 3.5, 2);
-  light.position.set(0, id === 'smelter' ? 0.7 : 0.8, id === 'smelter' ? 0.9 : 0.55);
+  const L = LIGHTS[id] ?? { color: '#5cffd6', y: 0.8, z: 0.55, range: 3.5, on: 2.5 };
+  const light = new THREE.PointLight(L.color, 0, L.range, 2);
+  light.position.set(0, L.y, L.z);
   root.add(light);
   return {
     root,
-    setActive: (on) => { light.intensity = on ? (id === 'smelter' ? 6 + Math.sin(performance.now() / 90) * 1.5 : 2.5) : 0; },
+    setActive: (on) => { light.intensity = on ? L.on + (L.flicker ? Math.sin(performance.now() / 90) * L.on * 0.25 : 0) : 0; },
     setLevel: (v) => { light.intensity = 0.3 + 2.2 * v; },
   };
 }
@@ -96,6 +142,7 @@ export function buildMachine(id: MachineId): MachineView {
   if (fromArt) return fromArt;
   if (id === 'battery') return battery();
   if (id === 'electrolyzer') return electrolyzer();
+  if (id === 'power_pylon') return pylon();
   const root = new THREE.Group();
   root.add(new THREE.Mesh(new THREE.ConeGeometry(0.8, 2, 8), new THREE.MeshStandardMaterial({ color: '#334' })));
   return { root };

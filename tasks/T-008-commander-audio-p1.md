@@ -8,3 +8,6 @@
 ## What to make (prompts in `docs/PROMPTS.md`)
 - §12 music marked P1: `title_theme`, `jiva_day`, `jiva_night`, `jiva_underground`, `factory_layer_1`
 - §13 sound effects marked P1: player and suit (13.1), laser and mining (13.2), pickups/crafting/UI (13.3), Chapter 1 machine loops (13.4: electrolyzer, smelter, solar lotus open, battery), ambience `amb_jiva_day`, `amb_jiva_night`, `amb_cave` (13.7)
+
+## Added 2026-10-27 for M2
+Machine loops now matter (PROMPTS.md §13.4): `auto_drill_loop`, `conveyor_loop`, `research_loop`, `coal_burner_loop`, `electrolyzer_loop`, `battery_hum`. Music: use a source that allows selling the game (PROMPTS.md §12).

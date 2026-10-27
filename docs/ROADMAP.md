@@ -24,7 +24,9 @@ Chapter 1 (Jivagraha) is built all the way to a polished free demo before worlds
 - **Build:** smooth diggable terrain (density field + marching cubes in workers); mining laser with VFX; ore pickup; backpack (8 stacks) and crafting; oxygen and suit power; blackout and wake; shelter dome, solar lotus, battery, electrolyzer; day/night consequences; autosave and save slots.
 - **Art (owner):** Custodian concept + turnaround + rigged GLB; Chapter 1 textures; Jivagraha sky.
 
-### M2 Build and automate
+### M2 Build and automate — first version built 2026-10-27
+- **Delivered:** build menu (B); research station with a tier 1–2 tree (auto-drill, conveyors, pylons, storage silo, coal burner, silicon furnace, bigger backpack, faster drills, better solar); auto-drills that mine what lies beneath; conveyors (C) using the owner's model with items riding them; storage silo; coal burner; silicon furnace and silicon; power pylons with cables and separate power networks; machine status tags; six new goals ending in the first fully automatic iron-plate line; the owner's seven new machine models.
+- **Moved:** foundation pads and the top-down build camera (not needed yet), scanner and Codex (to M3, with the science cards).
 - **Build:** build camera; foundation pads; placement/rotate/remove; auto-drill, smelter, silicon furnace, coal burner, storage silo, power pylons; conveyors with visible items; lifts; power network with under-supply; research terminal and tier 1–2 tech tree; scanner and Codex basics.
 - **Art (owner):** first 10 machine GLBs; item icons.
 

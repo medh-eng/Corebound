@@ -61,10 +61,10 @@ describe('survival and power', () => {
 describe('smelter', () => {
   it('turns ore and carbon into plates with power', () => {
     const s = newBase();
-    const sm: PlacedMachine = { id: 'smelter', pos: { x: 0, y: 0, z: 0 }, ore: 4, carbon: 2 };
+    const sm: PlacedMachine = { id: 'smelter', pos: { x: 0, y: 0, z: 0 }, ore: 4, carbon: 2 };   // old-save fields
     s.machines.push({ id: 'solar_lotus', pos: { x: 0, y: 0, z: 0 } }, sm);
     for (let i = 0; i < 20; i++) tickBase(s, tick());
-    expect(sm.plates).toBe(2);
-    expect(sm.ore).toBe(0);
+    expect(sm.out?.iron_plate).toBe(2);
+    expect(sm.inv?.iron_ore).toBe(0);
   });
 });

@@ -43,6 +43,9 @@ export class Backpack {
     return true;
   }
 
+  /** Grows (never shrinks) the backpack. */
+  resize(n: number) { if (n > this.size) { this.slots = this.slots.concat(new Array(n - this.size).fill(null)); this.size = n; } }
+
   static recipes() { return RECIPES; }
   toJSON() { return this.slots; }
   load(slots: (Slot | null)[]) { this.slots = slots.slice(0, this.size).concat(new Array(Math.max(0, this.size - slots.length)).fill(null)); }

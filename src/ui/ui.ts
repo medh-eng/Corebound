@@ -2,6 +2,7 @@
 import { assetUrl } from '../render/assets';
 import { CREDITS } from '../data/credits';
 import { ITEMS, RECIPES, type ItemId, type Recipe } from '../data/items';
+import { RESEARCH, type ResearchNode } from '../data/research';
 import type { Slot } from '../systems/inventory';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
@@ -13,8 +14,9 @@ const KEYS: [string, string][] = [
   ['Shift', 'Run'],
   ['Space', 'Jump · hold in the air for jetpack'],
   ['Tab', 'Backpack and crafting'],
-  ['B', 'Build mode (click to place, R to turn)'],
-  ['E', 'Use a machine'],
+  ['B', 'Build menu (click to place, R to turn)'],
+  ['C', 'Lay a conveyor belt between two machines'],
+  ['E', 'Use a machine (load it, collect, research)'],
   ['X', 'Pick up a machine'],
   ['Q', 'Breathe an O₂ canister'],
   ['M', 'Planet view'],
@@ -29,6 +31,9 @@ export interface Goal { key: string; text: string; done?: boolean; mystery?: boo
 export class UI {
   onCraft: (r: Recipe) => void = () => {};
   onPlace: (id: ItemId) => void = () => {};
+  onBuild: (id: ItemId) => void = () => {};
+  onResearch: (id: string) => void = () => {};
+  onResearchLoad: () => void = () => {};
   private sarathiTimer = 0;
 
   constructor() {
@@ -64,6 +69,14 @@ export class UI {
         <h2>Backpack</h2><div class="slots"></div><div class="note" id="pack-note">8 slots. Anything you need in bulk, you will automate later.</div>
         <h3>Craft</h3><div class="recipes"></div>
         <div class="note">Tab to close · click a machine in your backpack to place it</div>
+      </div></div>
+      <div id="build" class="hidden"><div class="card">
+        <h2>Build</h2><div class="builds"></div>
+        <div class="note">Click to place (crafts it first if you have the parts) · B or Esc to close</div>
+      </div></div>
+      <div id="research" class="hidden"><div class="card">
+        <h2>Research</h2><div class="current"></div><div class="nodes"></div>
+        <div class="note">E or Esc to close · the station needs power while it works</div>
       </div></div>
       <div id="hud" class="hidden">
         <div id="vitals" class="panel">
@@ -111,6 +124,16 @@ export class UI {
       if (e.key !== 'Tab') return;
       e.preventDefault();
       close.focus();
+    });
+    $('#build').addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest('[data-build]') as HTMLButtonElement | null;
+      if (b && !b.disabled) this.onBuild(b.dataset.build as ItemId);
+    });
+    $('#research').addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      const n = t.closest('[data-node]') as HTMLButtonElement | null;
+      if (n && !n.disabled) this.onResearch(n.dataset.node!);
+      if (t.closest('[data-load]')) this.onResearchLoad();
     });
     ($('#pack') as HTMLElement).addEventListener('click', (e) => {
       const t = e.target as HTMLElement;
@@ -186,7 +209,41 @@ export class UI {
   get packOpen() { return !$('#pack').classList.contains('hidden'); }
   setPack(open: boolean) { $('#pack').classList.toggle('hidden', !open); }
 
-  renderPack(slots: (Slot | null)[], canCraft: (r: Recipe) => boolean) {
+  get buildOpen() { return !$('#build').classList.contains('hidden'); }
+  setBuild(open: boolean) { $('#build').classList.toggle('hidden', !open); }
+  /** Machines you can place: how many you carry, and what one costs. */
+  renderBuild(list: { id: ItemId; have: number; canCraft: boolean; needs: string }[]) {
+    $('#build .builds').innerHTML = list.map((b) => {
+      const d = ITEMS[b.id];
+      const ok = b.have > 0 || b.canCraft;
+      return `<button class="recipe" data-build="${b.id}" ${ok ? '' : 'disabled'}><b><i class="dot" style="background:${d.color}"></i>${d.name}${b.have ? ` <small>× ${b.have} in backpack</small>` : ''}</b><span>${b.have ? 'Ready to place' : b.needs}</span><em>${d.note}</em></button>`;
+    }).join('') || '<div class="note">Nothing to build yet.</div>';
+  }
+
+  get researchOpen() { return !$('#research').classList.contains('hidden'); }
+  setResearch(open: boolean) { $('#research').classList.toggle('hidden', !open); }
+  /** The research tree: done, the current project (with parts delivered), what can start, what is locked. */
+  renderResearch(r: { done: string[]; active: string | null; inv: Partial<Record<ItemId, number>>; progress: number }, carried: (id: ItemId) => number, powered: boolean) {
+    const node = r.active ? RESEARCH.find((n) => n.id === r.active)! : null;
+    const parts = (n: ResearchNode, got?: Partial<Record<ItemId, number>>) => Object.entries(n.needs)
+      .map(([id, k]) => `${got ? `${Math.min(got[id as ItemId] ?? 0, k ?? 0)}/` : ''}${k} ${ITEMS[id as ItemId].name.toLowerCase()}`).join(' · ');
+    if (node) {
+      const ready = Object.entries(node.needs).every(([id, k]) => (r.inv[id as ItemId] ?? 0) >= (k ?? 0));
+      const missing = Object.entries(node.needs).some(([id, k]) => (r.inv[id as ItemId] ?? 0) < (k ?? 0) && carried(id as ItemId) > 0);
+      $('#research .current').innerHTML = `<div class="now"><b>${node.name}</b><span>${parts(node, r.inv)}</span>
+        <div class="bar"><i style="width:${Math.round((r.progress / node.seconds) * 100)}%"></i></div>
+        <em>${ready ? (powered ? 'Researching…' : 'Waiting for power') : 'Give it the parts: load from your backpack, or send them by conveyor.'}</em>
+        ${ready ? '' : `<button class="btn small" data-load ${missing ? '' : 'disabled'}>Load parts from backpack</button>`}</div>`;
+    } else $('#research .current').innerHTML = '<div class="note">Choose what to research.</div>';
+    $('#research .nodes').innerHTML = RESEARCH.map((n) => {
+      const done = r.done.includes(n.id);
+      const open = n.requires.every((q) => r.done.includes(q));
+      const state = done ? '✓ Done' : n.id === r.active ? 'In progress' : open ? parts(n) : `Needs ${n.requires.filter((q) => !r.done.includes(q)).map((q) => RESEARCH.find((x) => x.id === q)!.name).join(', ')}`;
+      return `<button class="recipe${done ? ' done' : ''}" data-node="${n.id}" ${done || !open || n.id === r.active ? 'disabled' : ''}><b>${n.name} <small>tier ${n.tier}</small></b><span>${state}</span><em>${n.note}</em></button>`;
+    }).join('');
+  }
+
+  renderPack(slots: (Slot | null)[], canCraft: (r: Recipe) => boolean, unlocked: (r: Recipe) => boolean = () => true) {
     $('#pack .slots').innerHTML = slots.map((s) => {
       if (!s) return '<div class="slot empty"></div>';
       const d = ITEMS[s.id];
@@ -194,6 +251,7 @@ export class UI {
       return `<div class="slot${d.placeable ? ' placeable' : ''}"${place}><i style="background:${d.color}"></i><b>${s.n}</b><span>${d.name}</span></div>`;
     }).join('');
     $('#pack .recipes').innerHTML = RECIPES.map((r, i) => {
+      if (!unlocked(r)) return '';
       const ok = canCraft(r);
       const needs = Object.entries(r.needs).map(([id, n]) => `${n} ${ITEMS[id as ItemId].name.toLowerCase()}`).join(' + ');
       return `<button class="recipe" data-recipe="${i}" ${ok ? '' : 'disabled'}><b>${ITEMS[r.out].name}</b><span>${needs}</span><em>${ITEMS[r.out].note}</em></button>`;
