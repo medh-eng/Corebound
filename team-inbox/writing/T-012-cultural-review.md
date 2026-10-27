@@ -227,10 +227,13 @@ Each world keeps the four constants from the style bible (jaali, stepwell geomet
 | --- | --- | --- | --- |
 | `shunya_wreck` | **Bhairavi in D** (the closing raga: a performance ends here) | Keep, and name the silence. Do not add conch or bells. | `sparse dark ambient, distant wordless choir, tanpura drone, metallic groans, long silences, instrumental` |
 
-### 3.9 Endings and credits
+### 3.9 Spaceflight, endings and credits
+
+**Instruments for the flight track:** sarod (a plucked string with a sliding, gliding voice: it is the instrument that most sounds like travel), bansuri, tanpura, and a synth arpeggio standing in for the tabla.
 
 | File | Raga to build on | What changes | Corrected style line |
 | --- | --- | --- | --- |
+| `spaceflight` | **Kirwani in A** (a raga borrowed from Carnatic music into Hindustani; its raised seventh gives the wonder-and-tension colour that synthwave already uses, so the two traditions meet without either being flattened) | Keep the retro synthwave, add the Indian string and flute so it is not a Western pastiche. | `retro synthwave, sarod, bansuri, tanpura, wide pads, arpeggiated bass, sense of flight, instrumental` |
 | `ending_harvest` | **Bhairavi in D** (the goodbye) | Add sarangi and a solo bansuri; this ending is a loss. | `bittersweet orchestral ambient, sarangi, solo bansuri, piano, strings, instrumental` |
 | `ending_covenant` | **Hamsadhwani in D** (the same raga as both calms, now as the ending) | Shehnai belongs here: an auspicious ending. | `uplifting orchestral synthwave, bansuri, shehnai, tabla, wordless choir, instrumental` |
 | `credits` | **Kafi in D**, the title theme's raga | Make the reprise explicit so it is a reprise and not a new tune. | `warm synthwave, santoor, bansuri, tanpura, a gentle reprise of the title theme, instrumental` |
