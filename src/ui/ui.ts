@@ -6,6 +6,7 @@ import { ITEMS, RECIPES, type ItemId, type Recipe } from '../data/items';
 import { RESEARCH, type ResearchNode } from '../data/research';
 import type { Slot } from '../systems/inventory';
 import { TIPS } from '../data/tips';
+import type { StoryLog } from '../data/logs';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
 
@@ -33,6 +34,11 @@ const KEYS: [string, string][] = [
 export interface Goal { key: string; text: string; done?: boolean; mystery?: boolean }
 
 export class UI {
+  private logFrame = 0;
+  private logText = '';
+  private logReaction = '';
+  private logOpener: HTMLElement | null = null;
+  private logMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   private loadingTipTimer = 0;
   onCraft: (r: Recipe) => void = () => {};
   onPlace: (id: ItemId) => void = () => {};
@@ -100,6 +106,18 @@ export class UI {
         <div class="codex-columns"><nav class="codex-list" aria-label="Discovered entries"></nav><article class="codex-entry" aria-live="polite"></article></div>
         <div class="note codex-count"></div>
       </div></div>
+      <div id="log" class="hidden" role="dialog" aria-modal="true" aria-labelledby="log-title" aria-describedby="log-speaker log-transcript">
+        <div class="card" tabindex="-1">
+          <div id="log-speaker"></div>
+          <h2 id="log-title"></h2>
+          <div class="log-reading">
+            <p id="log-text" aria-hidden="true"></p>
+            <p id="log-transcript" class="log-accessible"></p>
+            <p id="log-reaction" class="hidden" aria-live="polite"></p>
+          </div>
+          <button class="btn small" id="log-close">Close (E)</button>
+        </div>
+      </div>
       <div id="hud" class="hidden">
         <div id="vitals" class="panel">
           <div class="row"><span class="label">Oxygen</span><span class="meter" id="o2"><i style="width:100%"></i></span></div>
@@ -183,6 +201,26 @@ export class UI {
       // Rebuilding the list replaces the clicked button; keep keyboard focus on it.
       [...document.querySelectorAll<HTMLButtonElement>('#codex [data-entry]')]
         .find((button) => button.dataset.entry === this.codexSelected)?.focus();
+    });
+    $('#log-close').onclick = () => this.hideLog();
+    $('#log').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!(e.target as HTMLElement).closest('#log-close')) this.finishLog();
+    });
+    window.addEventListener('keydown', (e) => {
+      if (!this.logOpen) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this.finishLog();
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        $('#log-close').focus();
+      }
+    }, true);
+    this.logMotion.addEventListener('change', () => {
+      if (this.logOpen && this.logMotion.matches) this.finishLog();
     });
     this.renderCodex([]);
     $('#build').addEventListener('click', (e) => {
@@ -317,6 +355,70 @@ export class UI {
       const state = done ? '✓ Done' : n.id === r.active ? 'In progress' : open ? parts(n) : `Needs ${n.requires.filter((q) => !r.done.includes(q)).map((q) => RESEARCH.find((x) => x.id === q)!.name).join(', ')}`;
       return `<button class="recipe${done ? ' done' : ''}" data-node="${n.id}" ${done || !open || n.id === r.active ? 'disabled' : ''}><b>${n.name} <small>tier ${n.tier}</small></b><span>${state}</span><em>${n.note}</em></button>`;
     }).join('');
+  }
+
+  get logOpen() { return !$('#log').classList.contains('hidden'); }
+
+  showLog(log: StoryLog, reaction?: string) {
+    window.cancelAnimationFrame(this.logFrame);
+    this.logFrame = 0;
+    if (!this.logOpen) {
+      this.logOpener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
+    const panel = $('#log');
+    const speaker = log.speaker ?? '';
+    panel.classList.toggle('log-huxley', /huxley/i.test(speaker));
+    panel.classList.toggle('log-corrupted', /sarathi/i.test(speaker) && /corrupt/i.test(speaker));
+    $('#log-speaker').textContent = speaker;
+    $('#log-title').textContent = log.title || speaker || log.id;
+    this.logText = log.text ?? '';
+    this.logReaction = reaction ?? '';
+    $('#log-text').textContent = '';
+    // Give assistive technology a stable transcript, not repeated partial announcements.
+    $('#log-transcript').textContent = this.logText;
+    $('#log-reaction').textContent = '';
+    $('#log-reaction').classList.add('hidden');
+    panel.classList.remove('hidden');
+    $('#log .card').scrollTop = 0;
+    $('#log .card').focus();
+    const words = this.logText.match(/\S+\s*/g) ?? [];
+    if (this.logMotion.matches || !words.length) {
+      this.finishLog();
+      return;
+    }
+    const started = performance.now();
+    let shown = 0;
+    const reveal = (now: number) => {
+      // Reveal small groups at 14 words per second, independent of frame rate.
+      const count = Math.min(words.length, Math.floor((now - started) * 14 / 3000) * 3);
+      if (count !== shown) {
+        shown = count;
+        $('#log-text').textContent = words.slice(0, count).join('');
+      }
+      if (count >= words.length) this.finishLog();
+      else this.logFrame = window.requestAnimationFrame(reveal);
+    };
+    this.logFrame = window.requestAnimationFrame(reveal);
+  }
+
+  private finishLog() {
+    window.cancelAnimationFrame(this.logFrame);
+    this.logFrame = 0;
+    if (!this.logOpen) return;
+    $('#log-text').textContent = this.logText;
+    $('#log-reaction').textContent = this.logReaction;
+    $('#log-reaction').classList.toggle('hidden', !this.logReaction);
+  }
+
+  hideLog() {
+    window.cancelAnimationFrame(this.logFrame);
+    this.logFrame = 0;
+    if (!this.logOpen) return;
+    $('#log').classList.add('hidden');
+    this.logText = '';
+    this.logReaction = '';
+    if (this.logOpener?.isConnected) this.logOpener.focus();
+    this.logOpener = null;
   }
 
   get codexOpen() { return !$('#codex').classList.contains('hidden'); }

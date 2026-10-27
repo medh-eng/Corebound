@@ -1,7 +1,7 @@
 # T-019: The memory-log viewer
 
 - **Assigned to:** ChatGPT (Codex)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P1 (M4)
 - **Deliver to:** pull request from branch `chatgpt/T-019-log-viewer`
 
