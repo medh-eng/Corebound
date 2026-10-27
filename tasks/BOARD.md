@@ -12,9 +12,9 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | [T-004](T-004-names.md) | Names | Sarvam AI | P2 | done ✓; names chosen and in the game data |
 | [T-005](T-005-sarathi-voice-test.md) | SARATHI voice test | Sarvam AI + Commander | P2 | doing: **Commander to record audio** |
 | [T-006](T-006-translations-ch1.md) | Hindi and Marathi, Chapter 1 | Sarvam AI | P3 | waiting (text freeze at M4) |
-| [T-010](T-010-inventory-tests.md) | Unit tests for the backpack and crafting | ChatGPT (Codex) | P1 | todo |
+| [T-010](T-010-inventory-tests.md) | Unit tests for the backpack and crafting | ChatGPT (Codex) | P1 | done ✓ (PR #5, 47 tests) |
 | [T-011](T-011-loading-tips.md) | Tips on the loading screen | ChatGPT (Codex) | P2 | todo (tips may now mention B, C and research) |
-| [T-012](T-012-cultural-review.md) | Cultural review of art and music prompts | Sarvam AI | P2 | todo |
+| [T-012](T-012-cultural-review.md) | Cultural review of art and music prompts | Sarvam AI | P2 | done ✓ (PR #4, applied to PROMPTS.md) |
 | [T-013](T-013-data-checks.md) | Tests that check the game data fits together | ChatGPT (Codex) | P1 | todo (new) |
 | [T-014](T-014-research-lines.md) | SARATHI lines for research and new machines | ChatGPT (chat) | P2 | todo (new) |
 

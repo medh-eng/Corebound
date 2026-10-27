@@ -1,7 +1,7 @@
 # T-012: Cultural review of the art and music prompts
 
 - **Assigned to:** Sarvam AI
-- **Status:** todo
+- **Status:** done (merged 2026-10-27; applied to docs/PROMPTS.md)
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-012-cultural-review.md`
 - **Depends on:** nothing

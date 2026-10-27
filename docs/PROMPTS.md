@@ -57,10 +57,32 @@ Stylised Indo-futurist solarpunk game art for a cosy 3D sci-fi survival and fact
 Soft, chunky, rounded shapes with clear silhouettes; painterly hand-painted textures;
 warm golden light with soft atmospheric glow; bioluminescent nature.
 Technology is made of off-white ceramic, polished copper and brass, with warm amber lights,
-jaali lattice screens, stepwell geometry, arched domes and lotus-petal forms.
+jaali lattice screens, stepwell geometry, arched domes and lotus-petal forms used as engineering
+shapes (curved petal panels, petal-shaped fins and canopies), never held or sat upon.
+All of this as secular architecture and geometric ornament only: no deities, no idols, no shrines
+or temples, no minarets, no crosses, no shikhara spires, no kalash pot finials, no religious
+symbols of any kind, no ritual objects.
 Rich, harmonious colours, not neon. Friendly and wondrous, never scary or violent.
 No text, no letters, no logos, no watermark, no signature, no border.
+No elephants or cows used as decoration, no turbans, moustaches or bindis used as costume on
+alien, animal or robot characters, no Bollywood poster styling.
 ```
+
+### Materials per world (from Sarvam AI's cultural review, T-012)
+
+Every world keeps the same four shapes (jaali, stepwell geometry, chhatri-like canopies, lotus-petal panels) but builds them from its own **material**. Add the world's line to prompts for buildings and props:
+
+| World | Add this line |
+| --- | --- |
+| Jivagraha | `Local buildings in bamboo, cane weave and terracotta; Warli-style white line drawings of daily life (planting, harvesting, carrying lanterns) on earth walls.` |
+| Taptashila | `Local metalwork in blackened bidri metal with silver line inlay and dhokra lost-wax castings; cliff homes with jharokha balconies.` |
+| Marubhumi | `Mud walls with Kutch mirror inlay, bandhani and ajrakh cloth, deep chhajja shade eaves, lacquered Channapatna wood fittings.` |
+| Himasagara | `Frost-white carved ice, white-on-white chikankari-like frost patterns, kath-kuni interlocking timber and stone (no nails).` |
+| Vayumandala | `Kite-bamboo spars and cloth, Sankheda red-and-gold lacquered wood, tied bamboo scaffolding, geometric bunting.` |
+| Vishamegha | `Carved stone towers with jaali air filters, layered kalamkari-style robes, gold thewa filigree behind glass, meenakari enamel.` |
+| Shunyapath | `Wreck metal with bidri silver inlay, jaali hull ribs, cast-bronze fragments.` |
+
+Use a motif where it does a job (a jaali where air or light must pass, a chhatri where shade is needed), not as decoration sprinkled everywhere.
 
 ### World palettes (add the matching line to world prompts)
 
@@ -112,7 +134,7 @@ The old `tapta_*` images are close (volcanic). Add these to show **mountains, me
 | --- | --- |
 | `maru_orbit.png` | `A small round desert planet seen from orbit: red-orange and ochre dunes, a belt of golden savannah around the middle with dark winding dry riverbeds, a few blue oasis lakes, thin dusty pink atmosphere glowing at the rim, a small rover-shaped dust trail visible.` |
 | `maru_surface.png` | `Marubhumi surface at golden hour: tall curved red dunes, flat-topped stone mesas, a savannah of dry golden grass and umbrella-shaped alien trees with copper leaves, a shimmering oasis with turquoise water; a small astronaut beside a sleek buggy with big soft tyres; huge sky with two pale moons.` |
-| `maru_savannah.png` | `The savannah belt of a desert planet: tall golden grass, termite-like spires built by alien creatures, herds of gentle long-legged grazers, an alien nomad caravan of tall slender people with cloth sails on their backs walking in a line, distant dunes.` |
+| `maru_savannah.png` | `The savannah belt of a desert planet: tall golden grass, termite-like spires built by alien creatures, herds of gentle long-legged grazers, an alien nomad caravan of tall slender people with cloth sails on their backs walking in a line, drawn with dignity (walking, working, talking), no camels, no snake charmers, no turbans; distant dunes.` |
 | `maru_sandstorm.png` | `A giant red sandstorm wall rolling across a desert planet, the sun turned into an orange disc, a small ceramic base with amber lights bracing for it, an astronaut hurrying toward the airlock.` |
 | `maru_oil_region.png` | `A dark cracked plain on a desert planet where black oil seeps from the ground in glossy pools, glittering diamond crystals in an old riverbed, a liquid-drill pump of copper and ceramic working nearby.` |
 
@@ -141,7 +163,7 @@ Received ✓ `vayu_orbit`, `vayu_surface` (sky islands). Add:
 | --- | --- |
 | `visha_orbit.png` | `A small planet completely wrapped in thick swirling yellow-green and mustard clouds, a faint orange glow under the clouds, a pale sun nearby; seen from orbit with a small spaceship passing.` |
 | `visha_surface.png` | `On the surface of a cloud-covered toxic world: thick olive haze, dim filtered light, a landscape of smooth yellow rock and strange tall chimney plants that breathe out pale clouds, small orange acid pools that glow, an astronaut in a white suit with an extra filter backpack, a small base with glass air domes.` |
-| `visha_towers.png` | `Tall slender towers of an alien people built above the toxic clouds, made of curved stone and woven filters, glowing windows, gliders moving between them, the yellow cloud sea below.` |
+| `visha_towers.png` | `Tall slender towers of an alien people built above the toxic clouds, made of curved stone with carved jaali screens doubling as air filters and woven fibre panels, geometric ornament only (no temple or shrine forms), glowing windows, gliders moving between them, the yellow cloud sea below.` |
 | `visha_clean.png` | `The same toxic world after its air has been cleaned: the haze has thinned to soft gold, patches of blue sky, green algae growing on rocks, the chimney plants blooming with pink flowers.` |
 
 ### 3.7 Shunyapath (the wreck world): P3
@@ -150,7 +172,7 @@ Received ✓ `shunya_orbit`, `shunya_surface`. Add:
 
 | File | Prompt |
 | --- | --- |
-| `shunya_wreck_inside.png` | `Inside a gigantic crashed starship: a cathedral-like hall of off-white ceramic and copper ribs, rows of sealed seed vaults glowing soft green, cracked gold light leaking through the walls, a huge dormant machine at the far end shaped like a stepwell turned upside down (the terraforming engine), a small astronaut and a lotus-shaped floating drone.` |
+| `shunya_wreck_inside.png` | `Inside a gigantic crashed starship: a vast hall like the inside of a stepwell turned upside down, off-white ceramic and copper ribs rising in receding tiers (no church or temple forms), rows of sealed seed vaults glowing soft green, cracked gold light leaking through the walls, a huge dormant machine at the far end shaped like a stepwell turned upside down (the terraforming engine), a small astronaut and a lotus-shaped floating drone.` |
 | `shunya_core.png` | `The rebuilt Quantum Core floating in the centre of a ring machine, made of seven glowing fragments fitted together, light bending around it, the astronaut's hand reaching toward it, a moment of choice.` |
 
 ---
@@ -171,7 +193,7 @@ background, even soft studio lighting, no shadows, no props in hands.
 | Custodian | ✓ | `custodian.png`, `custodian_rigged.glb` | Received. |
 | Custodian suit modules | P3 | `custodian_suits.png` | `Four versions of the same astronaut suit side by side: heat-shielded with gold reflective plates; cold-insulated with quilted padding and fur-like trim; toxin-filter with a big round filter backpack and mask; pressure-sealed with extra rings and a glass collar.` (reference `custodian.png`). Suit modules may be added as attachments, so no new 3D model unless Claude asks. |
 | SARATHI | P2 | `sarathi_turnaround.png`, `sarathi.glb` | `A small floating drone shaped like a lotus bud: off-white ceramic petals that can open and close, a copper ring around the middle, one large warm amber eye-lens, small thruster glow underneath, a cracked petal showing it is damaged.` (reference `sarathi.png`). Single object, not rigged; Claude animates petals in code if the petals are separate parts. |
-| Prof. Orion Huxley | P2 | `huxley.png`, `huxley_turnaround.png`, `huxley_rigged.glb` | `An older scientist, around sixty, kind and tired face, short grey beard, round glasses, long lab coat over a simple high-collared mission uniform with a small lotus emblem, hands that like to gesture when he talks.` In the game he appears as a blue-gold hologram: Claude adds the hologram look in code, so make him in normal colours. Mixamo clips: Talking, Thinking, Pointing, Idle. |
+| Prof. Orion Huxley | P2 | `huxley.png`, `huxley_turnaround.png`, `huxley_rigged.glb` | `A specific individual with consistent features: an older scientist, around sixty, kind and tired face, short grey beard, round glasses, long lab coat over a simple high-collared mission uniform with a small lotus emblem, hands that like to gesture when he talks.` In the game he appears as a blue-gold hologram: Claude adds the hologram look in code, so make him in normal colours. Mixamo clips: Talking, Thinking, Pointing, Idle. |
 | Alion Voss | P3 | `voss.png`, `voss_turnaround.png`, `voss_rigged.glb` | `A friendly alien traveller: tall and slender, smooth blue-grey skin with soft bioluminescent freckles, large dark eyes, two small head-fins, wearing a patched space jacket with many pockets and a homemade radio device on the belt; curious, brave, a little tired.` Humanoid so Mixamo works. Clips: Idle, Talking, Waving, Walking, Sitting (trapped pose: Lying idle). |
 | Jivagraha people | P3 | `people_jiva.png` | `A small community of gentle forest people about one metre tall, moth-like with soft fuzzy antennae, woven leaf cloaks, carrying lanterns of glowing fungus; they tend giant mushroom gardens.` |
 | Taptashila people | P3 | `people_tapta.png` | `Sturdy miner people with stone-like shell plates on their backs, small bright eyes, heavy gloves, living in carved cliff homes lit by lava light; traders of metals.` |
@@ -303,12 +325,12 @@ Same turnaround ending as machines (section 6). Vehicles need **separate wheels*
 
 ## 8. Story props and items
 
-Small things. 1:1 turnaround images to `art-inbox/turnaround/`; GLB to `art-inbox/models/`.
+Small things. 1:1 turnaround images to `art-inbox/turnaround/`; GLB to `art-inbox/models/`. Any screen or panel on these props shows abstract bars and shapes, never letters.
 
 | Name | Priority | Prompt |
 | --- | --- | --- |
 | `laser_tool` | P2 (optional) | `A handheld mining laser tool: ceramic body, copper barrel with coils, a warm amber emitter tip, a comfortable grip.` (Claude has a code-made one; a model would replace it.) |
-| `translator` | P2 | `A handheld translator device: a round ceramic disc with a glowing amber ring of symbols around a small speaker grille, worn on a wrist strap.` |
+| `translator` | P2 | `A handheld translator device: a round ceramic disc with an engraved ring of abstract geometric marks (a repeating pattern, not letters, no readable writing of any script) around a small speaker grille, worn on a wrist strap.` |
 | `memory_log` | P2 | `A small data tablet left in a wreck: a slim ceramic slate with a cracked glowing screen, a copper edge, a lotus emblem.` |
 | `huxley_projector` | P2 | `A hologram projector: a round copper base with a glass lens in the middle and three curved ceramic arms.` |
 | `quantum_fragment` | P2 | `A Quantum Core fragment: a jagged shard of glowing gold-white crystal floating inside a small copper cage, light bending around it.` |
@@ -370,7 +392,7 @@ Icons needed (file name = item id): `ice`, `iron_ore`, `silica`, `carbon`, `iron
 | --- | --- | --- | --- |
 | `key_art.png` | ✓ | — | Received. |
 | `logo.png` | ✓ | — | Received. |
-| `store_main_capsule.png` | P2 | 1232 × 706 | `Key art: the astronaut Custodian standing on a tiny curved green planet at sunrise, a giant gentle Root Guardian rising from the glowing forest behind, a lotus-shaped drone beside them, a small spaceship on a launch pad, other planets of the star system in the sky. Leave the top third calm for the game title.` (reference `key_art.png`, `custodian.png`) |
+| `store_main_capsule.png` | P2 | 1232 × 706 | `Key art: the astronaut Custodian standing on a tiny curved green planet at sunrise, a giant gentle Root Guardian rising from the glowing forest behind, a lotus-shaped drone beside them, a small spaceship on a launch pad, other planets of the star system in the sky. Leave the top third calm for the game title. No religious symbols, temples, idols, elephants or turbans anywhere.` (reference `key_art.png`, `custodian.png`) |
 | `store_vertical.png` | P2 | 748 × 896 | Same scene, vertical. |
 | `store_header.png` | P2 | 920 × 430 | Same scene, wide, title area on the left. |
 | `library_hero.png` | P3 | 3840 × 1240 | Very wide panorama of the star system with the Custodian small in the foreground; no title. |
@@ -435,6 +457,8 @@ Clips wanted: **Custodian** ✓ plus `Dance` (celebration emote), `Pick Up`, `Ty
 
 If a tool needs a credit line, tell the Director: it goes on the Credits screen under "Music". This is a licence requirement, not a team credit.
 
+**Cultural rules for music (from Sarvam AI's review):** no instrument is used to signal worship. No temple bells, no singing bowls, no conch, no didgeridoo (it is an Aboriginal Australian instrument, not ours to borrow), no glass harmonica. Any choir is a **wordless choir**. Every world's bed includes a **tanpura drone** in that world's key: it ties all seven worlds together. Loops must cut on the first beat of the rhythm cycle (the *sam*). Ragas for each track are listed in `team-inbox/writing/T-012-cultural-review.md` §3 for whoever composes; raga names never appear in the game.
+
 **How to make them:**
 - In Suno (paid) or ElevenLabs Music, choose **Instrumental**. Paste the style line into the style box and the description into the prompt.
 - Keep **BPM and key exactly as written**: tracks of one world share tempo and key so Claude can layer them (the factory layers play on top of the world music as your factory grows).
@@ -443,30 +467,30 @@ If a tool needs a credit line, tell the Director: it goes on the Credits screen 
 
 | File | Priority | BPM / key | Style line | Description |
 | --- | --- | --- | --- | --- |
-| `title_theme` | P1 | 80 / D minor | `ambient synthwave, bansuri flute, santoor, warm pads, cinematic, hopeful, instrumental` | `Title music for a game about a lone scientist on tiny living planets: starts quiet with a tanpura drone and soft synth pads, a bansuri melody of wonder, builds gently with santoor arpeggios, ends hanging, mysterious.` |
-| `jiva_day` | P1 | 80 / D minor | `ambient, organic synth, santoor, birdsong-like synth chirps, soft hand percussion, calm, instrumental` | `Exploring a lush glowing alien forest in daylight: light, curious, peaceful, loopable, no big climax.` |
-| `jiva_night` | P1 | 80 / D minor | `dark ambient synthwave, tanpura drone, glassy bells, soft bansuri, mysterious, instrumental` | `Night on the forest world under an aurora; bioluminescent and a little lonely, loopable.` |
-| `jiva_underground` | P1 | 80 / D minor | `dark ambient, deep drones, dripping water textures, distant metallic resonances, instrumental` | `Digging tunnels deep underground, quiet and tense but not scary, loopable.` |
-| `factory_layer_1` | P1 | 80 / D minor | `minimal industrial percussion, mechanical clicks, soft analog bass pulse, instrumental` | `A light rhythmic loop of a small factory starting up: ticking, gentle pistons, a soft bass pulse. Must loop perfectly. Sparse so it can play on top of other music.` |
-| `factory_layer_2` | P2 | 80 / D minor | `industrial synthwave, tabla mixed with machine hits, pulsing arpeggio, instrumental` | `A busier factory layer: tabla patterns blended with metal hits and a pulsing synth arpeggio; loopable; sits on top of jiva_day.` |
-| `factory_layer_3` | P2 | 80 / D minor | `driving industrial synthwave, big drums, sitar riffs, instrumental` | `A large busy factory at full power; energetic and proud; loopable.` |
-| `guardian_awake` | P2 | 80 / D minor | `epic ambient, low brass swells, choir pads, deep drums, tanpura, instrumental` | `A colossal ancient creature wakes, restless and sad; awe and tension, never battle music; loopable middle section.` |
-| `guardian_calm` | P2 | 80 / D major | `uplifting ambient, choir, bansuri, santoor, warm strings, instrumental` | `The giant creature is calmed and the world heals; a release of tension into warmth, 90 seconds, ends resolved.` |
-| `memory_log` | P2 | free / D minor | `sparse piano and pads, tape texture, melancholic, instrumental` | `A soft bed for listening to old recorded messages from a lost scientist; 60 seconds, loopable.` |
-| `spaceflight` | P2 | 100 / A minor | `retro synthwave, wide pads, arpeggiated bass, sense of flight, instrumental` | `Flying a small spaceship between tiny planets: freedom, speed and wonder; loopable.` |
-| `tapta_day` | P3 | 90 / E minor | `desert rock ambient, deep didgeridoo-like drone, metallic plucks, heat shimmer pads, instrumental` | `A scorching rocky mineral world near the sun; harsh, bright and grand; loopable.` |
-| `tapta_night` | P3 | 90 / E minor | `cold ambient, crystalline bells, low drones, instrumental` | `The same world at freezing night; lava glows in the dark; loopable.` |
-| `maru_day` | P3 | 95 / C minor | `desert synthwave, sitar, rubab, frame drums, wind textures, instrumental` | `Crossing red dunes and golden savannah with nomad caravans; adventurous and warm; loopable.` |
-| `maru_storm` | P3 | 95 / C minor | `tense ambient, swirling noise, deep drums, instrumental` | `A giant sandstorm approaching; urgent but not violent; loopable.` |
-| `hima_ice` | P3 | 70 / F# minor | `glacial ambient, glass harmonica, soft choir, instrumental` | `A frozen white moon under a giant gas planet; vast, cold, beautiful; loopable.` |
-| `hima_ocean` | P3 | 70 / F# minor | `underwater ambient, whale-like synth calls, sonar pings, warm pads, instrumental` | `The dark hidden ocean beneath the ice with glowing creatures; loopable.` |
-| `vayu_reefs` | P3 | 85 / G major | `airy ambient synthwave, wind chimes, flute, soaring pads, instrumental` | `Floating islands in a lavender cloud sea on a gas giant; light and joyful; loopable.` |
-| `visha_haze` | P3 | 75 / B minor | `murky ambient, detuned synths, slow tabla, breathy textures, instrumental` | `A toxic yellow cloud world; heavy air, mysterious towers; loopable.` |
-| `visha_clean` | P3 | 75 / B major | `hopeful ambient, warm pads, santoor, instrumental` | `The same world after its air is cleaned; hope returns; loopable.` |
-| `shunya_wreck` | P3 | 60 / D minor | `sparse dark ambient, distant choir, metallic groans, instrumental` | `Inside the giant crashed starship holding humanity's seeds; silence and weight; loopable.` |
-| `ending_harvest` | P3 | 70 / D minor | `bittersweet orchestral ambient, piano, strings, instrumental` | `Humanity's seeds bloom but the living worlds fade to grey; beautiful and sad; 3 minutes.` |
-| `ending_covenant` | P3 | 80 / D major | `uplifting orchestral synthwave, bansuri, choir, tabla, instrumental` | `Humans and alien worlds live together in harmony; triumphant warmth; 3 minutes.` |
-| `credits` | P3 | 80 / D major | `warm synthwave, santoor, bansuri, instrumental` | `Credits music; a gentle reprise of the title theme; 3 minutes.` |
+| `title_theme` | P1 | 80 / D minor | `ambient synthwave, bansuri flute, santoor, tanpura drone, warm pads, cinematic, hopeful, instrumental` | `Title music for a game about a lone scientist on tiny living planets: starts quiet with a tanpura drone and soft synth pads, a bansuri melody of wonder, builds gently with santoor arpeggios, ends hanging, mysterious.` |
+| `jiva_day` | P1 | 80 / D minor | `ambient, organic synth, santoor, bansuri, birdsong-like synth chirps, soft tabla and manjira, calm, instrumental` | `Exploring a lush glowing alien forest in daylight: light, curious, peaceful, loopable, no big climax.` |
+| `jiva_night` | P1 | 80 / D minor | `dark ambient synthwave, tanpura drone, glassy bells, sparse bansuri, mysterious, spacious, instrumental` | `Night on the forest world under an aurora; bioluminescent and a little lonely, loopable.` |
+| `jiva_underground` | P1 | 80 / D minor | `dark ambient, deep tanpura and sarangi drones, dripping water textures, distant metallic resonances, instrumental` | `Digging tunnels deep underground, quiet and tense but not scary, loopable.` |
+| `factory_layer_1` | P1 | 80 / D minor | `minimal industrial percussion, mechanical clicks, soft analog bass pulse, instrumental, loop point on the first beat` | `A light rhythmic loop of a small factory starting up: ticking, gentle pistons, a soft bass pulse. Must loop perfectly. Sparse so it can play on top of other music.` |
+| `factory_layer_2` | P2 | 80 / D minor | `industrial synthwave, tabla in teentaal blended with machine hits, pulsing arpeggio, instrumental` | `A busier factory layer: tabla patterns blended with metal hits and a pulsing synth arpeggio; loopable; sits on top of jiva_day.` |
+| `factory_layer_3` | P2 | 80 / D minor | `driving industrial synthwave, big pakhawaj and drum hits, sitar riffs in D, instrumental` | `A large busy factory at full power; energetic and proud; loopable.` |
+| `guardian_awake` | P2 | 80 / D minor | `epic ambient, low rudra veena and sarangi, wordless choir pads, pakhawaj, tanpura, awe and grief, not battle music, instrumental` | `A colossal ancient creature wakes, restless and sad; awe and tension, never battle music; loopable middle section.` |
+| `guardian_calm` | P2 | 80 / D major | `uplifting ambient, bansuri, santoor, shehnai, wordless choir, warm strings, instrumental` | `The giant creature is calmed and the world heals; a release of tension into warmth, 90 seconds, ends resolved.` |
+| `memory_log` | P2 | free / D minor | `sparse sarangi and piano, tape texture, tanpura, melancholic, instrumental` | `A soft bed for listening to old recorded messages from a lost scientist; 60 seconds, loopable.` |
+| `spaceflight` | P2 | 100 / A minor | `retro synthwave, sarod, bansuri, tanpura, wide pads, arpeggiated bass, sense of flight, instrumental` | `Flying a small spaceship between tiny planets: freedom, speed and wonder; loopable.` |
+| `tapta_day` | P3 | 90 / E minor | `desert rock ambient, deep tanpura and rudra veena drone, metallic morchang plucks, heat shimmer pads, instrumental` | `A scorching rocky mineral world near the sun; harsh, bright and grand; loopable.` |
+| `tapta_night` | P3 | 90 / E minor | `cold ambient, struck metal bells, sarangi, low tanpura drones, instrumental` | `The same world at freezing night; lava glows in the dark; loopable.` |
+| `maru_day` | P3 | 95 / C minor | `desert synthwave, algoza double flute, Kashmiri rubab, khartal and dholak, wind textures, instrumental` | `Crossing red dunes and golden savannah with nomad caravans; adventurous and warm; loopable.` |
+| `maru_storm` | P3 | 95 / C minor | `tense ambient, swirling wind textures, kamaycha, khartal, deep dholak, urgent but not violent, instrumental` | `A giant sandstorm approaching; urgent but not violent; loopable.` |
+| `hima_ice` | P3 | 70 / F# minor | `glacial ambient, jal tarang water bowls, santoor, soft tanpura drone, wordless choir, instrumental` | `A frozen white moon under a giant gas planet; vast, cold, beautiful; loopable.` |
+| `hima_ocean` | P3 | 70 / F# minor | `underwater ambient, sarangi, whale-like synth calls, sonar pings, warm pads, instrumental` | `The dark hidden ocean beneath the ice with glowing creatures; loopable.` |
+| `vayu_reefs` | P3 | 85 / G major | `airy ambient synthwave, bansuri bamboo flute, swarmandal glissandi, manjira, soaring pads, instrumental` | `Floating islands in a lavender cloud sea on a gas giant; light and joyful; loopable.` |
+| `visha_haze` | P3 | 75 / B minor | `murky ambient, sarangi, detuned synths, slow tabla, breathy textures, instrumental` | `A toxic yellow cloud world; heavy air, mysterious towers; loopable.` |
+| `visha_clean` | P3 | 75 / B major | `hopeful ambient, warm pads, santoor, bansuri, shehnai, instrumental` | `The same world after its air is cleaned; hope returns; loopable.` |
+| `shunya_wreck` | P3 | 60 / D minor | `sparse dark ambient, distant wordless choir, tanpura drone, metallic groans, long silences, instrumental` | `Inside the giant crashed starship holding humanity's seeds; silence and weight; loopable.` |
+| `ending_harvest` | P3 | 70 / D minor | `bittersweet orchestral ambient, sarangi, solo bansuri, piano, strings, instrumental` | `Humanity's seeds bloom but the living worlds fade to grey; beautiful and sad; 3 minutes.` |
+| `ending_covenant` | P3 | 80 / D major | `uplifting orchestral synthwave, bansuri, shehnai, tabla, wordless choir, instrumental` | `Humans and alien worlds live together in harmony; triumphant warmth; 3 minutes.` |
+| `credits` | P3 | 80 / D major | `warm synthwave, santoor, bansuri, tanpura, a gentle reprise of the title theme, instrumental` | `Credits music; a gentle reprise of the title theme; 3 minutes.` |
 
 ---
 
