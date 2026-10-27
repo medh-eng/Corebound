@@ -1,7 +1,7 @@
 # T-016: The Codex panel
 
 - **Assigned to:** ChatGPT (Codex)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P1 (M3)
 - **Deliver to:** pull request from branch `chatgpt/T-016-codex-panel`
 - **Depends on:** nothing

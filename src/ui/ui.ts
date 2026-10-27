@@ -1,6 +1,7 @@
 // Menus and heads-up display (plain DOM over the 3D canvas).
 import { assetUrl } from '../render/assets';
 import { CREDITS } from '../data/credits';
+import { CODEX, type CodexKind } from '../data/codex';
 import { ITEMS, RECIPES, type ItemId, type Recipe } from '../data/items';
 import { RESEARCH, type ResearchNode } from '../data/research';
 import type { Slot } from '../systems/inventory';
@@ -35,6 +36,10 @@ export class UI {
   onResearch: (id: string) => void = () => {};
   onResearchLoad: () => void = () => {};
   private sarathiTimer = 0;
+  private codexFilter: CodexKind | 'all' = 'all';
+  private codexSelected: string | null = null;
+  private codexUnlocked = new Set<string>();
+  private codexNew = new Set<string>();
 
   constructor() {
     const keys = KEYS.map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
@@ -77,6 +82,19 @@ export class UI {
       <div id="research" class="hidden"><div class="card">
         <h2>Research</h2><div class="current"></div><div class="nodes"></div>
         <div class="note">E or Esc to close · the station needs power while it works</div>
+      </div></div>
+      <div id="codex" class="hidden"><div class="card">
+        <h2>Codex</h2>
+        <div class="codex-filters" role="group" aria-label="Filter Codex">
+          <button class="btn small" data-kind="all" aria-pressed="true">All</button>
+          <button class="btn small" data-kind="flora" aria-pressed="false">Flora</button>
+          <button class="btn small" data-kind="fauna" aria-pressed="false">Fauna</button>
+          <button class="btn small" data-kind="mineral" aria-pressed="false">Minerals</button>
+          <button class="btn small" data-kind="machine" aria-pressed="false">Machines</button>
+          <button class="btn small" data-kind="world" aria-pressed="false">Worlds</button>
+        </div>
+        <div class="codex-columns"><nav class="codex-list" aria-label="Discovered entries"></nav><article class="codex-entry" aria-live="polite"></article></div>
+        <div class="note codex-count"></div>
       </div></div>
       <div id="hud" class="hidden">
         <div id="vitals" class="panel">
@@ -127,6 +145,22 @@ export class UI {
       e.preventDefault();
       close.focus();
     });
+    $('#codex .codex-filters').addEventListener('click', (e) => {
+      const tab = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-kind]');
+      if (!tab) return;
+      this.codexFilter = tab.dataset.kind as CodexKind | 'all';
+      this.drawCodex();
+    });
+    $('#codex .codex-list').addEventListener('click', (e) => {
+      const entry = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-entry]');
+      if (!entry) return;
+      this.codexSelected = entry.dataset.entry!;
+      this.drawCodex();
+      // Rebuilding the list replaces the clicked button; keep keyboard focus on it.
+      [...document.querySelectorAll<HTMLButtonElement>('#codex [data-entry]')]
+        .find((button) => button.dataset.entry === this.codexSelected)?.focus();
+    });
+    this.renderCodex([]);
     $('#build').addEventListener('click', (e) => {
       const b = (e.target as HTMLElement).closest('[data-build]') as HTMLButtonElement | null;
       if (b && !b.disabled) this.onBuild(b.dataset.build as ItemId);
@@ -255,6 +289,68 @@ export class UI {
       const state = done ? '✓ Done' : n.id === r.active ? 'In progress' : open ? parts(n) : `Needs ${n.requires.filter((q) => !r.done.includes(q)).map((q) => RESEARCH.find((x) => x.id === q)!.name).join(', ')}`;
       return `<button class="recipe${done ? ' done' : ''}" data-node="${n.id}" ${done || !open || n.id === r.active ? 'disabled' : ''}><b>${n.name} <small>tier ${n.tier}</small></b><span>${state}</span><em>${n.note}</em></button>`;
     }).join('');
+  }
+
+  get codexOpen() { return !$('#codex').classList.contains('hidden'); }
+  setCodex(open: boolean) { $('#codex').classList.toggle('hidden', !open); }
+
+  renderCodex(unlocked: string[], newIds: string[] = []) {
+    this.codexUnlocked = new Set(unlocked);
+    this.codexNew = new Set(newIds);
+    this.drawCodex();
+  }
+
+  private drawCodex() {
+    const unlocked = CODEX.filter((entry) => this.codexUnlocked.has(entry.id));
+    const visible = unlocked.filter((entry) => this.codexFilter === 'all' || entry.kind === this.codexFilter);
+    const selected = visible.find((entry) => entry.id === this.codexSelected) ?? visible[0];
+    this.codexSelected = selected?.id ?? null;
+    document.querySelectorAll<HTMLButtonElement>('#codex [data-kind]').forEach((tab) => {
+      tab.setAttribute('aria-pressed', String(tab.dataset.kind === this.codexFilter));
+    });
+    const list = $('#codex .codex-list');
+    list.replaceChildren();
+    for (const entry of visible) {
+      const button = document.createElement('button');
+      button.className = 'recipe';
+      button.dataset.entry = entry.id;
+      button.setAttribute('aria-pressed', String(entry.id === selected?.id));
+      button.textContent = entry.title;
+      if (this.codexNew.has(entry.id)) {
+        const badge = document.createElement('small');
+        badge.className = 'codex-new';
+        badge.textContent = 'new';
+        button.append(badge);
+      }
+      list.append(button);
+    }
+    const detail = $('#codex .codex-entry');
+    detail.replaceChildren();
+    if (selected) {
+      const title = document.createElement('h3');
+      title.textContent = selected.title;
+      detail.append(title);
+      if (selected.name || selected.deva) {
+        const name = document.createElement('p');
+        name.className = 'codex-name';
+        name.textContent = [selected.name, selected.deva].filter(Boolean).join(' · ');
+        detail.append(name);
+      }
+      const text = document.createElement('p');
+      text.textContent = selected.text;
+      detail.append(text);
+      if (selected.science) {
+        const science = document.createElement('p');
+        science.className = 'codex-science';
+        const label = document.createElement('strong');
+        label.textContent = 'Science: ';
+        science.append(label, selected.science);
+        detail.append(science);
+      }
+    } else {
+      detail.textContent = unlocked.length ? 'No discoveries in this category yet.' : 'Scan your surroundings to discover Codex entries.';
+    }
+    $('#codex .codex-count').textContent = `${CODEX.length - unlocked.length} still to discover`;
   }
 
   renderPack(slots: (Slot | null)[], canCraft: (r: Recipe) => boolean, unlocked: (r: Recipe) => boolean = () => true) {
