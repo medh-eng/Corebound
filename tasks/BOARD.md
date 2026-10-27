@@ -17,6 +17,9 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | [T-012](T-012-cultural-review.md) | Cultural review of art and music prompts | Sarvam AI | P2 | done ✓ (PR #4, applied to PROMPTS.md) |
 | [T-013](T-013-data-checks.md) | Tests that check the game data fits together | ChatGPT (Codex) | P1 | todo (new) |
 | [T-014](T-014-research-lines.md) | SARATHI lines for research and new machines | ChatGPT (chat) | P2 | todo (new) |
+| [T-016](T-016-codex-panel.md) | The Codex panel (M3) | ChatGPT (Codex) | P1 | todo (new) |
+| [T-017](T-017-flora-names.md) | Names for Jivagraha's plants, rocks and the bloom | Sarvam AI | P2 | todo (new) |
+| [T-018](T-018-codex-text.md) | Codex entries for Jivagraha and Harmony | ChatGPT (chat) | P2 | todo (new) |
 
 ## Commander
 
@@ -36,4 +39,4 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | D-002 | M2 Build and automate | done ✓ (first version) |
 | D-003 | Rig tool: per-character animation folders | todo (before Huxley/Voss arrive) |
 | D-005 | Store art for the store pages and loading screen | M4 |
-| D-006 | M3 Harmony and life | after the Commander plays M2 |
+| D-006 | M3 Harmony and life | doing (Commander: "do the next work") |
