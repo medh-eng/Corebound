@@ -30,7 +30,7 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 | 11 | **Voice test** (T-005): record SARATHI's 5 test lines in Sarvam Bulbul | `art-inbox/audio/voice/tests/` | §14 and `art-inbox/audio/voice/tests/T-005-voice-test-sheet.md` |
 | 12 | **Teaser clips** for the demo trailer | `art-inbox/video/` | §10 |
 
-**Please also tell the Director** which site or tool each music track and sound came from (for example "jiva_day: Pixabay, boopul"), so the licences can be listed before release. Only one copy of `factory_layer` is needed (three identical files arrived; nothing to fix).
+**Licences:** music is from Pixabay (recorded in `docs/LICENCES.md`, thank you). **Still needed:** which site or tool the **sound effects** came from (the footsteps, laser, jetpack and so on), so they can be listed too. From now on, writing the source in the upload's commit message is enough.
 
 ### ✓ Received so far (all in the game unless noted)
 

@@ -298,7 +298,7 @@ Rules: wow in minute one; hands busy by minute 3; three goals always visible; so
 
 Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manual slots. Graphics presets (Low for Steam Deck/integrated GPUs). Rebindable keys, text size, subtitles, colour-blind support. English first; text externalised for translation (Hindi and Marathi next, with Sarvam AI).
 
-**Credits:** "A game by Medhanshu Shahane." No team list. Tools and AI use are listed in the store's AI-content disclosure, not in the credits.
+**Credits:** "A game by Medhanshu Shahane." No team list. A thank-you line to the Indian craft traditions that inspired the game, and a music credit to Pixabay artists. Tools and AI use are listed in the store's AI-content disclosure, not in the credits.
 
 ## 17. Art and audio
 
@@ -377,4 +377,6 @@ Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manua
 | 2026-10-27 | Three names corrected after Sarvam's check of modern Hindi/Marathi readings: Khanaka → **Khanik** (खनक means a tinkling sound), Kathinakita → **Kathorakita** (कठिन means difficult), Jyotipatang → **Jyotishalabha** (पतंग means kite, clashing with the kite-folk) | Sarvam AI review |
 | 2026-10-27 | Scanner = hold right mouse on a plant, rock, creature, machine or the shelter for about a second; the Codex (J) collects the entries; planet view unlocks the world and Harmony entries | GDD §11 scanner + Codex |
 | 2026-10-27 | Recorded music is chosen by situation (title; Jivagraha day, night, underground; Guardian awake when Harmony collapses) and crossfades; recorded factory layers join as more machines run; code-made pads only fill gaps | Owner music arrived |
-| Open | Szynthar: said SIN-thar or ZIN-thar (Medhanshu to decide); price; repo visibility at launch; final art direction sign-off | **owner** |
+| 2026-10-27 | Szynthar is said **SIN-thar** | Medhanshu's choice |
+| 2026-10-27 | Credits add a thank-you to the craft traditions that shaped the look and music (Warli, Manganiyar and Langa, dhokra, bidri) and a music credit to Pixabay artists | Commander's decision (Sarvam's suggestion) |
+| Open | price; repo visibility at launch; final art direction sign-off | **owner** |

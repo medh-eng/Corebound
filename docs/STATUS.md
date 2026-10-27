@@ -2,6 +2,12 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
+## 2026-10-27 (night)
+
+- **Credits** now thank the Warli painters, the Manganiyar and Langa musicians, the dhokra metal-casters and the bidri artisans, and credit the Pixabay music artists (Commander said yes).
+- **Szynthar** is said SIN-thar (final).
+- **Licences:** new `docs/LICENCES.md`; music recorded as Pixabay. Still to confirm: the source of the sound effects.
+
 ## 2026-10-27 (evening)
 
 **Your to-do list now lives at the top of [PROMPTS.md](PROMPTS.md) ("Your checklist").** Everything received is marked ✓; what is wanted next is numbered in order.
