@@ -1,7 +1,7 @@
 # T-018: Codex entries for Jivagraha and Harmony
 
 - **Assigned to:** ChatGPT (chat)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P2 (M3)
 - **Deliver to:** `team-inbox/writing/T-018-codex-text.md`
 - **Depends on:** nothing (use English names; the Director adds Sarvam's names from T-017)
