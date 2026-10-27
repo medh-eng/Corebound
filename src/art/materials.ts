@@ -13,6 +13,8 @@ export const shared = {
   uTime: { value: 0 },
   uNight: { value: 0 },        // 0 day .. 1 night, at the player's location
   uWind: { value: 1 },
+  uWilt: { value: 0 },         // 0 healthy .. 1 dying (from Harmony)
+  uThrive: { value: 0 },       // 0 .. 1 extra lushness when Harmony is very high
   // Painted ground textures (owner art), applied as triplanar detail on terrain.
   uDetail: { value: 0 },
   uTexGrass: { value: null as THREE.Texture | null }, uTexSoil: { value: null as THREE.Texture | null },
@@ -40,6 +42,7 @@ export interface StylisedOptions {
   map?: THREE.Texture | null;
   cutBoxes?: 'ground';          // hide this mesh inside dug-out regions (voxel chunks draw there)
   detail?: 'ground' | 'dug';    // triplanar painted textures chosen from the vertex colour
+  life?: number;               // 0..1: how much this wilts or thrives with Harmony (plants 1, ground less)
 }
 
 const DETAIL_GLSL = /* glsl */ `
@@ -71,22 +74,25 @@ export function stylised(o: StylisedOptions = {}): THREE.MeshStandardMaterial {
   const mottle = o.mottle ?? 0;
   const id = ++key;
   const detail = quality.detail ? o.detail : undefined;
-  m.customProgramCacheKey = () => `stylised-${o.glow ? 1 : 0}-${sway > 0 ? 1 : 0}-${mottle > 0 ? 1 : 0}-${o.cutBoxes ? 1 : 0}-${detail ?? ''}-${id}`;
+  const life = o.life ?? 0;
+  m.customProgramCacheKey = () => `stylised-${o.glow ? 1 : 0}-${sway > 0 ? 1 : 0}-${mottle > 0 ? 1 : 0}-${o.cutBoxes ? 1 : 0}-${detail ?? ''}-${life}-${id}`;
   m.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = shared.uTime;
     shader.uniforms.uNight = shared.uNight;
     shader.uniforms.uWind = shared.uWind;
+    shader.uniforms.uWilt = shared.uWilt;
+    shader.uniforms.uThrive = shared.uThrive;
     let vs = shader.vertexShader;
     let fs = shader.fragmentShader;
     const vDecl: string[] = ['uniform float uTime;', 'uniform float uWind;'];
-    const fDecl: string[] = ['uniform float uNight;'];
+    const fDecl: string[] = ['uniform float uNight;', 'uniform float uWilt;', 'uniform float uThrive;'];
     if (o.glow) {
       vDecl.push('attribute vec3 glow;', 'varying vec3 vGlow;');
       fDecl.push('varying vec3 vGlow;');
       vs = vs.replace('#include <begin_vertex>', '#include <begin_vertex>\n vGlow = glow;');
       fs = fs.replace(
         '#include <emissivemap_fragment>',
-        `#include <emissivemap_fragment>\n totalEmissiveRadiance += vGlow * mix(${glowDay.toFixed(3)}, ${glowNight.toFixed(3)}, uNight);`,
+        `#include <emissivemap_fragment>\n totalEmissiveRadiance += vGlow * mix(${glowDay.toFixed(3)}, ${glowNight.toFixed(3)}, uNight) * (1.0 - uWilt * ${(life * 0.85).toFixed(3)}) * (1.0 + uThrive * ${(life * 0.35).toFixed(3)});`,
       );
     }
     if (sway > 0) {
@@ -130,6 +136,18 @@ export function stylised(o: StylisedOptions = {}): THREE.MeshStandardMaterial {
         float mt = vnoise(vWorldP * 0.55) * 0.6 + vnoise(vWorldP * 2.3) * 0.4;
         diffuseColor.rgb *= 1.0 + (mt - 0.5) * ${(mottle * 2).toFixed(3)};`,
       );
+    }
+    if (life > 0) {
+      // Harmony: dirty air and soil turn living things to straw; a thriving world makes them lush.
+      fs = fs.replace('#include <color_fragment>', `#include <color_fragment>
+        {
+          vec3 c0 = diffuseColor.rgb;
+          float l0 = dot(c0, vec3(0.3, 0.59, 0.11));
+          float wl = uWilt * ${life.toFixed(3)};
+          vec3 dry = vec3(l0 * 1.08, l0 * 0.92, l0 * 0.52);
+          diffuseColor.rgb = mix(c0, dry, wl * 0.85) * (1.0 - wl * 0.3);
+          diffuseColor.rgb = mix(diffuseColor.rgb, c0 * vec3(0.94, 1.1, 1.02), uThrive * ${(life * 0.4).toFixed(3)});
+        }`);
     }
     if (detail) {
       for (const k of ['uDetail', 'uTexGrass', 'uTexSoil', 'uTexRock', 'uTexSand', 'uTexMean'] as const) shader.uniforms[k] = shared[k];

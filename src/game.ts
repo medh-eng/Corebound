@@ -18,6 +18,10 @@ import { OreField, ORE_ITEM, type OreNode } from './render/ore';
 import { LaserView } from './render/laser';
 import { buildMachine, ghostOf, preloadMachines, type MachineView } from './render/machines';
 import { BeltRenderer, beltPath, pathLength } from './render/belts';
+import { Fauna } from './render/fauna';
+import { BloomField, type Bloom } from './render/bloom';
+import { harmonyValue, bandOf } from './systems/harmony';
+import { HARMONY, BAND_TEXT, type Band } from './data/harmony';
 import { buildSky } from './art/sky';
 import { shared, quality as matQuality, loadGroundTextures } from './art/materials';
 import { paintModel } from './art/paint';
@@ -170,6 +174,10 @@ export async function startGame(opts: GameOptions) {
   scene.add(ore.group);
   const laser = new LaserView();
   scene.add(laser.group);
+  const fauna = new Fauna((d) => terrain.groundRadius(P(d)));
+  scene.add(fauna.group);
+  const blooms = new BloomField((d) => terrain.groundRadius(P(d)));
+  scene.add(blooms.group);
 
   // ── Sky and light ─────────────────────────────────────
   ui.loading('Lighting the sky', 0.7); await nextFrame();
@@ -378,6 +386,9 @@ export async function startGame(opts: GameOptions) {
       case 'place_drill': return base.machines.some((m) => m.id === 'auto_drill' && !!m.mine);
       case 'research_belt': return base.research.done.includes('conveyor');
       case 'belt': return base.belts.length > 0;
+      case 'harmony_look': return !!flags.sawPlanet;
+      case 'bio_filter': return base.machines.some((m) => m.id === 'bio_filter');
+      case 'bloom': return (mined.bloom ?? 0) >= 1;
       case 'auto_plates': return base.machines.filter((m) => m.id === 'smelter' && (m.fedByBelt ?? 0) > 0).reduce((s, m) => s + (m.made ?? 0), 0) >= 5;
       default: return false;
     }
@@ -566,19 +577,28 @@ export async function startGame(opts: GameOptions) {
     dayZ: new THREE.Color(pal.skyDayZenith), dayH: new THREE.Color(pal.skyDayHorizon), setH: new THREE.Color(pal.skySunsetHorizon), nightH: new THREE.Color(pal.skyNightHorizon),
   };
   const camDir = new THREE.Vector3();
+  const murk = new THREE.Color('#6b6a3a');
+  const hazeCol = new THREE.Color('#c9b98a');
+  let bloomTimer = 8;
+  let lastBand: Band | null = null;
 
   /** What the crosshair points at: a deposit or the ground. */
-  const aim = (): { point: THREE.Vector3; normal: THREE.Vector3; node?: OreNode } | null => {
+  const aim = (): { point: THREE.Vector3; normal: THREE.Vector3; node?: OreNode; bloom?: Bloom } | null => {
     camera.getWorldDirection(camDir);
     const o = camera.position;
     const start = Math.max(0, rig.dist - 0.6);
     const hitOre = ore.raycast(o, camDir, start + 9);
+    const hitBloom = blooms.raycast(o, camDir, start + 9);
     let tGround = -1;
     for (let t = start; t < start + 9; t += 0.1) {
       const p = o.clone().addScaledVector(camDir, t);
       if (voxels.density(p.x, p.y, p.z) > 0) { tGround = t; break; }
     }
     const pos = V(me.pos);
+    if (hitBloom && (tGround < 0 || hitBloom.t < tGround) && (!hitOre || hitBloom.t < hitOre.t)) {
+      const p = o.clone().addScaledVector(camDir, hitBloom.t);
+      if (p.distanceTo(pos) <= 8) return { point: p, normal: camDir.clone().negate(), bloom: hitBloom.bloom };
+    }
     if (hitOre && (tGround < 0 || hitOre.t < tGround)) {
       const p = o.clone().addScaledVector(camDir, hitOre.t);
       if (p.distanceTo(pos) > 8) return null;
@@ -623,6 +643,8 @@ export async function startGame(opts: GameOptions) {
   const machinePrompt = (m: PlacedMachine): string => {
     const d = MACHINES[m.id];
     const x = ' · <b>X</b> pick up';
+    if (m.fault) return `${d.name} · <b>needs attention</b> · <b>E</b> fix it${x}`;
+    if (d.filter) return `${d.name} · ${m.working ? 'cleaning' : d.powerKW < 0 ? 'no power' : 'idle'}${x}`;
     if (d.research) return `Research station${base.research.active ? ` · ${researchById(base.research.active)!.name}` : ''} · <b>E</b> research${x}`;
     if (d.storage) return `Storage silo · ${total(m.inv)}/${d.storage}${total(m.inv) ? ` (${names(m.inv)})` : ''} · <b>E</b> take all${x}`;
     if (d.drill) return `Auto-drill · mining ${m.mine ? ITEMS[m.mine].name.toLowerCase() : 'nothing'} (${Math.round((m.rich ?? 0) * 100)}% rich)${total(m.out) ? ` · ${total(m.out)} waiting` : ''}${x}`;
@@ -634,6 +656,7 @@ export async function startGame(opts: GameOptions) {
   };
   const useMachine = (m: PlacedMachine) => {
     const d = MACHINES[m.id];
+    if (m.fault) { m.fault = false; sound.place(); ui.pickup(`Fixed the ${d.name.toLowerCase()}`, '#5cffd6'); return; }
     if (d.research) { openResearch(); return; }
     if (d.storage) {
       let got = 0;
@@ -663,6 +686,7 @@ export async function startGame(opts: GameOptions) {
     const d = MACHINES[m.id];
     const sup = lastSupply.get(m.uid!);
     const feeds = base.belts.filter((b) => b.to === m.uid).length;
+    if (m.fault) return 'Needs attention (E)';
     if (d.powerKW < 0 && sup === undefined) return 'No power';
     if (d.research) {
       if (!base.research.active) return 'Choose research (E)';
@@ -839,8 +863,18 @@ export async function startGame(opts: GameOptions) {
       if (a) {
         lasering = true;
         laserTo = a.point; laserN = a.normal;
-        laserHit = a.node?.kind === 'ice' ? 'crystal' : 'rock';
-        if (a.node) {
+        laserHit = a.node?.kind === 'ice' || a.bloom ? 'crystal' : 'rock';
+        if (a.bloom) {
+          oreTimer += dt;
+          ui.progress(Math.min(1, oreTimer / 0.6));
+          if (oreTimer >= 0.6) {
+            oreTimer = 0;
+            blooms.remove(a.bloom);
+            give('bloom', 1, 'mine');
+            if (!flags.bloomFirst) { flags.bloomFirst = true; ui.sarathi(SARATHI_EVENTS.bloomFirst, 8); }
+            advanceGoals();
+          }
+        } else if (a.node) {
           oreTimer += dt;
           ui.progress(Math.min(1, oreTimer / 0.45));
           if (oreTimer >= 0.45) { oreTimer = 0; if (ore.take(a.node)) give(ORE_ITEM[a.node.kind], 1, 'mine'); }
@@ -924,9 +958,36 @@ export async function startGame(opts: GameOptions) {
     helmet.position.copy(pos).addScaledVector(up, 1.7);
     helmet.target.position.copy(pos).addScaledVector(up, 1.0).addScaledVector(camera.getWorldDirection(camDir), 6);
 
+    // Harmony: the world answers the factory.
+    const hv = harmonyValue(base.harmony);
+    const band: Band = bandOf(hv);
+    const ease = 1 - Math.exp(-dt * 0.8);
+    shared.uWilt.value += (THREE.MathUtils.clamp((70 - hv) / 50, 0, 1) - shared.uWilt.value) * ease;
+    shared.uThrive.value += (THREE.MathUtils.clamp((hv - 80) / 15, 0, 1) - shared.uThrive.value) * ease;
+    const haze = THREE.MathUtils.smoothstep(base.harmony.air, 12, 80);
+    sky.setHaze(haze);
+    (planet.water.material as THREE.MeshStandardMaterial).color.set(world.palette.water).lerp(murk, THREE.MathUtils.smoothstep(base.harmony.water, 10, 70) * 0.8);
+    fauna.update(shared.uTime.value, pos, band === 'thriving' ? 1 : THREE.MathUtils.clamp((hv - 25) / 55, 0, 1) * 0.7);
+    if (playing && band === 'thriving') {
+      bloomTimer -= dt;
+      if (bloomTimer <= 0 && blooms.blooms.length < HARMONY.bloomMax) {
+        bloomTimer = HARMONY.bloomEverySec * (0.6 + Math.random() * 0.8);
+        blooms.spawn(pos, shared.uTime.value, (p) => p.distanceTo(domePoint) < 6 || base.machines.some((m) => V(m.pos).distanceTo(p) < 2.5) || terrain.height(p.x, p.y, p.z) < world.seaLevel + 0.3);
+      }
+    }
+    blooms.update(shared.uTime.value, band === 'thriving');
+    if (playing && band !== lastBand) {
+      const msg = { thriving: SARATHI_EVENTS.bandThriving, stable: SARATHI_EVENTS.bandStable, stressed: SARATHI_EVENTS.bandStressed, collapse: SARATHI_EVENTS.bandCollapse }[band];
+      if (lastBand !== null && (band !== 'thriving' || lastBand !== 'stable' || !flags.toldThriving)) { ui.sarathi(msg, 8); ui.toast(`Harmony: ${BAND_TEXT[band]}`); if (band === 'thriving') flags.toldThriving = true; }
+      lastBand = band;
+    }
+    if (rig.mode === 'orbit' && playing) flags.sawPlanet = true;
+    ui.harmony({ value: hv, band: BAND_TEXT[band], ...base.harmony }, playing && rig.mode === 'orbit');
+
     tmpCol.copy(cols.nightH).lerp(cols.dayH, day).lerp(cols.setH, sunset * 0.35).lerp(cols.dayZ, 0.35 * day);
+    tmpCol.lerp(hazeCol, haze * 0.6 * day);
     fog.color.copy(tmpCol);
-    fog.density = 0.0038 * (1 - space);
+    fog.density = 0.0038 * (1 - space) * (1 + haze * 1.6);
 
     envTimer -= dt * (timeScale > 1 ? 6 : 1);
     if (envTimer <= 0) { refreshEnv(); envTimer = 1.5; }
@@ -940,6 +1001,11 @@ export async function startGame(opts: GameOptions) {
         nearShelter,
       });
       lastSupply = res.supply;
+      if (res.faults.length) {
+        ui.toast(`${res.faults.length > 1 ? `${res.faults.length} machines need` : `The ${MACHINES[res.faults[0].id].name.toLowerCase()} needs`} attention`);
+        sound.alarm();
+        if (!flags.faultTold) { flags.faultTold = true; ui.sarathi(SARATHI_EVENTS.fault, 9); }
+      }
       if (res.researched) {
         const node = researchById(res.researched)!;
         ui.toast(`Research complete: ${node.name}`);
@@ -964,12 +1030,15 @@ export async function startGame(opts: GameOptions) {
         const sup = res.supply.get(m.uid!) ?? 0;
         let on = false;
         if (m.id === 'battery') { v.setLevel?.((m.charge ?? 0) / (d.storeKWh ?? 20)); continue; }
+        if (m.id === 'settling_pond') { v.setLevel?.(1 - base.harmony.water / 100); continue; }
         if (m.id === 'power_pylon') on = res.supply.has(m.uid!);
         else if (d.process?.fuel) on = (m.burn ?? 0) > 0;
         else if (d.process) on = (m.burn ?? 0) > 0 && sup > 0.2;
         else if (d.drill) on = !!m.mine && sup > 0.2 && total(m.out) < (d.outCap ?? 20);
         else if (d.research) on = researchReady(base) && sup > 0.2;
         else if (d.storage) on = total(m.inv) > 0;
+        else if (d.filter) on = !!m.working;
+        if (m.fault) on = false;
         v.setActive?.(on);
         if (v.root.userData.smoke) (v.root.userData.smoke as THREE.Points).visible = on;
       }
@@ -1010,7 +1079,8 @@ export async function startGame(opts: GameOptions) {
       for (const m of base.machines) if ((m.id === 'smelter' || m.id === 'coal_burner' || m.id === 'silicon_furnace') && (m.burn ?? 0) > 0) { const d = V(m.pos).distanceTo(pos); if (near === null || d < near) near = d; }
       sound.smelter(near);
     }
-    sound.update(dt, night, me.grounded ? Math.hypot(me.vel.x, me.vel.y, me.vel.z) : 0);
+    sound.update(dt, night, me.grounded ? Math.hypot(me.vel.x, me.vel.y, me.vel.z) : 0,
+      Math.min(1, base.machines.filter((m) => m.working || m.fuelOn).length / 8), harmonyValue(base.harmony) / 100);
     resTimer -= dt;
     if (resTimer <= 0 && playing) {
       resTimer = 0.25;
@@ -1036,6 +1106,13 @@ export async function startGame(opts: GameOptions) {
     stats: () => ({ calls: renderer.info.render.calls, triangles: renderer.info.render.triangles }),
     state: () => ({ pos: { ...me.pos }, grounded: me.grounded, fuel: me.jetFuel, alt: altitude(me, groundR), oxygen: base.oxygen, power: base.power, shelterO2: base.shelterO2, goal: CHAPTER1_GOALS[goalIndex].id, pack: pack.slots, machines: base.machines.length, smelters: base.machines.filter((m) => m.id === 'smelter').map((m) => ({ inv: m.inv, out: m.out, burn: m.burn, made: m.made, fed: m.fedByBelt })) }),
     base: () => base,
+    pollute: (air: number, water: number, soil: number) => {
+      base.harmony.air = air; base.harmony.water = water; base.harmony.soil = soil;
+      const hv = harmonyValue(base.harmony);   // skip the slow fade so screenshots show it at once
+      shared.uWilt.value = THREE.MathUtils.clamp((70 - hv) / 50, 0, 1); shared.uThrive.value = THREE.MathUtils.clamp((hv - 80) / 15, 0, 1);
+    },
+    bloom: () => blooms.spawn(V(me.pos), shared.uTime.value - 3, () => false),
+    planetView: () => rig.setMode('orbit', 0.001),
     remove: (i: number) => { removeMachine(base.machines[i]); },
     research: (id: string) => { if (!base.research.done.includes(id)) base.research.done.push(id); refreshFactory(); advanceGoals(); },
     belt: (a: number, b: number) => {

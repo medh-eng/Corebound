@@ -10,7 +10,7 @@ A 3D survival-factory game on small, living planets. Walk all the way around eac
 
 ## Status
 
-**M2 Build and automate is playable** (October 2026): research new machines, place auto-drills on rich ground, lay conveyors, store, smelt and bake silicon, and carry power out with pylons — on top of M1's digging and survival. Next: owner playtest, then **M3 Harmony and life**.
+**M3 Harmony and life is playable** (October 2026): the planet answers your factory — smoke and mud make the forest wilt and the sky haze over; filters, ponds and a Sabatier reactor clean it; glow-moths and rare bloom flowers return when it thrives. Built on M2's research, drills, conveyors and power networks, and M1's digging and survival. Next: owner playtest, then **M4 Chapter 1 demo**.
 
 | Document | What it holds |
 | --- | --- |

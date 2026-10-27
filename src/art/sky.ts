@@ -17,6 +17,8 @@ export interface Sky {
     uNight: { value: number };
   };
   update(camera: THREE.Camera): void;
+  /** 0 clean .. 1 heavy haze. */
+  setHaze(v: number): void;
   /** A sky-only copy (no stars) used to light metals and water. */
   envScene: THREE.Scene;
   /** Use a painted 360° night sky (equirectangular). Its painted gas giant at (u, v) is turned
@@ -40,6 +42,7 @@ export function buildSky(world: WorldDef): Sky {
     nightZ: { value: lin(P.skyNightZenith) }, nightH: { value: lin(P.skyNightHorizon) },
     spaceC: { value: lin(P.space) }, auroraC: { value: lin(P.aurora) },
     uPano: { value: null as THREE.Texture | null }, uPanoOn: { value: 0 }, uPanoRot: { value: new THREE.Matrix3() },
+    uHaze: { value: 0 },   // dirty air: a dull yellow-grey veil (Harmony)
   };
   const hide = { value: 0 };   // 1 = the painted sky's planet has taken over
 
@@ -53,7 +56,7 @@ export function buildSky(world: WorldDef): Sky {
     }`;
   const skyFrag = (withAurora: boolean) => /* glsl */ `
     uniform vec3 uSun, uUp, dayZ, dayH, setZ, setH, nightZ, nightH, spaceC, auroraC;
-    uniform float uSpace, uNight, uTime, uPanoOn;
+    uniform float uSpace, uNight, uTime, uPanoOn, uHaze;
     uniform sampler2D uPano; uniform mat3 uPanoRot;
     varying vec3 vDir;
     void main() {
@@ -89,6 +92,10 @@ export function buildSky(world: WorldDef): Sky {
           col += vec3(0.6, 0.3, 1.0) * band * smoothstep(0.25, 0.5, h) * uNight * 0.25 * (1.0 - uSpace);
         }
       }` : ''}
+      {
+        float lum = dot(col, vec3(0.3, 0.59, 0.11));
+        col = mix(col, vec3(lum) * vec3(1.06, 0.98, 0.8) + vec3(0.03, 0.025, 0.0), uHaze * 0.65 * (1.0 - uSpace));
+      }
       col = mix(col, spaceC + vec3(1.0, 0.9, 0.7) * smoothstep(0.9993, 0.9997, sd) * 14.0, uSpace);
       ${withAurora ? `
       if (uPanoOn > 0.5) {
@@ -245,6 +252,7 @@ export function buildSky(world: WorldDef): Sky {
 
   return {
     group, ringed, atmosphere, uniforms, envScene,
+    setHaze(v) { skyUniforms.uHaze.value = v; },
     setPanorama(tex, [u, v], planetDir) {
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.generateMipmaps = false; tex.minFilter = THREE.LinearFilter;

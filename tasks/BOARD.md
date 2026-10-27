@@ -39,4 +39,4 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | D-002 | M2 Build and automate | done ✓ (first version) |
 | D-003 | Rig tool: per-character animation folders | todo (before Huxley/Voss arrive) |
 | D-005 | Store art for the store pages and loading screen | M4 |
-| D-006 | M3 Harmony and life | doing (Commander: "do the next work") |
+| D-006 | M3 Harmony and life | first version done ✓; scanner/Codex waits for T-016/T-017/T-018 |

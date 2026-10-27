@@ -75,7 +75,60 @@ const LIGHTS: Partial<Record<MachineId, { color: string; y: number; z: number; r
   auto_drill: { color: '#ffb347', y: 1.4, z: 0.7, range: 4, on: 2.5 },
   research_station: { color: '#5cffd6', y: 1.9, z: 0.2, range: 4, on: 3 },
   storage_silo: { color: '#ffcf6a', y: 2.0, z: 0.9, range: 3, on: 1.5 },
+  bio_filter: { color: '#7dffb0', y: 1.1, z: 0.9, range: 4, on: 2.5 },
+  sabatier_reactor: { color: '#c6ff8a', y: 1.2, z: 0.6, range: 3.5, on: 2.5 },
 };
+
+/** A settling pond: a stepped ceramic basin of water that clears as the world heals. */
+function settlingPond(): MachineView {
+  const root = new THREE.Group();
+  const rimMat = ceramic();
+  for (let k = 0; k < 3; k++) {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.45 - k * 0.22, 0.09, 8, 40), k === 0 ? copper() : rimMat);
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = 0.42 - k * 0.12;
+    root.add(ring);
+  }
+  const wall = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.35, 0.45, 40, 1, true), rimMat);
+  wall.position.y = 0.22;
+  const waterMat = new THREE.MeshStandardMaterial({ color: '#7a6a4a', roughness: 0.1, metalness: 0, transparent: true, opacity: 0.88, envMapIntensity: 1.2 });
+  const water = new THREE.Mesh(new THREE.CircleGeometry(1.32, 40), waterMat);
+  water.rotation.x = -Math.PI / 2;
+  water.position.y = 0.3;
+  const reeds = new THREE.Group();
+  for (let i = 0; i < 9; i++) {
+    const a = (i / 9) * Math.PI * 2 + 0.3;
+    const reed = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.025, 0.7 + (i % 3) * 0.2, 5), new THREE.MeshStandardMaterial({ color: '#4f9a5a' }));
+    reed.position.set(Math.cos(a) * 1.1, 0.6, Math.sin(a) * 1.1);
+    reeds.add(reed);
+  }
+  root.add(wall, water, reeds);
+  root.traverse((o) => { o.receiveShadow = true; });
+  const dirty = new THREE.Color('#7a6a4a'), clean = new THREE.Color('#4fb8c9');
+  return { root, setLevel: (v) => waterMat.color.copy(dirty).lerp(clean, v), setActive: () => {} };
+}
+
+/** A Sabatier reactor: two copper tanks and a warm ceramic chamber (until the owner's model arrives). */
+function sabatier(): MachineView {
+  const root = new THREE.Group();
+  for (const x of [-0.5, 0.5]) {
+    const tank = new THREE.Mesh(new THREE.CapsuleGeometry(0.32, 0.8, 6, 16), copper());
+    tank.position.set(x, 0.85, -0.2);
+    root.add(tank);
+  }
+  const chamber = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.5, 1.4, 20), ceramic());
+  chamber.position.set(0, 0.95, 0.35);
+  const winMat = new THREE.MeshStandardMaterial({ color: '#c6ff8a', emissive: '#9fe86a', emissiveIntensity: 0.2 });
+  const win = new THREE.Mesh(new THREE.CircleGeometry(0.18, 20), winMat);
+  win.position.set(0, 1.0, 0.86);
+  const coil = new THREE.Mesh(new THREE.TorusGeometry(0.46, 0.04, 8, 28), copper());
+  coil.rotation.x = Math.PI / 2; coil.position.set(0, 1.7, 0.35);
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.05, 0.15, 24), copper());
+  base.position.y = 0.075;
+  root.add(chamber, win, coil, base);
+  root.traverse((o) => { o.castShadow = true; o.receiveShadow = true; });
+  return { root, setActive: (on) => { winMat.emissiveIntensity = on ? 2.2 : 0.2; } };
+}
 
 /** A copper power pylon with a ceramic lotus top and an amber lamp. */
 function pylon(): MachineView {
@@ -113,7 +166,7 @@ export const PYLON_TOP = 3.88;
 
 /** Loads the owner's machine models; any that are missing fall back to code-built versions. */
 export async function preloadMachines() {
-  const ids: MachineId[] = ['solar_lotus', 'battery', 'electrolyzer', 'smelter', 'auto_drill', 'storage_silo', 'research_station', 'coal_burner', 'silicon_furnace'];
+  const ids: MachineId[] = ['solar_lotus', 'battery', 'electrolyzer', 'smelter', 'auto_drill', 'storage_silo', 'research_station', 'coal_burner', 'silicon_furnace', 'bio_filter', 'sabatier_reactor'];
   await Promise.all(ids.map(async (id) => { try { models.set(id, await loadModel(id)); } catch { /* fallback below */ } }));
   try { conveyorModel = await loadModel('conveyor_straight'); } catch { conveyorModel = null; }
 }
@@ -143,6 +196,8 @@ export function buildMachine(id: MachineId): MachineView {
   if (id === 'battery') return battery();
   if (id === 'electrolyzer') return electrolyzer();
   if (id === 'power_pylon') return pylon();
+  if (id === 'settling_pond') return settlingPond();
+  if (id === 'sabatier_reactor') return sabatier();
   const root = new THREE.Group();
   root.add(new THREE.Mesh(new THREE.ConeGeometry(0.8, 2, 8), new THREE.MeshStandardMaterial({ color: '#334' })));
   return { root };

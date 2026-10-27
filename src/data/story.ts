@@ -18,6 +18,9 @@ export const CHAPTER1_GOALS: StoryGoal[] = [
   { id: 'research_belt', text: 'Research conveyors at the research station', sarathi: 'A drill that nobody empties will fill up and stop. We need belts.' },
   { id: 'belt', text: 'Craft conveyors, press C, click the drill, then click the smelter', sarathi: 'A belt from the drill to the smelter, and the smelter never waits for you again.' },
   { id: 'auto_plates', text: 'Make 5 iron plates from ore that came by belt (keep the smelter fed with carbon)', sarathi: 'Iron plates, made while you were not looking. I believe this is called a factory.' },
+  { id: 'harmony_look', text: 'Press M to see the whole planet — and how healthy it is', sarathi: 'Our machines make smoke and stir up mud. The planet notices. Look at it from above.' },
+  { id: 'bio_filter', text: 'Research a bio-filter and build one to clean the air', sarathi: 'Algae eat smoke. A bio-filter by the smelters will keep the forest glowing.' },
+  { id: 'bloom', text: 'Keep the world thriving until a bloom flower opens, then collect it with the laser', sarathi: 'A flower that only grows where the air, water and soil are clean. I would like to study one.' },
   { id: 'done', text: 'Explore, research, automate — and keep your shelter breathing', sarathi: 'Seismic activity below us. Something very large is… waking. We should be ready.' },
 ];
 
@@ -31,4 +34,10 @@ export const SARATHI_EVENTS = {
   researched: 'Research complete:',
   noPower: 'That machine has no power. Build it within 30 m of the shelter, or carry power out with pylons.',
   drillFull: 'A drill is full and has stopped. Empty it, or give it a belt.',
+  fault: 'Acid rain is getting into the machines. Walk up to any that need attention and press E.',
+  bandThriving: 'The forest is thriving. Look — blooms are opening.',
+  bandStable: 'The air is getting heavier. The forest is holding on.',
+  bandStressed: 'The forest is wilting and the rain is turning sour. Build filters, or slow the smelters.',
+  bandCollapse: 'Jivagraha is struggling to breathe. Something deep below is restless.',
+  bloomFirst: 'A bloom. It grew because the world is clean. Research can use it.',
 };

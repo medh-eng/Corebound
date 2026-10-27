@@ -367,5 +367,11 @@ Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manua
 | 2026-10-27 | Power networks: the shelter powers 30 m around it; pylons carry power 14 m further and link up to 26 m apart; each network balances its own solar, coal and batteries | GDD §8 under-supply rule, extended to pylons |
 | 2026-10-27 | Research tiers 1–2: parts are loaded into the research station by hand or by belt, then it works while powered | Matches "research station" in Medhanshu's blueprint |
 | 2026-10-27 | Scanner and Codex moved from M2 to M3 (they need the science cards, T-002) | Content not delivered yet |
+| 2026-10-27 | M3 Harmony: pollution stocks per minute of play (`src/data/harmony.ts`); smelters, furnaces, coal and drills dirty; plants clean by themselves (scaled by their health, never below a quarter); bio-filter, settling pond and Sabatier reactor clean | GDD §10, tuned so a mid-size factory turns Stressed in about 10–15 minutes without filters |
+| 2026-10-27 | "Repair" made non-violent: when Stressed or worse, machines randomly need attention (acid rain, grit, clogged petals) and stop until you press E | GDD §6: hazards never destroy anything |
+| 2026-10-27 | The electrolyzer now also makes hydrogen (vented when nobody collects it); the Sabatier reactor turns it into methane and cleans the air | Real chemistry; methane is the rocket fuel for M5 |
+| 2026-10-27 | Bloom flowers open near you while Thriving and fade when it is not; collected with the laser; tier 3 research (clean smelting, bloom filters) needs them | GDD §9 bloom materials |
+| 2026-10-27 | Fauna in M3 is glow-moths (Jyotipatang), code-made, numbers following Harmony; grazers and burrowers wait for the owner's creature models (T-015) | No creature models yet |
+| 2026-10-27 | Music: a code-made factory rhythm grows with the number of working machines; chords darken and bells thin out as Harmony falls | GDD §17 layered music, until owner tracks arrive |
 | 2026-10-27 | Names chosen by the Director on the Commander's instruction from Sarvam's options (`src/data/names.ts`); पादकानन (Padakanan) is the Szynthars' name for Marubhumi's grassland belt | Commander: "choose your names" |
 | Open | price; repo visibility at launch; final art direction sign-off | **owner** |

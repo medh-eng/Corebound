@@ -30,7 +30,9 @@ Chapter 1 (Jivagraha) is built all the way to a polished free demo before worlds
 - **Build:** build camera; foundation pads; placement/rotate/remove; auto-drill, smelter, silicon furnace, coal burner, storage silo, power pylons; conveyors with visible items; lifts; power network with under-supply; research terminal and tier 1–2 tech tree; scanner and Codex basics.
 - **Art (owner):** first 10 machine GLBs; item icons.
 
-### M3 Harmony and life
+### M3 Harmony and life — first version built 2026-10-27
+- **Delivered:** Air/Water/Soil pollution and Harmony bands; plants wilt and lose their glow, haze thickens, water turns murky, music darkens; machines need attention when the world suffers; bio-filter (owner model), settling pond, Sabatier reactor (hydrogen → methane); glow-moths that follow Harmony; bloom flowers and tier 3 research; Harmony in the HUD and numbers in planet view; three new goals.
+- **Still to do in M3:** scanner and Codex (waiting for T-016 panel, T-002/T-018 text, T-017 names); grazers and burrowers (owner creature models, T-015); owner music and machine loops.
 - **Build:** Air/Water/Soil stocks; sky/fog/water/vegetation shader response; smoke plumes; acid rain and repair state; fauna with Harmony-driven spawning; bio-filter, settling pond, Sabatier reactor; bloom materials; layered music driven by factory size, time of day and Harmony.
 - **Art (owner):** creature sheet, plant concepts; Jivagraha music and SFX.
 

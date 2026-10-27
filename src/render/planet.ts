@@ -130,7 +130,7 @@ export function buildPlanet(world: WorldDef, terrain: Terrain, segments = 144): 
   fixWinding(g);
   g.computeBoundingSphere();
 
-  const ground = new THREE.Mesh(g, stylised({ vertexColors: true, roughness: 0.93, mottle: 0.12, cutBoxes: 'ground', detail: 'ground' }));
+  const ground = new THREE.Mesh(g, stylised({ vertexColors: true, roughness: 0.93, mottle: 0.12, cutBoxes: 'ground', detail: 'ground', life: 0.55 }));
   ground.customDepthMaterial = cutDepthMaterial();
   ground.receiveShadow = true;
   ground.castShadow = true;

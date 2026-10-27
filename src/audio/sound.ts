@@ -146,6 +146,16 @@ export class Sound {
     o.start(t); o.stop(t + a + r + 0.05);
   }
 
+  private burstTo(bus: GainNode, freq: number, q: number, peak: number, r: number, type: BiquadFilterType = 'lowpass') {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const s = this.ctx.createBufferSource(); s.buffer = this.noise;
+    const f = this.ctx.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
+    const g = this.ctx.createGain(); this.env(g, t, 0.003, peak, r);
+    s.connect(f).connect(g).connect(bus);
+    s.start(t, Math.random()); s.stop(t + r + 0.05);
+  }
+
   private burst(freq: number, q: number, peak: number, r: number, type: BiquadFilterType = 'lowpass') {
     if (!this.ctx) return;
     const t = this.ctx.currentTime;
@@ -161,18 +171,36 @@ export class Sound {
   private static SCALE = [62, 64, 65, 69, 72, 74, 77, 81]; // D minor pentatonic-ish bells
   private midi(n: number) { return 440 * Math.pow(2, (n - 69) / 12); }
 
-  update(dt: number, night: number, walking: number) {
+  private static DARK = [[50, 53, 56, 62], [49, 53, 56, 61], [46, 50, 53, 56], [48, 51, 55, 58]]; // uneasy: dim and minor
+  private beat = 0;
+  private beatN = 0;
+
+  /** night 0..1; walking speed; activity 0..1 = how much of the factory is running; harmony 0..1. */
+  update(dt: number, night: number, walking: number, activity = 0, harmony = 1) {
     if (!this.ctx) return;
+    // Factory layer: a soft mechanical pulse at 80 BPM that grows with the factory (GDD §17).
+    this.beat -= dt;
+    if (this.beat <= 0) {
+      this.beat += 0.75;
+      this.beatN++;
+      if (activity > 0.05 && !this.has('music_factory')) {
+        const v = 0.05 + activity * 0.1;
+        if (this.beatN % 2 === 0) this.tone(55, 'sine', v * 1.4, 0.004, 0.22, this.musicBus);           // thump
+        this.burstTo(this.musicBus, 5200, 0.9, v * 0.35, 0.05, 'highpass');                              // tick
+        if (activity > 0.45 && this.beatN % 4 === 3) this.tone(this.midi(62), 'triangle', v * 0.5, 0.004, 0.18, this.musicBus); // ping
+      }
+    }
     this.musicTimer -= dt;
     if (this.musicTimer <= 0) {
       this.musicTimer = 9;
-      const ch = Sound.CHORDS[this.chord++ % Sound.CHORDS.length];
+      const set = harmony < 0.5 ? Sound.DARK : Sound.CHORDS;
+      const ch = set[this.chord++ % set.length];
       for (const n of ch) {
         this.tone(this.midi(n - 12), 'triangle', 0.05, 3.5, 6, this.musicBus, 0, -6);
         this.tone(this.midi(n), 'sine', 0.03, 4, 5.5, this.musicBus, 0.2, 7);
       }
       // A few bell notes over the chord; more at night.
-      const bells = 2 + Math.round(night * 3);
+      const bells = Math.max(0, Math.round((2 + night * 3) * Math.min(1, harmony * 1.4) + (harmony > 0.85 ? 2 : 0)));
       for (let i = 0; i < bells; i++) {
         const n = Sound.SCALE[Math.floor(Math.random() * Sound.SCALE.length)];
         this.tone(this.midi(n + (night > 0.5 ? 12 : 0)), 'sine', 0.035, 0.01, 2.8, this.musicBus, 1 + Math.random() * 7);

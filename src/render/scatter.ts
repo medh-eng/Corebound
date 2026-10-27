@@ -83,10 +83,10 @@ export function scatterWorld(terrain: Terrain, seed: number, baseDir: THREE.Vect
   const colliders: Collider[] = [];
   const big: { p: THREE.Vector3; rad: number }[] = keepClear.map((k) => ({ p: k.pos.clone(), rad: k.radius }));
 
-  const matTree = stylised({ vertexColors: true, glow: true, roughness: 0.75, glowDay: 0.45, glowNight: 2.6, sway: 0.05, swayHeight: 8 });
-  const matLeaf = stylised({ vertexColors: true, glow: true, roughness: 0.7, side: THREE.DoubleSide, sway: 0.08, swayHeight: 0.6 });
-  const matGrass = stylised({ vertexColors: true, roughness: 0.9, side: THREE.DoubleSide, sway: 0.1, swayHeight: 0.5 });
-  const matFlower = stylised({ vertexColors: true, glow: true, roughness: 0.6, side: THREE.DoubleSide, glowDay: 0.5, glowNight: 2.4, sway: 0.03, swayHeight: 0.3 });
+  const matTree = stylised({ vertexColors: true, glow: true, roughness: 0.75, glowDay: 0.45, glowNight: 2.6, sway: 0.05, swayHeight: 8, life: 0.8 });
+  const matLeaf = stylised({ vertexColors: true, glow: true, roughness: 0.7, side: THREE.DoubleSide, sway: 0.08, swayHeight: 0.6, life: 1 });
+  const matGrass = stylised({ vertexColors: true, roughness: 0.9, side: THREE.DoubleSide, sway: 0.1, swayHeight: 0.5, life: 1 });
+  const matFlower = stylised({ vertexColors: true, glow: true, roughness: 0.6, side: THREE.DoubleSide, glowDay: 0.5, glowNight: 2.4, sway: 0.03, swayHeight: 0.3, life: 1 });
   const matRock = stylised({ vertexColors: true, roughness: 0.92 });
   const matCrystal = stylised({ vertexColors: true, glow: true, roughness: 0.25, metalness: 0.1, glowDay: 0.5, glowNight: 2.2 });
 
@@ -211,7 +211,7 @@ export function decorateBase(terrain: Terrain, frame: { up: THREE.Vector3; forwa
     const R = terrain.radius;
     return frame.up.clone().multiplyScalar(R).addScaledVector(frame.forward, fw).addScaledVector(frame.right, rt).normalize();
   };
-  const matTree = stylised({ vertexColors: true, glow: true, roughness: 0.75, glowDay: 0.45, glowNight: 2.6, sway: 0.05, swayHeight: 8 });
+  const matTree = stylised({ vertexColors: true, glow: true, roughness: 0.75, glowDay: 0.45, glowNight: 2.6, sway: 0.05, swayHeight: 8, life: 0.8 });
   const matFlower = stylised({ vertexColors: true, glow: true, roughness: 0.6, side: THREE.DoubleSide, glowDay: 0.5, glowNight: 2.4 });
   const matStone = stylised({ vertexColors: true, roughness: 0.9 });
 

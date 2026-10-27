@@ -84,6 +84,7 @@ export class UI {
           <div class="row"><span class="label">Suit</span><span class="meter" id="power"><i style="width:100%"></i></span></div>
           <div class="row"><span class="label">Shelter</span><span class="meter" id="air"><i style="width:0%"></i></span></div>
           <div class="row small"><span id="clock">06:00</span><span id="grid"></span></div>
+          <div class="row small" id="harm" title="Planet health: Air, Water, Soil"><span class="hs air">◆ Air</span><span class="hs water">● Water</span><span class="hs soil">■ Soil</span></div>
         </div>
         <div id="goals" class="panel"></div>
         <div id="res" class="panel"></div>
@@ -96,6 +97,7 @@ export class UI {
         <div id="sarathi" class="hidden"><span class="who">SARATHI</span><span class="line"></span></div>
         <div id="pickups"></div>
         <div id="tags"></div>
+        <div id="planet" class="panel hidden"></div>
       </div>`);
     const credits = $('#credits');
     const close = $('#credits-close');
@@ -203,6 +205,18 @@ export class UI {
       if (t) { e.className = 'tag'; e.style.transform = `translate(${t.x}px, ${t.y}px) translate(-50%, -100%)`; if (e.textContent !== t.text) e.textContent = t.text; }
     });
   }
+  /** Harmony: colour-coded shapes in the HUD; numbers only in planet view (GDD §10). */
+  harmony(h: { value: number; band: string; air: number; water: number; soil: number }, planetView: boolean) {
+    const col = (p: number) => (p < 25 ? '#5cffd6' : p < 50 ? '#c9e86a' : p < 75 ? '#ffb347' : '#ff6a5a');
+    for (const k of ['air', 'water', 'soil'] as const) ($(`#harm .${k}`) as HTMLElement).style.color = col(h[k]);
+    const pv = $('#planet');
+    pv.classList.toggle('hidden', !planetView);
+    if (planetView) {
+      const bar = (label: string, p: number) => `<div class="pr"><span>${label}</span><i><b style="width:${Math.round(100 - p)}%;background:${col(p)}"></b></i><em>${Math.round(100 - p)}% clean</em></div>`;
+      pv.innerHTML = `<div class="ph">Jivagraha · Harmony <b>${Math.round(h.value)}</b> · ${h.band}</div>${bar('Air', h.air)}${bar('Water', h.water)}${bar('Soil', h.soil)}`;
+    }
+  }
+
   hidePause() { $('#pause').classList.add('hidden'); }
   get paused() { return !$('#pause').classList.contains('hidden'); }
 

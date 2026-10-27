@@ -2,6 +2,26 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
+## 2026-10-27 (M3)
+
+**Playable:** https://medh-eng.github.io/Corebound/ (Pages is on again)
+
+**Reviewed and merged:** T-010 backpack tests (ChatGPT, 47 tests), T-012 cultural review (Sarvam; applied to PROMPTS.md: religious-imagery guard in the style bible, fixed props, 24 corrected music style lines, materials per world).
+
+**M3 Harmony and life: first version built** (the Commander said to carry on with the next work)
+- **Harmony:** Air, Water and Soil get dirty from smelters, furnaces, coal burners and drills, and clean themselves through healthy plants. Bands: Thriving, Stable, Stressed, Collapse.
+- **The world answers:** plants wilt to straw and lose their glow, the sky and fog haze over, water turns murky, the music darkens; when it thrives, plants get lusher and bloom flowers open.
+- **When Stressed:** machines randomly need attention (acid rain, grit); walk up and press E to fix. Nothing is ever destroyed.
+- **New machines:** bio-filter (your model), settling pond, Sabatier reactor (code-made until a model arrives). The electrolyzer now also makes hydrogen for the Sabatier reactor, which makes methane (future rocket fuel).
+- **Life:** glow-moths (Jyotipatang) fly around you, more when the world is healthy. **Blooms:** rare flowers while Thriving; laser them; they unlock tier 3 research (clean smelting, bloom filters).
+- **HUD:** Air/Water/Soil shapes change colour; press M for planet view with exact numbers.
+- **Goals:** look at the planet (M) → build a bio-filter → collect a bloom.
+- **Checked:** 148 unit tests (8 new for Harmony), the M2 playtest, the mouse playtest, the new goal chain, screenshots of a clean and a polluted world, planet view and the new machines.
+
+**Still to come in M3:** scanner and Codex (T-016 panel, T-017 names, T-018 text, T-002 science cards); grazers and burrowers (your creature models, T-015); your music and machine sounds.
+
+**Waiting for the Commander:** play M2 and M3; answer the Credits question (a thank-you line to Indian craft traditions, suggested by Sarvam); pass on T-011, T-013, T-016 (ChatGPT Codex), T-001, T-002, T-014, T-018 (ChatGPT chat), T-017 (Sarvam); art T-015 and sound T-008.
+
 ## 2026-10-27 (M2)
 
 **Playable:** waits for GitHub Pages to be turned on again (Settings → Pages → Source: GitHub Actions). The repository is public again.

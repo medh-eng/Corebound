@@ -3,6 +3,8 @@
 // auto-drills, storage silos, conveyor belts and research. Plain TypeScript, unit-tested.
 import { BELTS, MACHINES, SURVIVAL, type ItemId, type MachineId } from '../data/items';
 import { RESEARCH, researchById } from '../data/research';
+import { HARMONY } from '../data/harmony';
+import { newHarmony, tickHarmony, harmonyValue, bandOf, type HarmonyState } from './harmony';
 
 type Pos = { x: number; y: number; z: number };
 type Bag = Partial<Record<ItemId, number>>;
@@ -20,6 +22,9 @@ export interface PlacedMachine {
   rich?: number;        // drill: 0..1, how rich the ground is
   made?: number;        // items finished, ever
   fedByBelt?: number;   // items that arrived by belt, ever
+  working?: boolean;    // did something useful in the last tick
+  fuelOn?: boolean;     // burner: burning this tick
+  fault?: boolean;      // needs attention (acid rain, grit, clogged petals): stops until you fix it (E)
   // Saves from before M2 (moved into inv/out by migrateBase):
   ice?: number; ore?: number; carbon?: number; plates?: number;
 }
@@ -39,6 +44,7 @@ export interface BaseState {
   blackouts: number;
   nextUid: number;
   research: ResearchState;
+  harmony: HarmonyState;
 }
 
 export interface Tick {
@@ -49,6 +55,7 @@ export interface Tick {
   jetting: boolean;
   sunAt: (p: Pos) => number;            // daylight 0..1 at a machine
   nearShelter: (p: Pos) => boolean;     // inside the shelter's own power area
+  random?: () => number;                // for machine faults (tests pass their own)
 }
 
 export interface TickResult {
@@ -60,10 +67,11 @@ export interface TickResult {
   smelting: boolean;
   researched: string | null;
   supply: Map<number, number>;   // machine uid → power ratio of its network (absent: no network)
+  faults: PlacedMachine[];       // machines that needed attention this tick
 }
 
 export function newBase(): BaseState {
-  return { oxygen: SURVIVAL.startOxygen, power: 1, shelterO2: 0, stored: 0, machines: [], belts: [], blackouts: 0, nextUid: 1, research: { done: [], active: null, inv: {}, progress: 0 } };
+  return { oxygen: SURVIVAL.startOxygen, power: 1, shelterO2: 0, stored: 0, machines: [], belts: [], blackouts: 0, nextUid: 1, research: { done: [], active: null, inv: {}, progress: 0 }, harmony: newHarmony() };
 }
 
 /** Brings older saves and hand-made states up to date: ids, buffers, belts, research. */
@@ -71,6 +79,7 @@ export function migrateBase(b: BaseState): BaseState {
   b.belts ??= [];
   b.research ??= { done: [], active: null, inv: {}, progress: 0 };
   b.nextUid ??= 1;
+  b.harmony ??= newHarmony();
   const batteries = b.machines.filter((m) => m.id === 'battery' && m.charge === undefined);
   for (const m of b.machines) {
     if (m.uid === undefined) m.uid = b.nextUid++;
@@ -200,13 +209,15 @@ const effectOn = (b: BaseState, id: string) => b.research.done.includes(id);
 /** Can this machine start (or keep doing) its job right now? */
 function wantsPower(b: BaseState, m: PlacedMachine): boolean {
   const d = MACHINES[m.id];
+  if (m.fault) return false;
+  if (d.filter) return true;
   if (d.process && !d.process.fuel) return (m.burn ?? 0) > 0 || (canStart(m) && outRoom(m));
   if (d.drill) return !!m.mine && outRoom(m);
   if (d.research) return researchReady(b);
   return false;
 }
-const canStart = (m: PlacedMachine) => Object.entries(MACHINES[m.id].process?.needs ?? {}).every(([k, n]) => (m.inv?.[k as ItemId] ?? 0) >= (n ?? 0));
-const outRoom = (m: PlacedMachine) => { const cap = MACHINES[m.id].outCap; return cap === undefined || total(m.out) < cap; };
+const canStart = (m: PlacedMachine) => !m.fault && Object.entries(MACHINES[m.id].process?.needs ?? {}).every(([k, n]) => (m.inv?.[k as ItemId] ?? 0) >= (n ?? 0));
+const outRoom = (m: PlacedMachine) => { const d = MACHINES[m.id]; return d.process?.vent || d.outCap === undefined || total(m.out) < d.outCap; };
 export function researchReady(b: BaseState): boolean {
   const node = b.research.active ? researchById(b.research.active) : null;
   return !!node && Object.entries(node.needs).every(([k, n]) => (b.research.inv[k as ItemId] ?? 0) >= (n ?? 0));
@@ -231,14 +242,16 @@ export function tickBase(b: BaseState, t: Tick): TickResult {
     for (const m of ms) {
       const p = MACHINES[m.id].process;
       if (!p?.fuel) continue;
+      if (m.fault) { m.fuelOn = false; continue; }
       if ((m.burn ?? 0) <= 0 && canStart(m)) { take(m, p.needs); m.burn = p.seconds; }
       if ((m.burn ?? 0) > 0) m.burn = Math.max(0, (m.burn ?? 0) - dt);
+      m.fuelOn = (m.burn ?? 0) > 0;
     }
     let produce = 0, demand = net === 0 ? wantSuit : 0;
     for (const m of ms) {
       const d = MACHINES[m.id];
-      if (m.id === 'solar_lotus') produce += d.powerKW * t.sunAt(m.pos) * solarMult;
-      else if (d.process?.fuel) { if ((m.burn ?? 0) > 0) produce += d.powerKW; }
+      if (m.id === 'solar_lotus') produce += d.powerKW * t.sunAt(m.pos) * solarMult * (m.fault ? 0.3 : 1);
+      else if (d.process?.fuel) { if (m.fuelOn) produce += d.powerKW; }
       else if (d.powerKW < 0 && wantsPower(b, m)) demand += -d.powerKW;
     }
     const batteries = ms.filter((m) => m.id === 'battery');
@@ -253,25 +266,33 @@ export function tickBase(b: BaseState, t: Tick): TickResult {
 
     for (const m of ms) {
       const d = MACHINES[m.id];
+      m.working = false;
+      if (m.fault) continue;
       if (d.process && !d.process.fuel) {
         if ((m.burn ?? 0) <= 0 && canStart(m) && outRoom(m)) { take(m, d.process.needs); m.burn = d.process.seconds; }
         if ((m.burn ?? 0) > 0 && ratio > 0.2) {
+          m.working = true;
           const step = Math.min(m.burn ?? 0, dt * ratio);
           m.burn = (m.burn ?? 0) - step;
           if (d.process.o2) { b.shelterO2 = Math.min(SURVIVAL.shelterO2Capacity, b.shelterO2 + (d.process.o2 / d.process.seconds) * step); making = true; }
           if (m.id === 'smelter') smelting = true;
           if ((m.burn ?? 0) <= 1e-9) {
             m.burn = 0;
-            for (const [k, n] of Object.entries(d.process.makes ?? {})) add(outOf(m), k as ItemId, n ?? 0);
+            const full = d.process.vent && d.outCap !== undefined && total(m.out) >= d.outCap;   // vented gas is simply let go
+            if (!full) for (const [k, n] of Object.entries(d.process.makes ?? {})) add(outOf(m), k as ItemId, n ?? 0);
             if (d.process.makes) m.made = (m.made ?? 0) + 1;
           }
         }
+      } else if (d.filter) {
+        m.working = d.powerKW >= 0 || ratio > 0.2;
       } else if (d.drill && m.mine && outRoom(m) && ratio > 0.2) {
+        m.working = true;
         const speed = effectOn(b, 'drill_plus') ? 1.5 : 1;
         const per = d.drill.seconds / Math.max(0.25, m.rich ?? 1);
         m.burn = (m.burn ?? 0) + dt * ratio * speed;
         while ((m.burn ?? 0) >= per && outRoom(m)) { m.burn = (m.burn ?? 0) - per; add(outOf(m), m.mine, 1); m.made = (m.made ?? 0) + 1; }
       } else if (d.research && researchReady(b) && ratio > 0.2) {
+        m.working = true;
         const node = researchById(b.research.active!)!;
         b.research.progress += dt * ratio;
         if (b.research.progress >= node.seconds) {
@@ -286,6 +307,20 @@ export function tickBase(b: BaseState, t: Tick): TickResult {
   }
 
   tickBelts(b, dt);
+
+  // Harmony: working machines dirty or clean the world; when it suffers, machines need attention.
+  const working = b.machines.filter((m) => m.working || m.fuelOn).map((m) => m.id);
+  tickHarmony(b.harmony, working, dt, { clean: effectOn(b, 'clean_smelting'), filter2: effectOn(b, 'bloom_filter') });
+  const faults: PlacedMachine[] = [];
+  const band = bandOf(harmonyValue(b.harmony));
+  const perMin = band === 'collapse' ? HARMONY.faultPerMinute.collapse : band === 'stressed' ? HARMONY.faultPerMinute.stressed : 0;
+  if (perMin > 0) {
+    const rnd = t.random ?? Math.random;
+    for (const m of b.machines) {
+      if (m.fault || m.id === 'power_pylon' || m.id === 'battery') continue;
+      if (rnd() < perMin * dt / 60) { m.fault = true; faults.push(m); }
+    }
+  }
 
   // Suit.
   if (t.inShelter && b.shelterO2 > 0 && b.oxygen < 1) {
@@ -305,7 +340,7 @@ export function tickBase(b: BaseState, t: Tick): TickResult {
     b.oxygen = SURVIVAL.wakeOxygen;
     b.power = Math.max(b.power, 0.3);
   }
-  return { blackout, produceKW: shelterProduce, useKW: shelterUse, capacity: shelterCap, making, smelting, researched, supply };
+  return { blackout, produceKW: shelterProduce, useKW: shelterUse, capacity: shelterCap, making, smelting, researched, supply, faults };
 }
 
 /** Moves items along belts, hands them over at the far end, and loads new ones at the start. */
