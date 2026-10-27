@@ -23,6 +23,9 @@ canvas { display: block; }
 #loading .msg { margin-top: 18px; letter-spacing: 0.18em; text-transform: uppercase; font-size: 13px; color: var(--ink-dim); }
 #loading .bar { width: 260px; height: 3px; margin: 14px auto 0; background: rgba(255,255,255,0.12); border-radius: 2px; overflow: hidden; }
 #loading .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--copper), var(--amber)); transition: width 0.3s; }
+#loading .tip { box-sizing: border-box; max-width: 520px; width: 90vw; min-height: 3em; margin: 18px auto 0; padding: 0 12px; color: var(--ink-dim); font-size: 13px; line-height: 1.5; text-align: center; animation: loading-tip 5s infinite; }
+@keyframes loading-tip { 0%, 100% { opacity: 0; } 6%, 94% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { #loading .tip { animation: none; } }
 
 /* Title */
 #title { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 7vh 16px 5vh; pointer-events: none; }
