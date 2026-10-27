@@ -1,7 +1,7 @@
 # T-014: SARATHI lines for research and new machines
 
 - **Assigned to:** ChatGPT (chat)
-- **Status:** review
+- **Status:** done (merged 2026-10-27)
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-014-research-lines.md`
 - **Depends on:** nothing

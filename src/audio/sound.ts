@@ -18,6 +18,9 @@ export class Sound {
   private chord = 0;
   private stepPhase = 0;
   private buffers = new Map<string, AudioBuffer>();
+  private musicFiles = new Set<string>();
+  private tracks = new Map<string, { el: HTMLAudioElement; gain: GainNode }>();
+  private currentTrack: string | null = null;
   private loops = new Map<string, { src: AudioBufferSourceNode; gain: GainNode }>();
   private lastStep = '';
   /** Surface under the player's feet, for footsteps: grass, rock, metal, sand, snow. */
@@ -57,7 +60,47 @@ export class Sound {
     src.start(); lfo.start();
     this.wind = g;
     void this.loadSamples();
+    void this.loadMusicList();
   }
+
+  private async loadMusicList() {
+    const base = `${import.meta.env.BASE_URL}assets/audio/music/`;
+    try {
+      const list = (await (await fetch(`${base}index.json`)).json()) as string[];
+      for (const f of list) this.musicFiles.add(f);
+      // Short factory loops are decoded; long tracks are streamed when needed.
+      await Promise.all(list.filter((f) => f.startsWith('factory_layer')).map(async (f) => {
+        try { this.buffers.set('music_' + f.replace(/\.(mp3|wav)$/, ''), await this.ctx!.decodeAudioData(await (await fetch(base + f)).arrayBuffer())); } catch { /* skip */ }
+      }));
+    } catch { /* no music yet */ }
+  }
+
+  /** Crossfades to a recorded track (null = silence; code-made pads take over). Tracks loop. */
+  playMusic(name: string | null) {
+    if (!this.ctx || name === this.currentTrack) return;
+    const file = name ? [...this.musicFiles].find((f) => f.startsWith(name + '.')) : undefined;
+    if (name && !file) return;   // not delivered: keep whatever plays now
+    const t = this.ctx.currentTime;
+    if (this.currentTrack) {
+      const old = this.tracks.get(this.currentTrack);
+      if (old) { old.gain.gain.setTargetAtTime(0, t, 1.2); const el = old.el; setTimeout(() => { if (old.gain.gain.value < 0.02) el.pause(); }, 6000); }
+    }
+    this.currentTrack = name;
+    if (!name || !file) return;
+    let tr = this.tracks.get(name);
+    if (!tr) {
+      const el = new Audio(`${import.meta.env.BASE_URL}assets/audio/music/${file}`);
+      el.loop = true; el.preload = 'auto';
+      const src = this.ctx.createMediaElementSource(el);
+      const gain = this.ctx.createGain(); gain.gain.value = 0;
+      src.connect(gain).connect(this.musicBus);
+      tr = { el, gain };
+      this.tracks.set(name, tr);
+    }
+    void tr.el.play().catch(() => { /* blocked until a click */ });
+    tr.gain.gain.setTargetAtTime(1, t, 1.5);
+  }
+  get recordedMusic() { return this.currentTrack !== null; }
 
   private async loadSamples() {
     const base = `${import.meta.env.BASE_URL}assets/audio/sfx/`;
@@ -86,7 +129,7 @@ export class Sound {
   }
 
   /** Starts or stops a recorded loop, fading in and out. `vol` can change while it plays. */
-  loop(name: string, on: boolean, vol = 1, fade = 0.08): boolean {
+  loop(name: string, on: boolean, vol = 1, fade = 0.08, bus?: GainNode): boolean {
     const buf = this.buffers.get(name);
     if (!this.ctx || !buf) return false;
     const cur = this.loops.get(name);
@@ -95,7 +138,7 @@ export class Sound {
       const src = this.ctx.createBufferSource(); src.buffer = buf; src.loop = true;
       const gain = this.ctx.createGain(); gain.gain.value = 0;
       gain.gain.setTargetAtTime(vol, t, fade);
-      src.connect(gain).connect(this.sfxBus); src.start(t, Math.random() * buf.duration);
+      src.connect(gain).connect(bus ?? this.sfxBus); src.start(t, name.startsWith('music_') ? 0 : Math.random() * buf.duration);
       this.loops.set(name, { src, gain });
     } else if (on && cur) {
       cur.gain.gain.setTargetAtTime(vol, t, 0.1);
@@ -183,14 +226,21 @@ export class Sound {
     if (this.beat <= 0) {
       this.beat += 0.75;
       this.beatN++;
-      if (activity > 0.05 && !this.has('music_factory')) {
+      if (activity > 0.05 && !this.has('music_factory_layer_1')) {
         const v = 0.05 + activity * 0.1;
         if (this.beatN % 2 === 0) this.tone(55, 'sine', v * 1.4, 0.004, 0.22, this.musicBus);           // thump
         this.burstTo(this.musicBus, 5200, 0.9, v * 0.35, 0.05, 'highpass');                              // tick
         if (activity > 0.45 && this.beatN % 4 === 3) this.tone(this.midi(62), 'triangle', v * 0.5, 0.004, 0.18, this.musicBus); // ping
       }
     }
+    // Recorded factory layers: more join as more machines run.
+    if (this.has('music_factory_layer_1')) {
+      this.loop('music_factory_layer_1', activity > 0.05, 0.35 + activity * 0.35, 1.5, this.musicBus);
+      this.loop('music_factory_layer_2', activity > 0.4, 0.3 + activity * 0.3, 1.5, this.musicBus);
+      this.loop('music_factory_layer_3', activity > 0.75, 0.3, 1.5, this.musicBus);
+    }
     this.musicTimer -= dt;
+    if (this.musicTimer <= 0 && this.recordedMusic) this.musicTimer = 9;   // recorded music replaces the code-made pads
     if (this.musicTimer <= 0) {
       this.musicTimer = 9;
       const set = harmony < 0.5 ? Sound.DARK : Sound.CHORDS;

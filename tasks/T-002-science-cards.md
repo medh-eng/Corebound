@@ -1,7 +1,7 @@
 # T-002: Science cards for machines and resources
 
 - **Assigned to:** ChatGPT (chat)
-- **Status:** review
+- **Status:** done (merged 2026-10-27)
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-002-science-cards.md`
 - **Depends on:** nothing

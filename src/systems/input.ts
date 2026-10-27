@@ -30,6 +30,7 @@ export class Input {
     });
     addEventListener('mouseup', (e) => this.keys.delete(`Mouse${e.button}`));
     document.addEventListener('pointerlockchange', () => { if (!document.pointerLockElement) { this.keys.delete('Mouse0'); this.keys.delete('Mouse2'); } });
+    addEventListener('contextmenu', (e) => { if (this.locked || this.alwaysLocked) e.preventDefault(); });   // right mouse = scanner
     addEventListener('wheel', (e) => { this.wheel += Math.sign(e.deltaY); }, { passive: true });
     document.addEventListener('pointerlockchange', () => { this.locked = document.pointerLockElement === this.canvas; });
   }

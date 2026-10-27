@@ -1,7 +1,7 @@
 # T-011: Tips on the loading screen
 
 - **Assigned to:** ChatGPT (Codex)
-- **Status:** review
+- **Status:** done (merged 2026-10-27)
 - **Priority:** P2
 - **Deliver to:** pull request from branch `chatgpt/T-011-loading-tips`
 - **Depends on:** nothing

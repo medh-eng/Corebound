@@ -2,6 +2,25 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
+## 2026-10-27 (evening)
+
+**Your to-do list now lives at the top of [PROMPTS.md](PROMPTS.md) ("Your checklist").** Everything received is marked ✓; what is wanted next is numbered in order.
+
+**Reviewed and merged (6 pull requests):**
+- ChatGPT: **Codex panel** (T-016), **loading-screen tips** (T-011), **data-check tests** (T-013), and the writing: **Huxley's message and 9 memory logs** (T-001), **33 science cards** (T-002), **SARATHI's research and machine lines** (T-014), **16 Codex entries** (T-018). All careful and accurate; ChatGPT tested its code branches together before sending.
+- Sarvam: **check of the chosen names** (three fixed: Khanaka → Khanik, Kathinakita → Kathorakita, Jyotipatang → Jyotishalabha) and a **translation glossary with a Hindi/Marathi pilot** for when the Chapter 1 text is frozen.
+
+**Your uploads, now in the game:**
+- **Music:** title theme (on the title screen), Jivagraha day, night and underground (chosen automatically), Guardian awake (plays if Harmony collapses), Guardian calm (kept for M4), three factory layers that join as your factory grows. All loudness-matched and crossfaded.
+- **Prof. Huxley:** concept and turnarounds received and consistent. Square, tightly framed copies made for the 3D tool: `art-inbox/turnaround/huxley_front_square.png` (and side, back).
+- **Machine models:** all seven M2 models were already in the game (auto-drill, storage silo, research station, coal burner, silicon furnace, bio-filter, conveyor).
+
+**New in the game:** the **scanner** (hold right mouse) and the **Codex** (J): 30 entries for plants, creatures, rocks, machines and the planet's health; SARATHI now speaks ChatGPT's lines when research finishes, a machine is placed for the first time, or the first belt is laid.
+
+**Questions for the Commander:** (1) the Credits thank-you line to Indian craft traditions, yes or no; (2) Szynthar: said SIN-thar or ZIN-thar (Medhanshu's choice); (3) where each music track and sound came from (licences).
+
+**New worker tasks:** T-019 memory-log viewer (ChatGPT Codex), T-020 Codex entries for the remaining machines (ChatGPT chat). Sarvam still has T-017 (plant names).
+
 ## 2026-10-27 (M3)
 
 **Playable:** https://medh-eng.github.io/Corebound/ (Pages is on again)

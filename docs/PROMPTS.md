@@ -4,10 +4,40 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 
 - **Who uses it:** the Commander (Pon), with Gemini, ChatGPT, image-to-3D websites, Suno, a sound-effects tool and Sarvam AI.
 - **Who checks it:** the Director (Claude) checks every upload in `art-inbox/`, puts it into the game, and reports problems in [STATUS.md](STATUS.md).
-- **Priority:** **P1** = needed now (Chapter 1, milestones M1–M2). **P2** = needed for the Chapter 1 demo (M3–M4). **P3** = later worlds (M5+). ✓ = already received. Do P1 first.
+- **Priority:** see **Your checklist** below first. **P1/P2/P3** in the tables = now / Chapter 1 demo / later worlds. ✓ = already received.
 - **Code-made (no file needed):** things marked *code* are built by Claude in code. Do not spend credits on them.
 
 ---
+
+## Your checklist (read this first)
+
+**✓** = received and in the game. **⏳** = wanted next. Rows without a mark are for later milestones. *code* = Claude makes it, so don't spend credits on it. The Director updates this list every time you upload.
+
+### ⏳ Needed from you next, in this order
+
+| # | What | Where it goes | Prompt |
+| --- | --- | --- | --- |
+| 1 | **Prof. Huxley 3D model** from `turnaround/huxley_front_square.png` (Hunyuan3D), then Mixamo clips `Talking`, `Thinking`, `Pointing`, `Idle` | `art-inbox/models/huxley.glb` and `art-inbox/models/huxley/*.fbx` | §4, §11. If Mixamo cannot rig him (arms too close to the body), make one more front image in an A-pose and try again |
+| 2 | **Root Guardian, restless**: `guardian_root_restless.png` | `art-inbox/concept/` | §5.2 |
+| 3 | **Jivagraha creatures as 3D**: a gentle grazer and a small burrower (turnaround image, then textured GLB) | `art-inbox/turnaround/`, `art-inbox/models/` | §5.1, task T-015 |
+| 4 | **Story props for the demo**: `escape_module`, `cryo_pod`, `translator`, `memory_log`, `huxley_projector`, `quantum_fragment`, `o2_canister` (turnaround, then GLB) | `art-inbox/turnaround/`, `art-inbox/models/` | §6.3, §8 |
+| 5 | **Rover**, **starter ship**, **launch pad**, **vehicle bay** models (for the demo's ending) | `art-inbox/models/` | §6.3, §7 |
+| 6 | **SARATHI 3D model** (lotus drone, petals as separate parts if possible) | `art-inbox/models/sarathi.glb` | §4 |
+| 7 | **Sabatier reactor model** (a code-made one stands in) | `art-inbox/models/` | §6.3 |
+| 8 | **Machine sound loops**: `auto_drill_loop`, `conveyor_loop`, `research_loop`, `coal_burner_loop`, `electrolyzer_loop`, `battery_hum`, `solar_lotus_open` | `art-inbox/audio/sfx/` | §13.4 |
+| 9 | **Ambience**: `amb_jiva_day`, `amb_jiva_night`, `amb_cave` | `art-inbox/audio/sfx/` | §13.7 |
+| 10 | **Music still missing**: `memory_log`, `spaceflight` | `art-inbox/audio/music/` | §12 |
+| 11 | **Voice test** (T-005): record SARATHI's 5 test lines in Sarvam Bulbul | `art-inbox/audio/voice/tests/` | §14 and `art-inbox/audio/voice/tests/T-005-voice-test-sheet.md` |
+| 12 | **Teaser clips** for the demo trailer | `art-inbox/video/` | §10 |
+
+**Please also tell the Director** which site or tool each music track and sound came from (for example "jiva_day: Pixabay, boopul"), so the licences can be listed before release. Only one copy of `factory_layer` is needed (three identical files arrived; nothing to fix).
+
+### ✓ Received so far (all in the game unless noted)
+
+- **Images:** style tests, key art (day, night, tall, wide), logo, store art (main capsule, header, vertical, library hero), 20+ world and Guardian concepts, Custodian and Huxley concept and turnarounds, Jivagraha textures (grass, soil, rock, sandstone), night sky and space panoramas.
+- **3D models:** Custodian (rigged, 11 animations including two dances and a salute), shelter dome, solar lotus, battery, electrolyzer, smelter, auto-drill, storage silo, research station, coal burner, silicon furnace, bio-filter, conveyor.
+- **Music:** title theme, Jivagraha day, night and underground, Guardian awake and calm, three factory layers.
+- **Sound effects:** footsteps (grass, rock, metal, sand, snow), jump, land, jetpack, laser (start, loop, on rock, on crystal), digging, low oxygen, breathing, canister, blackout, helmet lamp, a whoosh and a ship engine (also used to make menu, machine, power and smelter sounds).
 
 ## Contents
 
@@ -193,7 +223,7 @@ background, even soft studio lighting, no shadows, no props in hands.
 | Custodian | ✓ | `custodian.png`, `custodian_rigged.glb` | Received. |
 | Custodian suit modules | P3 | `custodian_suits.png` | `Four versions of the same astronaut suit side by side: heat-shielded with gold reflective plates; cold-insulated with quilted padding and fur-like trim; toxin-filter with a big round filter backpack and mask; pressure-sealed with extra rings and a glass collar.` (reference `custodian.png`). Suit modules may be added as attachments, so no new 3D model unless Claude asks. |
 | SARATHI | P2 | `sarathi_turnaround.png`, `sarathi.glb` | `A small floating drone shaped like a lotus bud: off-white ceramic petals that can open and close, a copper ring around the middle, one large warm amber eye-lens, small thruster glow underneath, a cracked petal showing it is damaged.` (reference `sarathi.png`). Single object, not rigged; Claude animates petals in code if the petals are separate parts. |
-| Prof. Orion Huxley | P2 | `huxley.png`, `huxley_turnaround.png`, `huxley_rigged.glb` | `A specific individual with consistent features: an older scientist, around sixty, kind and tired face, short grey beard, round glasses, long lab coat over a simple high-collared mission uniform with a small lotus emblem, hands that like to gesture when he talks.` In the game he appears as a blue-gold hologram: Claude adds the hologram look in code, so make him in normal colours. Mixamo clips: Talking, Thinking, Pointing, Idle. |
+| Prof. Orion Huxley | ✓ concept and turnarounds · ⏳ **3D model next** (use `turnaround/huxley_front_square.png`) | `huxley.png`, `huxley_turnaround.png`, `huxley_rigged.glb` | `A specific individual with consistent features: an older scientist, around sixty, kind and tired face, short grey beard, round glasses, long lab coat over a simple high-collared mission uniform with a small lotus emblem, hands that like to gesture when he talks.` In the game he appears as a blue-gold hologram: Claude adds the hologram look in code, so make him in normal colours. Mixamo clips: Talking, Thinking, Pointing, Idle. |
 | Alion Voss | P3 | `voss.png`, `voss_turnaround.png`, `voss_rigged.glb` | `A friendly alien traveller: tall and slender, smooth blue-grey skin with soft bioluminescent freckles, large dark eyes, two small head-fins, wearing a patched space jacket with many pockets and a homemade radio device on the belt; curious, brave, a little tired.` Humanoid so Mixamo works. Clips: Idle, Talking, Waving, Walking, Sitting (trapped pose: Lying idle). |
 | Jivagraha people | P3 | `people_jiva.png` | `A small community of gentle forest people about one metre tall, moth-like with soft fuzzy antennae, woven leaf cloaks, carrying lanterns of glowing fungus; they tend giant mushroom gardens.` |
 | Taptashila people | P3 | `people_tapta.png` | `Sturdy miner people with stone-like shell plates on their backs, small bright eyes, heavy gloves, living in carved cliff homes lit by lava light; traders of metals.` |
@@ -233,11 +263,11 @@ Save to `art-inbox/concept/`. Show each one **calm** (friendly, glowing) and **r
 
 | File | Status | Prompt |
 | --- | --- | --- |
-| `guardian_root.png` | ✓ | Add `guardian_root_restless.png`: `The same giant root guardian rising from the forest, its glowing roots tense and lifting the ground, mushrooms dimming, birds flying away; majestic and sad, not attacking.` |
-| `guardian_magma.png` | ✓ | Add `guardian_magma_calm.png`: `The same lava serpent resting peacefully in a cooled lava lake, its glow soft and gentle, heat lichen blooming around it.` |
+| ✓ `guardian_root.png` | ✓ | Add `guardian_root_restless.png`: `The same giant root guardian rising from the forest, its glowing roots tense and lifting the ground, mushrooms dimming, birds flying away; majestic and sad, not attacking.` |
+| ✓ `guardian_magma.png` | ✓ | Add `guardian_magma_calm.png`: `The same lava serpent resting peacefully in a cooled lava lake, its glow soft and gentle, heat lichen blooming around it.` |
 | `guardian_dune.png` | P3 | `The Dune Leviathan: an enormous creature that swims through desert sand like a whale through water, its back covered in overlapping plates of translucent silica glass that glow when the sun hits them, a huge gentle eye, sand pouring off it as it surfaces; a tiny astronaut on a dune for scale. Calm and majestic.` + `guardian_dune_restless.png` (`...the same creature restless, raising sandstorms with its fins, dunes trembling, not attacking.`) |
-| `guardian_ice.png` | ✓ | Add `guardian_ice_restless.png`: `The same ice leviathan deep under the ice, releasing clouds of glowing ink that dim every light around it, restless, not attacking.` |
-| `guardian_storm.png` | ✓ | Add `guardian_storm_calm.png`. |
+| ✓ `guardian_ice.png` | ✓ | Add `guardian_ice_restless.png`: `The same ice leviathan deep under the ice, releasing clouds of glowing ink that dim every light around it, restless, not attacking.` |
+| ✓ `guardian_storm.png` | ✓ | Add `guardian_storm_calm.png`. |
 | `guardian_haze.png` | P3 | `The Haze Weaver: a vast, graceful, many-winged creature made of soft layered membranes that drifts inside yellow toxic clouds, weaving the haze into spirals with its long trailing fins, small lights along its body like a lantern festival.` + `guardian_haze_restless.png` |
 
 ---
@@ -258,16 +288,16 @@ Turnaround to `art-inbox/turnaround/<name>.png`, model to `art-inbox/models/<nam
 ### 6.1 Received ✓
 `shelter_dome`, `solar_lotus`, `battery`, `electrolyzer`, `smelter`.
 
-### 6.2 P1: needed for M2 (Build and automate)
+### 6.2 M2 machines: ✓ all received and in the game
 
 | Name | Height | Prompt |
 | --- | --- | --- |
-| `auto_drill` | 2.5 m | `A mining machine (auto-drill) that stands over the ground on three sturdy legs, a large copper drill bit pointing down into the ground through a ring, an ore hopper on the side with a small chute, an amber status light, ceramic panels with jaali lattice vents.` |
-| `storage_silo` | 3 m | `A storage silo: a tall rounded ceramic cylinder with copper bands, a domed lotus-petal lid, a small hatch and loading chute at the base, a vertical glass strip showing how full it is.` |
-| `research_station` | 2.4 m | `A research station: a curved ceramic desk with a large round holographic display ring above it, a sample slot with a glowing tray, small copper antennae, a stool, rows of tiny amber lights.` |
-| `coal_burner` | 2.2 m | `A small coal-burning power generator: squat brick-and-ceramic furnace with a round copper door showing a fire glow, a tall chimney, a spinning copper flywheel on the side, cables leading out.` |
-| `silicon_furnace` | 2.4 m | `A silicon furnace: a tall narrow ceramic kiln shaped like a stepwell turned upside down, a glowing white-hot window, copper crucible on top, an output tray holding shiny grey silicon wafers.` |
-| `bio_filter` | 2 m | `An air-cleaning bio-filter: a glass tank full of green algae with bubbles, wrapped in a ceramic frame with jaali screens, small fans on top, leafy plants growing from it.` |
+| ✓ `auto_drill` | 2.5 m | `A mining machine (auto-drill) that stands over the ground on three sturdy legs, a large copper drill bit pointing down into the ground through a ring, an ore hopper on the side with a small chute, an amber status light, ceramic panels with jaali lattice vents.` |
+| ✓ `storage_silo` | 3 m | `A storage silo: a tall rounded ceramic cylinder with copper bands, a domed lotus-petal lid, a small hatch and loading chute at the base, a vertical glass strip showing how full it is.` |
+| ✓ `research_station` | 2.4 m | `A research station: a curved ceramic desk with a large round holographic display ring above it, a sample slot with a glowing tray, small copper antennae, a stool, rows of tiny amber lights.` |
+| ✓ `coal_burner` | 2.2 m | `A small coal-burning power generator: squat brick-and-ceramic furnace with a round copper door showing a fire glow, a tall chimney, a spinning copper flywheel on the side, cables leading out.` |
+| ✓ `silicon_furnace` | 2.4 m | `A silicon furnace: a tall narrow ceramic kiln shaped like a stepwell turned upside down, a glowing white-hot window, copper crucible on top, an output tray holding shiny grey silicon wafers.` |
+| ✓ `bio_filter` | 2 m | `An air-cleaning bio-filter: a glass tank full of green algae with bubbles, wrapped in a ceramic frame with jaali screens, small fans on top, leafy plants growing from it.` |
 | `power_pylon` | *code* | Claude makes this. |
 | `conveyor`, `lift`, `foundation_pad`, `pipe` | *code* | Claude makes these. |
 
@@ -352,7 +382,7 @@ no objects, edges wrap perfectly. Stylised painterly game texture.
 
 | World | Files and prompts |
 | --- | --- |
-| Jivagraha (P1) | `jiva_grass.png` `short soft alien grass, emerald with teal tips, tiny yellow flowers` · `jiva_soil.png` `rich dark brown forest soil with small pebbles and roots` · `jiva_rock.png` `smooth grey-blue rock with moss patches` · `jiva_sandstone.png` `pale peach layered sandstone` |
+| ✓ Jivagraha (all four received) | `jiva_grass.png` `short soft alien grass, emerald with teal tips, tiny yellow flowers` · `jiva_soil.png` `rich dark brown forest soil with small pebbles and roots` · `jiva_rock.png` `smooth grey-blue rock with moss patches` · `jiva_sandstone.png` `pale peach layered sandstone` |
 | Taptashila | `tapta_rock.png` `dark charcoal rock with rust-red streaks` · `tapta_ore.png` `rock with veins of green copper and silver metal` · `tapta_lava_crust.png` `cracked black crust with glowing orange lava in the cracks` |
 | Marubhumi | `maru_sand.png` `red-orange rippled sand` · `maru_grass.png` `dry golden savannah grass` · `maru_cracked.png` `cracked dry clay` |
 | Himasagara | `hima_ice.png` `blue-white ice with cracks and bubbles` · `hima_snow.png` `soft wind-blown snow` · `hima_seafloor.png` `dark sea floor with glowing specks` |
@@ -370,8 +400,8 @@ no ground, no horizon, stars evenly spread, no text.
 
 | File | Prompt |
 | --- | --- |
-| `jiva_night_sky.png` (P1) | `Deep violet-blue night sky full of stars, a soft pink and teal nebula band, a large ringed violet gas giant small in one area, two tiny distant planets.` |
-| `system_space.png` (P2) | `Open space between planets: dense stars, a golden glowing trail of fragments in one band, a soft orange and blue nebula, the warm sun as a bright point.` |
+| ✓ `jiva_night_sky.png` | `Deep violet-blue night sky full of stars, a soft pink and teal nebula band, a large ringed violet gas giant small in one area, two tiny distant planets.` |
+| ✓ `system_space.png` | `Open space between planets: dense stars, a golden glowing trail of fragments in one band, a soft orange and blue nebula, the warm sun as a bright point.` |
 | `tapta_sky.png`, `maru_sky.png`, `hima_sky.png`, `visha_sky.png`, `shunya_sky.png` (P3) | Same idea; for Himasagara put the huge banded gas giant in the panorama; for Shunyapath, very dark with sharp stars and the golden fragment trail. |
 
 ### 9.3 Item and interface icons: P2
@@ -390,12 +420,12 @@ Icons needed (file name = item id): `ice`, `iron_ore`, `silica`, `carbon`, `iron
 
 | File | Priority | Size | Prompt |
 | --- | --- | --- | --- |
-| `key_art.png` | ✓ | — | Received. |
-| `logo.png` | ✓ | — | Received. |
-| `store_main_capsule.png` | P2 | 1232 × 706 | `Key art: the astronaut Custodian standing on a tiny curved green planet at sunrise, a giant gentle Root Guardian rising from the glowing forest behind, a lotus-shaped drone beside them, a small spaceship on a launch pad, other planets of the star system in the sky. Leave the top third calm for the game title. No religious symbols, temples, idols, elephants or turbans anywhere.` (reference `key_art.png`, `custodian.png`) |
-| `store_vertical.png` | P2 | 748 × 896 | Same scene, vertical. |
-| `store_header.png` | P2 | 920 × 430 | Same scene, wide, title area on the left. |
-| `library_hero.png` | P3 | 3840 × 1240 | Very wide panorama of the star system with the Custodian small in the foreground; no title. |
+| ✓ `key_art.png` | ✓ | — | Received. |
+| ✓ `logo.png` | ✓ | — | Received. |
+| ✓ `store_main_capsule.png` | P2 | 1232 × 706 | `Key art: the astronaut Custodian standing on a tiny curved green planet at sunrise, a giant gentle Root Guardian rising from the glowing forest behind, a lotus-shaped drone beside them, a small spaceship on a launch pad, other planets of the star system in the sky. Leave the top third calm for the game title. No religious symbols, temples, idols, elephants or turbans anywhere.` (reference `key_art.png`, `custodian.png`) |
+| ✓ `store_vertical.png` | P2 | 748 × 896 | Same scene, vertical. |
+| ✓ `store_header.png` | P2 | 920 × 430 | Same scene, wide, title area on the left. |
+| ✓ `library_hero.png` | P3 | 3840 × 1240 | Very wide panorama of the star system with the Custodian small in the foreground; no title. |
 
 Claude adds the logo and makes the exact sizes; generate at the closest ratio.
 
@@ -467,15 +497,15 @@ If a tool needs a credit line, tell the Director: it goes on the Credits screen 
 
 | File | Priority | BPM / key | Style line | Description |
 | --- | --- | --- | --- | --- |
-| `title_theme` | P1 | 80 / D minor | `ambient synthwave, bansuri flute, santoor, tanpura drone, warm pads, cinematic, hopeful, instrumental` | `Title music for a game about a lone scientist on tiny living planets: starts quiet with a tanpura drone and soft synth pads, a bansuri melody of wonder, builds gently with santoor arpeggios, ends hanging, mysterious.` |
-| `jiva_day` | P1 | 80 / D minor | `ambient, organic synth, santoor, bansuri, birdsong-like synth chirps, soft tabla and manjira, calm, instrumental` | `Exploring a lush glowing alien forest in daylight: light, curious, peaceful, loopable, no big climax.` |
-| `jiva_night` | P1 | 80 / D minor | `dark ambient synthwave, tanpura drone, glassy bells, sparse bansuri, mysterious, spacious, instrumental` | `Night on the forest world under an aurora; bioluminescent and a little lonely, loopable.` |
-| `jiva_underground` | P1 | 80 / D minor | `dark ambient, deep tanpura and sarangi drones, dripping water textures, distant metallic resonances, instrumental` | `Digging tunnels deep underground, quiet and tense but not scary, loopable.` |
-| `factory_layer_1` | P1 | 80 / D minor | `minimal industrial percussion, mechanical clicks, soft analog bass pulse, instrumental, loop point on the first beat` | `A light rhythmic loop of a small factory starting up: ticking, gentle pistons, a soft bass pulse. Must loop perfectly. Sparse so it can play on top of other music.` |
-| `factory_layer_2` | P2 | 80 / D minor | `industrial synthwave, tabla in teentaal blended with machine hits, pulsing arpeggio, instrumental` | `A busier factory layer: tabla patterns blended with metal hits and a pulsing synth arpeggio; loopable; sits on top of jiva_day.` |
-| `factory_layer_3` | P2 | 80 / D minor | `driving industrial synthwave, big pakhawaj and drum hits, sitar riffs in D, instrumental` | `A large busy factory at full power; energetic and proud; loopable.` |
-| `guardian_awake` | P2 | 80 / D minor | `epic ambient, low rudra veena and sarangi, wordless choir pads, pakhawaj, tanpura, awe and grief, not battle music, instrumental` | `A colossal ancient creature wakes, restless and sad; awe and tension, never battle music; loopable middle section.` |
-| `guardian_calm` | P2 | 80 / D major | `uplifting ambient, bansuri, santoor, shehnai, wordless choir, warm strings, instrumental` | `The giant creature is calmed and the world heals; a release of tension into warmth, 90 seconds, ends resolved.` |
+| ✓ `title_theme` | P1 | 80 / D minor | `ambient synthwave, bansuri flute, santoor, tanpura drone, warm pads, cinematic, hopeful, instrumental` | `Title music for a game about a lone scientist on tiny living planets: starts quiet with a tanpura drone and soft synth pads, a bansuri melody of wonder, builds gently with santoor arpeggios, ends hanging, mysterious.` |
+| ✓ `jiva_day` | P1 | 80 / D minor | `ambient, organic synth, santoor, bansuri, birdsong-like synth chirps, soft tabla and manjira, calm, instrumental` | `Exploring a lush glowing alien forest in daylight: light, curious, peaceful, loopable, no big climax.` |
+| ✓ `jiva_night` | P1 | 80 / D minor | `dark ambient synthwave, tanpura drone, glassy bells, sparse bansuri, mysterious, spacious, instrumental` | `Night on the forest world under an aurora; bioluminescent and a little lonely, loopable.` |
+| ✓ `jiva_underground` | P1 | 80 / D minor | `dark ambient, deep tanpura and sarangi drones, dripping water textures, distant metallic resonances, instrumental` | `Digging tunnels deep underground, quiet and tense but not scary, loopable.` |
+| ✓ `factory_layer_1` | P1 | 80 / D minor | `minimal industrial percussion, mechanical clicks, soft analog bass pulse, instrumental, loop point on the first beat` | `A light rhythmic loop of a small factory starting up: ticking, gentle pistons, a soft bass pulse. Must loop perfectly. Sparse so it can play on top of other music.` |
+| ✓ `factory_layer_2` | P2 | 80 / D minor | `industrial synthwave, tabla in teentaal blended with machine hits, pulsing arpeggio, instrumental` | `A busier factory layer: tabla patterns blended with metal hits and a pulsing synth arpeggio; loopable; sits on top of jiva_day.` |
+| ✓ `factory_layer_3` | P2 | 80 / D minor | `driving industrial synthwave, big pakhawaj and drum hits, sitar riffs in D, instrumental` | `A large busy factory at full power; energetic and proud; loopable.` |
+| ✓ `guardian_awake` | P2 | 80 / D minor | `epic ambient, low rudra veena and sarangi, wordless choir pads, pakhawaj, tanpura, awe and grief, not battle music, instrumental` | `A colossal ancient creature wakes, restless and sad; awe and tension, never battle music; loopable middle section.` |
+| ✓ `guardian_calm` | P2 | 80 / D major | `uplifting ambient, bansuri, santoor, shehnai, wordless choir, warm strings, instrumental` | `The giant creature is calmed and the world heals; a release of tension into warmth, 90 seconds, ends resolved.` |
 | `memory_log` | P2 | free / D minor | `sparse sarangi and piano, tape texture, tanpura, melancholic, instrumental` | `A soft bed for listening to old recorded messages from a lost scientist; 60 seconds, loopable.` |
 | `spaceflight` | P2 | 100 / A minor | `retro synthwave, sarod, bansuri, tanpura, wide pads, arpeggiated bass, sense of flight, instrumental` | `Flying a small spaceship between tiny planets: freedom, speed and wonder; loopable.` |
 | `tapta_day` | P3 | 90 / E minor | `desert rock ambient, deep tanpura and rudra veena drone, metallic morchang plucks, heat shimmer pads, instrumental` | `A scorching rocky mineral world near the sun; harsh, bright and grand; loopable.` |
@@ -506,30 +536,30 @@ Claude already plays code-made stand-ins for the P1 sounds marked ★; recorded 
 
 | File | Length | Prompt |
 | --- | --- | --- |
-| `step_grass` ★ | 0.3 s ×4 variations | `soft footstep on short grass, astronaut boot, light` |
-| `step_rock` | 0.3 s ×4 | `footstep on hard rock, heavy boot, slight crunch` |
-| `step_sand`, `step_snow`, `step_metal` | 0.3 s ×4 each | `footstep on loose sand` / `footstep on crunchy snow` / `footstep on a metal floor panel` |
-| `jump` | 0.4 s | `small suit servo whoosh as an astronaut jumps` |
-| `land` | 0.4 s | `soft thud landing on ground with suit rattle` |
-| `jetpack_start` ★ | 0.5 s | `small jetpack ignition puff` |
-| `jetpack_loop` ★ | 3 s loop | `steady soft jetpack thrust hiss, seamless loop` |
-| `jetpack_stop` | 0.5 s | `jetpack cutting out with a sputter` |
-| `o2_low` ★ | 1 s | `gentle two-tone suit warning beep, calm` |
-| `breath_low` | 4 s loop | `astronaut breathing heavier inside a helmet, seamless loop` |
-| `blackout` | 2 s | `suit powering down, soft electronic fade` |
-| `helmet_lamp` | 0.2 s | `small click of a helmet lamp switching on` |
-| `canister_breathe` | 1 s | `oxygen canister hiss into a helmet` |
+| ✓ `step_grass` ★ | 0.3 s ×4 variations | `soft footstep on short grass, astronaut boot, light` |
+| ✓ `step_rock` | 0.3 s ×4 | `footstep on hard rock, heavy boot, slight crunch` |
+| ✓ `step_sand`, `step_snow`, `step_metal` | 0.3 s ×4 each | `footstep on loose sand` / `footstep on crunchy snow` / `footstep on a metal floor panel` |
+| ✓ `jump` | 0.4 s | `small suit servo whoosh as an astronaut jumps` |
+| ✓ `land` | 0.4 s | `soft thud landing on ground with suit rattle` |
+| ✓ `jetpack_start` ★ | 0.5 s | `small jetpack ignition puff` |
+| ✓ `jetpack_loop` ★ | 3 s loop | `steady soft jetpack thrust hiss, seamless loop` |
+| ✓ `jetpack_stop` | 0.5 s | `jetpack cutting out with a sputter` |
+| ✓ `o2_low` ★ | 1 s | `gentle two-tone suit warning beep, calm` |
+| ✓ `breath_low` | 4 s loop | `astronaut breathing heavier inside a helmet, seamless loop` |
+| ✓ `blackout` | 2 s | `suit powering down, soft electronic fade` |
+| ✓ `helmet_lamp` | 0.2 s | `small click of a helmet lamp switching on` |
+| ✓ `canister_breathe` | 1 s | `oxygen canister hiss into a helmet` |
 
 ### 13.2 Laser and mining: P1
 
 | File | Length | Prompt |
 | --- | --- | --- |
-| `laser_start` | 0.4 s | `sci-fi mining laser powering up, warm hum rising` |
-| `laser_loop` ★ | 3 s loop | `steady sci-fi mining laser beam hum with crackle, seamless loop` |
-| `laser_stop` | 0.4 s | `mining laser powering down` |
-| `laser_hit_rock` | 3 s loop | `laser burning into rock, sizzling and crumbling, seamless loop` |
-| `laser_hit_crystal` | 3 s loop | `laser on ice crystal, glassy singing and cracking, seamless loop` |
-| `dig_chunk` ★ | 0.5 s ×3 | `a chunk of soil and stone breaking away` |
+| ✓ `laser_start` | 0.4 s | `sci-fi mining laser powering up, warm hum rising` |
+| ✓ `laser_loop` ★ | 3 s loop | `steady sci-fi mining laser beam hum with crackle, seamless loop` |
+| ✓ `laser_stop` | 0.4 s | `mining laser powering down` |
+| ✓ `laser_hit_rock` | 3 s loop | `laser burning into rock, sizzling and crumbling, seamless loop` |
+| ✓ `laser_hit_crystal` | 3 s loop | `laser on ice crystal, glassy singing and cracking, seamless loop` |
+| ✓ `dig_chunk` ★ | 0.5 s ×3 | `a chunk of soil and stone breaking away` |
 | `ore_pop` | 0.4 s | `mineral chunk popping free with a sparkle` |
 
 ### 13.3 Pickups, crafting, building, UI: P1
@@ -540,13 +570,13 @@ Claude already plays code-made stand-ins for the P1 sounds marked ★; recorded 
 | `pickup_rare` | 0.6 s | `sparkly rare item pickup chime` |
 | `backpack_full` | 0.5 s | `soft low denied buzz` |
 | `craft_done` | 0.7 s | `satisfying crafting complete sound, small mechanical clunk then chime` |
-| `place_machine` ★ | 0.8 s | `heavy machine set down on ground, thud with metal settle` |
-| `pickup_machine` | 0.6 s | `machine folding up with servo whirr` |
+| ✓ `place_machine` ★ | 0.8 s | `heavy machine set down on ground, thud with metal settle` |
+| ✓ `pickup_machine` | 0.6 s | `machine folding up with servo whirr` |
 | `place_invalid` | 0.3 s | `short soft error blip` |
 | `rotate` | 0.2 s | `small ratchet click` |
-| `ui_click` ★ | 0.1 s | `soft UI click` |
+| ✓ `ui_click` ★ | 0.1 s | `soft UI click` |
 | `ui_hover` | 0.1 s | `very soft UI tick` |
-| `ui_open`, `ui_close` | 0.3 s | `soft whoosh of a menu panel opening` / `closing` |
+| ✓ `ui_open`, `ui_close` | 0.3 s | `soft whoosh of a menu panel opening` / `closing` |
 | `goal_complete` ★ | 1.2 s | `rewarding goal complete jingle, bells and soft synth, short` |
 | `goal_new` | 0.8 s | `gentle notification for a new objective` |
 | `save` | 0.5 s | `soft confirmation tone` |
@@ -558,7 +588,7 @@ All 4–6 s, `seamless loop`.
 | File | Prompt |
 | --- | --- |
 | `electrolyzer_loop` | `water electrolysis machine bubbling with a soft electric hum` |
-| `smelter_loop` | `small furnace roaring with crackling heat and occasional metal clink` |
+| ✓ `smelter_loop` | `small furnace roaring with crackling heat and occasional metal clink` |
 | `solar_lotus_open` | `mechanical petals unfolding smoothly, 2 seconds, not a loop` |
 | `battery_hum` | `low steady electrical hum of a battery charging` |
 | `auto_drill_loop` | `mining drill grinding into rock with rhythmic thumps` |
@@ -571,8 +601,8 @@ All 4–6 s, `seamless loop`.
 | `power_station_loop` | `turbine spinning with deep hum` |
 | `windmill_loop` | `wind turbine blades whooshing slowly` |
 | `geothermal_loop` | `steam vent rumble and hiss with heat exchanger hum` |
-| `power_out` | `power failure, machines winding down, 2 seconds, not a loop` |
-| `power_on` | `power restored, machines spinning up, 2 seconds, not a loop` |
+| ✓ `power_out` | `power failure, machines winding down, 2 seconds, not a loop` |
+| ✓ `power_on` | `power restored, machines spinning up, 2 seconds, not a loop` |
 | `needs_attention` | `soft mechanical sputter and a small alert chirp, 1 second, not a loop` |
 
 ### 13.5 Creatures and Guardians: P2 (Jivagraha), P3
@@ -603,7 +633,7 @@ None of these should sound violent: curious, shy, proud, sad.
 | `sub_loop` | `submarine engine hum underwater with bubbles, seamless loop 5 s` |
 | `sonar_ping` | `underwater sonar ping with echo, 2 s` |
 | `ship_ignite` | `small rocket engine igniting with a roar building up, 3 s` |
-| `ship_thrust_loop` | `spaceship main engine thrust rumble, seamless loop 5 s` |
+| ✓ `ship_thrust_loop` | `spaceship main engine thrust rumble, seamless loop 5 s` |
 | `ship_rcs` | `short puff of a spaceship manoeuvring thruster, 0.3 s` |
 | `ship_land` | `landing thrusters then heavy touchdown and hydraulic settle, 3 s` |
 | `ship_dock` | `docking clamps locking with metal clunks and air hiss, 2 s` |

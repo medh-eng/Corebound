@@ -1,35 +1,330 @@
 {
   "_note": "Recipes that turn art-inbox/audio/sfx uploads into game sounds in public/assets/audio/sfx. Times in seconds. kind: shot (one-shot, mp3), loop (seamless, wav), steps (cuts single footsteps out of long recordings). rate < 1 lowers pitch. Run: python3 scripts/process-audio.py",
   "sounds": [
-    { "out": "jump", "src": "jump.mp3", "kind": "shot", "start": 0.1, "dur": 0.4, "level": -18 },
-    { "out": "land", "src": "land.mp3", "kind": "shot", "start": 0.15, "dur": 0.7, "level": -18 },
-    { "out": "jetpack_start", "src": "jetpack_start.mp3", "kind": "shot", "start": 0.0, "dur": 1.1, "level": -20 },
-    { "out": "jetpack_loop", "src": "jetpack_loop.mp3", "kind": "loop", "start": 0.05, "dur": 0.62, "xfade": 0.15, "level": -20 },
-    { "out": "jetpack_stop", "src": "jetpack_stop.mp3", "kind": "shot", "start": 2.7, "dur": 2.9, "level": -22 },
-    { "out": "laser_start", "src": "laser_start.mp3", "kind": "shot", "start": 0.25, "dur": 1.05, "level": -19 },
-    { "out": "laser_loop", "src": "laser_loop.mp3", "kind": "loop", "start": 1.0, "dur": 3.5, "xfade": 0.5, "level": -21 },
-    { "out": "laser_stop", "src": "laser_loop.mp3", "kind": "shot", "start": 2.0, "dur": 0.7, "rate": 1.0, "rateEnd": 0.55, "level": -21 },
-    { "out": "laser_hit_rock", "src": "laser_hit_rock.mp3", "kind": "loop", "start": 5.0, "dur": 4.0, "xfade": 0.6, "level": -24 },
-    { "out": "laser_hit_crystal", "src": "laser_hit_crystal.mp3", "kind": "loop", "start": 3.0, "dur": 4.0, "xfade": 0.6, "level": -24 },
-    { "out": "dig_chunk", "src": "dig_chunk.mp3", "kind": "shot", "start": 0.02, "dur": 1.2, "level": -18 },
-    { "out": "o2_low", "src": "o2_low.mp3", "kind": "shot", "start": 0.03, "dur": 1.25, "level": -20 },
-    { "out": "breath_low", "src": "breath_low.mp3", "kind": "loop", "start": 0.0, "dur": 7.6, "xfade": 0.6, "level": -24 },
-    { "out": "canister_breathe", "src": "canister_breathe.mp3", "kind": "shot", "start": 0.05, "dur": 0.8, "level": -18 },
-    { "out": "blackout", "src": "blackout.mp3", "kind": "shot", "start": 0.1, "dur": 2.7, "level": -19 },
-    { "out": "power_out", "src": "blackout.mp3", "kind": "shot", "start": 0.1, "dur": 2.7, "rate": 0.8, "level": -21 },
-    { "out": "power_on", "src": "blackout.mp3", "kind": "shot", "start": 0.1, "dur": 2.4, "reverse": true, "level": -21 },
-    { "out": "helmet_lamp", "src": "helmet_lamp.mp3", "kind": "shot", "start": 0.38, "dur": 0.25, "peak": -8 },
-    { "out": "ui_click", "src": "helmet_lamp.mp3", "kind": "shot", "start": 0.39, "dur": 0.09, "rate": 1.4, "peak": -14 },
-    { "out": "ui_open", "src": "dragon-studio-simple-whoosh-03-433005.mp3", "kind": "shot", "start": 0.5, "dur": 0.9, "rate": 1.25, "level": -27 },
-    { "out": "ui_close", "src": "dragon-studio-simple-whoosh-03-433005.mp3", "kind": "shot", "start": 0.5, "dur": 0.9, "rate": 1.25, "reverse": true, "level": -27 },
-    { "out": "place_machine", "src": "land.mp3", "kind": "shot", "start": 0.15, "dur": 0.9, "rate": 0.62, "level": -16 },
-    { "out": "pickup_machine", "src": "dragon-studio-simple-whoosh-03-433005.mp3", "kind": "shot", "start": 0.6, "dur": 0.8, "rate": 1.5, "reverse": true, "level": -24 },
-    { "out": "smelter_loop", "src": "spaceship-.mp3", "kind": "loop", "start": 3.0, "dur": 4.0, "xfade": 0.8, "rate": 0.8, "lowpass": 1400, "level": -26 },
-    { "out": "ship_thrust_loop", "src": "spaceship-.mp3", "kind": "loop", "start": 3.0, "dur": 5.0, "xfade": 0.8, "level": -22 },
-    { "out": "step_grass", "kind": "steps", "srcs": ["step_grass_6.mp3", "step_grass_3.mp3", "step_grass_4.mp3", "step_grass_1.mp3"], "count": 6, "level": -24 },
-    { "out": "step_rock", "kind": "steps", "srcs": ["step_rock_1.mp3", "step_rock_4.mp3"], "count": 6, "level": -23 },
-    { "out": "step_metal", "kind": "steps", "srcs": ["step_metal_2.mp3"], "count": 6, "level": -25 },
-    { "out": "step_sand", "kind": "steps", "srcs": ["step_sand_2.mp3"], "count": 6, "level": -24 },
-    { "out": "step_snow", "kind": "steps", "srcs": ["step_snow_3.mp3", "step_snow_5.mp3"], "count": 6, "level": -24 }
-  ]
+    {
+      "out": "jump",
+      "src": "jump.mp3",
+      "kind": "shot",
+      "start": 0.1,
+      "dur": 0.4,
+      "level": -18
+    },
+    {
+      "out": "land",
+      "src": "land.mp3",
+      "kind": "shot",
+      "start": 0.15,
+      "dur": 0.7,
+      "level": -18
+    },
+    {
+      "out": "jetpack_start",
+      "src": "jetpack_start.mp3",
+      "kind": "shot",
+      "start": 0.0,
+      "dur": 1.1,
+      "level": -20
+    },
+    {
+      "out": "jetpack_loop",
+      "src": "jetpack_loop.mp3",
+      "kind": "loop",
+      "start": 0.05,
+      "dur": 0.62,
+      "xfade": 0.15,
+      "level": -20
+    },
+    {
+      "out": "jetpack_stop",
+      "src": "jetpack_stop.mp3",
+      "kind": "shot",
+      "start": 2.7,
+      "dur": 2.9,
+      "level": -22
+    },
+    {
+      "out": "laser_start",
+      "src": "laser_start.mp3",
+      "kind": "shot",
+      "start": 0.25,
+      "dur": 1.05,
+      "level": -19
+    },
+    {
+      "out": "laser_loop",
+      "src": "laser_loop.mp3",
+      "kind": "loop",
+      "start": 1.0,
+      "dur": 3.5,
+      "xfade": 0.5,
+      "level": -21
+    },
+    {
+      "out": "laser_stop",
+      "src": "laser_loop.mp3",
+      "kind": "shot",
+      "start": 2.0,
+      "dur": 0.7,
+      "rate": 1.0,
+      "rateEnd": 0.55,
+      "level": -21
+    },
+    {
+      "out": "laser_hit_rock",
+      "src": "laser_hit_rock.mp3",
+      "kind": "loop",
+      "start": 5.0,
+      "dur": 4.0,
+      "xfade": 0.6,
+      "level": -24
+    },
+    {
+      "out": "laser_hit_crystal",
+      "src": "laser_hit_crystal.mp3",
+      "kind": "loop",
+      "start": 3.0,
+      "dur": 4.0,
+      "xfade": 0.6,
+      "level": -24
+    },
+    {
+      "out": "dig_chunk",
+      "src": "dig_chunk.mp3",
+      "kind": "shot",
+      "start": 0.02,
+      "dur": 1.2,
+      "level": -18
+    },
+    {
+      "out": "o2_low",
+      "src": "o2_low.mp3",
+      "kind": "shot",
+      "start": 0.03,
+      "dur": 1.25,
+      "level": -20
+    },
+    {
+      "out": "breath_low",
+      "src": "breath_low.mp3",
+      "kind": "loop",
+      "start": 0.0,
+      "dur": 7.6,
+      "xfade": 0.6,
+      "level": -24
+    },
+    {
+      "out": "canister_breathe",
+      "src": "canister_breathe.mp3",
+      "kind": "shot",
+      "start": 0.05,
+      "dur": 0.8,
+      "level": -18
+    },
+    {
+      "out": "blackout",
+      "src": "blackout.mp3",
+      "kind": "shot",
+      "start": 0.1,
+      "dur": 2.7,
+      "level": -19
+    },
+    {
+      "out": "power_out",
+      "src": "blackout.mp3",
+      "kind": "shot",
+      "start": 0.1,
+      "dur": 2.7,
+      "rate": 0.8,
+      "level": -21
+    },
+    {
+      "out": "power_on",
+      "src": "blackout.mp3",
+      "kind": "shot",
+      "start": 0.1,
+      "dur": 2.4,
+      "reverse": true,
+      "level": -21
+    },
+    {
+      "out": "helmet_lamp",
+      "src": "helmet_lamp.mp3",
+      "kind": "shot",
+      "start": 0.38,
+      "dur": 0.25,
+      "peak": -8
+    },
+    {
+      "out": "ui_click",
+      "src": "helmet_lamp.mp3",
+      "kind": "shot",
+      "start": 0.39,
+      "dur": 0.09,
+      "rate": 1.4,
+      "peak": -14
+    },
+    {
+      "out": "ui_open",
+      "src": "dragon-studio-simple-whoosh-03-433005.mp3",
+      "kind": "shot",
+      "start": 0.5,
+      "dur": 0.9,
+      "rate": 1.25,
+      "level": -27
+    },
+    {
+      "out": "ui_close",
+      "src": "dragon-studio-simple-whoosh-03-433005.mp3",
+      "kind": "shot",
+      "start": 0.5,
+      "dur": 0.9,
+      "rate": 1.25,
+      "reverse": true,
+      "level": -27
+    },
+    {
+      "out": "place_machine",
+      "src": "land.mp3",
+      "kind": "shot",
+      "start": 0.15,
+      "dur": 0.9,
+      "rate": 0.62,
+      "level": -16
+    },
+    {
+      "out": "pickup_machine",
+      "src": "dragon-studio-simple-whoosh-03-433005.mp3",
+      "kind": "shot",
+      "start": 0.6,
+      "dur": 0.8,
+      "rate": 1.5,
+      "reverse": true,
+      "level": -24
+    },
+    {
+      "out": "smelter_loop",
+      "src": "spaceship-.mp3",
+      "kind": "loop",
+      "start": 3.0,
+      "dur": 4.0,
+      "xfade": 0.8,
+      "rate": 0.8,
+      "lowpass": 1400,
+      "level": -26
+    },
+    {
+      "out": "ship_thrust_loop",
+      "src": "spaceship-.mp3",
+      "kind": "loop",
+      "start": 3.0,
+      "dur": 5.0,
+      "xfade": 0.8,
+      "level": -22
+    },
+    {
+      "out": "step_grass",
+      "kind": "steps",
+      "srcs": [
+        "step_grass_6.mp3",
+        "step_grass_3.mp3",
+        "step_grass_4.mp3",
+        "step_grass_1.mp3"
+      ],
+      "count": 6,
+      "level": -24
+    },
+    {
+      "out": "step_rock",
+      "kind": "steps",
+      "srcs": [
+        "step_rock_1.mp3",
+        "step_rock_4.mp3"
+      ],
+      "count": 6,
+      "level": -23
+    },
+    {
+      "out": "step_metal",
+      "kind": "steps",
+      "srcs": [
+        "step_metal_2.mp3"
+      ],
+      "count": 6,
+      "level": -25
+    },
+    {
+      "out": "step_sand",
+      "kind": "steps",
+      "srcs": [
+        "step_sand_2.mp3"
+      ],
+      "count": 6,
+      "level": -24
+    },
+    {
+      "out": "step_snow",
+      "kind": "steps",
+      "srcs": [
+        "step_snow_3.mp3",
+        "step_snow_5.mp3"
+      ],
+      "count": 6,
+      "level": -24
+    }
+  ],
+  "music": [
+    {
+      "out": "title_theme",
+      "src": "title_theme.mp3",
+      "kind": "stream"
+    },
+    {
+      "out": "jiva_day",
+      "src": "jiva_day.mp3",
+      "kind": "stream",
+      "max": 300
+    },
+    {
+      "out": "jiva_night",
+      "src": "jiva_night.mp3",
+      "kind": "stream"
+    },
+    {
+      "out": "jiva_underground",
+      "src": "jiva_underground.mp3",
+      "kind": "stream"
+    },
+    {
+      "out": "guardian_calm",
+      "src": "guardian_calm.mp3",
+      "kind": "stream"
+    },
+    {
+      "out": "guardian_awake",
+      "src": "guardian_awake.mp3",
+      "kind": "stream"
+    },
+    {
+      "out": "factory_layer_1",
+      "src": "factory_layer_1.mp3",
+      "kind": "beatloop",
+      "beats": 5,
+      "bpm": 80
+    },
+    {
+      "out": "factory_layer_2",
+      "src": "factory_layer_2.wav",
+      "kind": "beatloop",
+      "beats": 4,
+      "bpm": 80
+    },
+    {
+      "out": "factory_layer_3",
+      "src": "80_D_minor_minimal_i_#4-1793104153199.wav",
+      "kind": "beatloop",
+      "beats": 5,
+      "bpm": 80
+    }
+  ],
+  "_note_music": "Music from art-inbox/audio/music: stream = long track, loudness-matched (-18 LUFS), faded, mp3 128k (max = cut to that many seconds); beatloop = short loop cut to an exact number of beats so layers stay in time."
 }

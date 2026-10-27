@@ -22,6 +22,8 @@ const KEYS: [string, string][] = [
   ['X', 'Pick up a machine'],
   ['Q', 'Breathe an O₂ canister'],
   ['M', 'Planet view'],
+  ['Right mouse (hold)', 'Scanner: learn what something is'],
+  ['J', 'Codex: everything you have scanned'],
   ['G', 'Dance (press again for another)'],
   ['N (hold)', 'Speed up time'],
   ['F3', 'Performance info'],

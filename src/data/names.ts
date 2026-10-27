@@ -1,5 +1,5 @@
 // Names of Guardians, peoples and creatures, chosen 2026-10-27 from Sarvam AI's options
-// (team-inbox/writing/T-004-names.md). "say" is a pronunciation guide (capitals = stressed).
+// (team-inbox/writing/T-004-names.md); three corrected after Sarvam's review (T-004-names-review.md). "say" is a pronunciation guide (capitals = stressed).
 
 export interface Name { name: string; deva: string; say: string; meaning: string }
 
@@ -14,7 +14,7 @@ export const GUARDIAN_NAMES: Record<string, Name> = {
 
 export const PEOPLE_NAMES: Record<string, Name> = {
   jivagraha: { name: 'Deepajana', deva: 'दीपजन', say: 'DEE-puh-JUH-nuh', meaning: 'lamp-folk' },
-  taptashila: { name: 'Khanaka', deva: 'खनक', say: 'KHAA-nuk', meaning: 'miners' },
+  taptashila: { name: 'Khanik', deva: 'खनिक', say: 'KHUH-nik', meaning: 'miners' },
   marubhumi: { name: 'Maruyatri', deva: 'मरुयात्री', say: 'MUH-roo-YAA-tree', meaning: 'desert travellers' },
   himasagara: { name: 'Jalabandhu', deva: 'जलबन्धु', say: 'JUH-luh-BUN-dhoo', meaning: 'water-friends' },
   vayumandala: { name: 'Patangajana', deva: 'पतंगजन', say: 'puh-TUN-guh-JUH-nuh', meaning: 'kite-folk' },
@@ -22,7 +22,7 @@ export const PEOPLE_NAMES: Record<string, Name> = {
 };
 
 export const CREATURE_NAMES: Record<string, Name> = {
-  glow_moth: { name: 'Jyotipatang', deva: 'ज्योतिपतंग', say: 'JYOH-tee-puh-TUNG', meaning: 'light-moth' },
+  glow_moth: { name: 'Jyotishalabha', deva: 'ज्योतिशलभ', say: 'JYOH-tee-SHUH-luh-bhuh', meaning: 'light-moth' },
   rock_crab: { name: 'Golakarka', deva: 'गोलकर्क', say: 'GOH-luh-KUR-kuh', meaning: 'round-crab' },
   mountain_grazer: { name: 'Lavana', deva: 'लवण', say: 'LUH-vun', meaning: 'salt, mineral' },
   szynthar: { name: 'Szynthar', deva: 'सिन्थार', say: 'SIN-thar', meaning: "Medhanshu's own name" },
@@ -32,7 +32,7 @@ export const CREATURE_NAMES: Record<string, Name> = {
   ice_crab: { name: 'Himakarka', deva: 'हिमकर्क', say: 'HEE-muh-KUR-kuh', meaning: 'ice-crab' },
   balloon: { name: 'Meghapota', deva: 'मेघपोट', say: 'MAY-ghuh-POTE', meaning: 'cloud-belly' },
   ribbon_glider: { name: 'Tarangini', deva: 'तरंगिणी', say: 'tuh-RUN-gi-nee', meaning: 'the flowing one' },
-  acid_beetle: { name: 'Kathinakita', deva: 'कठिनकीट', say: 'kuh-THEE-nuh-KEET', meaning: 'hard-shelled beetle' },
+  acid_beetle: { name: 'Kathorakita', deva: 'कठोरकीट', say: 'kuh-THOR-uh-KEET', meaning: 'hard-shelled beetle' },
   cloud_ray: { name: 'Neelachhaya', deva: 'नीलछाया', say: 'NEEL-uh-CHHAA-yaa', meaning: 'blue shadow' },
 };
 

@@ -1,7 +1,7 @@
 # T-001: Chapter 1 story: Huxley's first message and memory logs
 
 - **Assigned to:** ChatGPT (chat)
-- **Status:** review
+- **Status:** done (merged 2026-10-27)
 - **Priority:** P2 (needed for M4, write now so it can be reviewed early)
 - **Deliver to:** `team-inbox/writing/T-001-chapter1-logs.md`
 - **Depends on:** nothing

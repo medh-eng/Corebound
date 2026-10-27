@@ -158,6 +158,38 @@ def process(r):
     return [save(fades(lv, 0.002, min(0.25, r['dur'] * 0.3)), r['out'], 'mp3')]
 
 
+MUSIC_SRC = os.path.join(ROOT, 'art-inbox', 'audio', 'music')
+MUSIC_OUT = os.path.join(ROOT, 'public', 'assets', 'audio', 'music')
+
+
+def music(r):
+    src = os.path.join(MUSIC_SRC, r['src'])
+    if r['kind'] == 'stream':
+        out = os.path.join(MUSIC_OUT, r['out'] + '.mp3')
+        dur = float(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', src], capture_output=True, text=True).stdout)
+        length = min(dur, r.get('max', dur))
+        af = f"loudnorm=I=-18:TP=-1.5:LRA=11,afade=t=in:d=2,afade=t=out:st={max(0, length - 4):.2f}:d=4"
+        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', src, '-t', f'{length:.2f}', '-af', af, '-ar', '44100', '-c:a', 'libmp3lame', '-b:a', '128k', out], check=True)
+        return f"{r['out']}.mp3 ({length:.0f} s)"
+    # beatloop: an exact number of beats, ends crossfaded into the start
+    raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', src, '-ac', '2', '-ar', str(SR), '-f', 'f32le', '-'], capture_output=True, check=True).stdout
+    x = np.frombuffer(raw, np.float32).astype(np.float64).reshape(-1, 2)
+    L = int(round(r['beats'] * 60 / r['bpm'] * SR))
+    X = int(0.02 * SR)
+    if len(x) < L + X:
+        x = np.concatenate([x, np.zeros((L + X - len(x), 2))])
+    seg = x[:L + X]
+    out = seg[:L].copy()
+    t = np.linspace(0, np.pi / 2, X)[:, None]
+    out[:X] = seg[:X] * np.sin(t) + seg[L:L + X] * np.cos(t)
+    out *= (10 ** (-20 / 20)) / (np.sqrt((out ** 2).mean()) + 1e-9)
+    out = np.clip(out, -0.95, 0.95)
+    pcm = (out * 32767).astype('<i2').tobytes()
+    path = os.path.join(MUSIC_OUT, r['out'] + '.wav')
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 's16le', '-ar', str(SR), '-ac', '2', '-i', '-', '-c:a', 'pcm_s16le', path], input=pcm, check=True)
+    return f"{r['out']}.wav ({L / SR:.2f} s loop)"
+
+
 def main():
     cfg = json.load(open(os.path.join(ROOT, 'scripts', 'audio.config.json')))
     os.makedirs(OUT, exist_ok=True)
@@ -171,6 +203,14 @@ def main():
         print(f"{r['out']:20s} -> {', '.join(made) if made else 'NOTHING (no clean hits found)'}")
     files = sorted(f for f in os.listdir(OUT) if f.endswith(('.mp3', '.wav')))
     json.dump(files, open(os.path.join(OUT, 'index.json'), 'w'), indent=0)
+    os.makedirs(MUSIC_OUT, exist_ok=True)
+    for r in cfg.get('music', []):
+        if only and r['out'] not in only: continue
+        if not os.path.exists(os.path.join(MUSIC_SRC, r['src'])):
+            print(f"skip {r['out']}: source missing"); continue
+        print(f"{r['out']:20s} -> {music(r)}")
+    mf = sorted(f for f in os.listdir(MUSIC_OUT) if f.endswith(('.mp3', '.wav')))
+    json.dump(mf, open(os.path.join(MUSIC_OUT, 'index.json'), 'w'), indent=0)
 
 
 if __name__ == '__main__':

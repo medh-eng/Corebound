@@ -4,6 +4,8 @@ import { JIVAGRAHA } from './data/worlds';
 import { START_BASE } from './data/base';
 import { ITEMS, YIELD, MACHINES, SURVIVAL, RECIPES, type ItemId, type MachineId, type Recipe } from './data/items';
 import { researchById } from './data/research';
+import { CODEX, codexById } from './data/codex';
+import { RESEARCH_LINES, MACHINE_LINES, EVENT_LINES } from './data/lines';
 import { CHAPTER1_GOALS, SARATHI_EVENTS } from './data/story';
 import { Terrain } from './core/terrain';
 import { VoxelWorld, type Dig } from './core/voxels';
@@ -70,6 +72,7 @@ interface SaveData {
   mined: Partial<Record<ItemId, number>>;
   crafted: Partial<Record<ItemId, number>>;
   flags: Record<string, boolean>;
+  codex?: string[];
 }
 
 const V = (v: V3) => new THREE.Vector3(v.x, v.y, v.z);
@@ -278,6 +281,19 @@ export async function startGame(opts: GameOptions) {
   const crafted: Partial<Record<ItemId, number>> = {};
   const flags: Record<string, boolean> = {};
   const fraction = new Map<ItemId, number>();
+  const codexKnown: string[] = [];
+  const codexNew: string[] = [];
+  /** Adds a Codex entry the first time something is scanned. */
+  const unlockCodex = (id: string) => {
+    const e = codexById(id);
+    if (!e || codexKnown.includes(id)) return false;
+    codexKnown.push(id); codexNew.push(id);
+    ui.pickup(`Codex: ${e.title.split(':')[0]}`, '#9fe8ff');
+    ui.toast('New Codex entry — press J to read it');
+    sound.goal();
+    if (ui.codexOpen) ui.renderCodex(codexKnown, codexNew);
+    return true;
+  };
 
   const machineCollider = (m: PlacedMachine): Collider => ({ pos: m.pos, radius: MACHINES[m.id].radius });
   const addMachineView = (m: PlacedMachine, yaw = 0) => {
@@ -346,7 +362,7 @@ export async function startGame(opts: GameOptions) {
     if (opts.shot) return;
     const data: SaveData = {
       v: 1, days, me: { pos: { ...me.pos }, heading: { ...me.heading } }, pack: pack.toJSON(), base,
-      digs: voxels.digs, ore: ore.amounts(), goal: goalIndex, mined, crafted, flags,
+      digs: voxels.digs, ore: ore.amounts(), goal: goalIndex, mined, crafted, flags, codex: codexKnown,
     };
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch { /* storage full or blocked */ }
   };
@@ -362,6 +378,7 @@ export async function startGame(opts: GameOptions) {
     ore.restore(d.ore);
     goalIndex = d.goal;
     Object.assign(mined, d.mined); Object.assign(crafted, d.crafted); Object.assign(flags, d.flags);
+    codexKnown.splice(0, codexKnown.length, ...(d.codex ?? []));
     for (const m of base.machines) addMachineView(m, m.yaw ?? 0);
     refreshFactory();
   };
@@ -481,6 +498,8 @@ export async function startGame(opts: GameOptions) {
     const powered = !!st && (lastSupply.get(st.uid!) ?? 0) > 0.2;
     ui.renderResearch(base.research, (id) => pack.count(id), powered);
   };
+  const openCodex = () => { sound.uiOpen(); ui.renderCodex(codexKnown, codexNew); ui.setCodex(true); codexNew.length = 0; if (document.pointerLockElement) document.exitPointerLock(); };
+  const closeCodex = () => { ui.setCodex(false); if (playing && !opts.shot) input.lock(); };
   const openResearch = () => { sound.uiOpen(); renderResearch(); ui.setResearch(true); if (document.pointerLockElement) document.exitPointerLock(); };
   const closeResearch = () => { ui.setResearch(false); if (playing && !opts.shot) input.lock(); };
   const loadResearchParts = () => {
@@ -551,16 +570,18 @@ export async function startGame(opts: GameOptions) {
   }
 
   document.addEventListener('pointerlockchange', () => {
-    if (!document.pointerLockElement && playing && !opts.shot && !ui.packOpen && !ui.buildOpen && !ui.researchOpen) { save(); ui.showPause(() => input.lock()); }
+    if (!document.pointerLockElement && playing && !opts.shot && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && !ui.codexOpen) { save(); ui.showPause(() => input.lock()); }
   });
   renderer.domElement.addEventListener('click', () => { sound.start(); });
-  renderer.domElement.addEventListener('click', () => { if (playing && !input.locked && !opts.shot && !ui.packOpen && !ui.buildOpen && !ui.researchOpen) { ui.hidePause(); input.lock(); } });
+  addEventListener('pointerdown', () => sound.start(), { once: true });   // title music after the first click
+  renderer.domElement.addEventListener('click', () => { if (playing && !input.locked && !opts.shot && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && !ui.codexOpen) { ui.hidePause(); input.lock(); } });
   addEventListener('keydown', (e) => {
     if (!playing) return;
     if (e.code === 'Tab') { e.preventDefault(); if (ui.buildOpen) closeBuild(false); if (ui.researchOpen) ui.setResearch(false); if (ui.packOpen) closePack(); else { cancelBuild(); endBelt(); openPack(); } }
     // Closing keys must not also count as a fresh press in the game this frame.
     if ((e.code === 'KeyB' || e.code === 'Escape') && ui.buildOpen) { e.preventDefault(); closeBuild(); setTimeout(() => input.pressed.delete(e.code)); }
     if ((e.code === 'KeyE' || e.code === 'Escape') && ui.researchOpen) { e.preventDefault(); closeResearch(); setTimeout(() => input.pressed.delete(e.code)); }
+    if ((e.code === 'KeyJ' || e.code === 'Escape') && ui.codexOpen) { e.preventDefault(); closeCodex(); setTimeout(() => input.pressed.delete(e.code)); }
   });
 
   addEventListener('resize', () => {
@@ -705,6 +726,50 @@ export async function startGame(opts: GameOptions) {
     return '';
   };
 
+  let scanTimer = 0;
+  const KIND_CODEX: Record<string, string> = { ice: 'ice_crystal', iron: 'iron_ore', carbon: 'carbon' };
+  /** What the scanner is pointing at (a Codex id), if anything it knows about. */
+  const scanTarget = (): string | null => {
+    camera.getWorldDirection(camDir);
+    const o = camera.position;
+    const hits: [number, string][] = [];
+    const m = aimMachine();
+    if (m && V(m.pos).distanceTo(camera.position) < 25) hits.push([V(m.pos).distanceTo(o), m.id]);
+    { const oc = domePoint.clone().addScaledVector(domeDir, 1.8).sub(o); const t = oc.dot(camDir); if (t > 0 && t < 30 && oc.lengthSq() - t * t < 3.2 * 3.2) hits.push([t, 'shelter_dome']); }
+    const bl = blooms.raycast(o, camDir, 30); if (bl) hits.push([bl.t, 'bloom']);
+    const on = ore.raycast(o, camDir, 30); if (on) hits.push([on.t, KIND_CODEX[on.node.kind]]);
+    const mt = fauna.nearRay(o, camDir, 25); if (mt !== null) hits.push([mt, 'glow_moth']);
+    for (const [kind, id, r] of [['banyan', 'banyan', 4.5], ['mushroomTree', 'mushroom_tree', 2.5]] as const) {
+      for (const p of scatter.landmarks[kind] ?? []) {
+        const c = p.clone().addScaledVector(p.clone().normalize(), kind === 'banyan' ? 5 : 3);
+        const oc = c.sub(o); const t = oc.dot(camDir);
+        if (t > 0 && t < 45 && oc.lengthSq() - t * t < r * r) hits.push([t, id]);
+      }
+    }
+    // Small plants and sandstone: where the ray meets the ground.
+    let tg = -1;
+    for (let t = 1; t < 25; t += 0.2) { const p = o.clone().addScaledVector(camDir, t); if (voxels.density(p.x, p.y, p.z) > 0) { tg = t; break; } }
+    if (tg > 0) {
+      const g = o.clone().addScaledVector(camDir, tg);
+      const near = (name: string, r: number) => {
+        const m4 = new THREE.Matrix4(), p = new THREE.Vector3();
+        for (const obj of scatter.group.children) {
+          const im = obj as THREE.InstancedMesh;
+          if (!im.isInstancedMesh || im.name !== name) continue;
+          if (im.boundingSphere && im.boundingSphere.center.distanceTo(g) > im.boundingSphere.radius + r) continue;
+          for (let i = 0; i < im.count; i++) { im.getMatrixAt(i, m4); p.setFromMatrixPosition(m4); if (p.distanceTo(g) < r) return true; }
+        }
+        return false;
+      };
+      if (near('lotus', 1.4)) hits.push([tg, 'lotus_pad']);
+      else if (near('smallMushroom', 1.2)) hits.push([tg, 'glow_mushroom']);
+      else if (near('fern', 1.3)) hits.push([tg, 'fern']);
+      else if (voxels.edited(P(g)) && voxels.material(P(g.clone().addScaledVector(g.clone().normalize(), -0.4))) === Mat.Rock) hits.push([tg, 'sandstone']);
+    }
+    hits.sort((a, b) => a[0] - b[0]);
+    return hits.find(([, id]) => !!codexById(id))?.[1] ?? null;
+  };
+
   const nearestMachine = (pos: THREE.Vector3, maxD: number) => {
     let best: PlacedMachine | null = null, bd = maxD;
     for (const m of base.machines) { const d = V(m.pos).distanceTo(pos); if (d < bd) { bd = d; best = m; } }
@@ -721,7 +786,7 @@ export async function startGame(opts: GameOptions) {
     if (input.hit('KeyH')) ui.toggleHelp();
     if (input.wheel && !building) rig.dist = THREE.MathUtils.clamp(rig.dist + input.wheel * 0.8, 3.5, 14);
 
-    const active = playing && !ui.paused && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && (input.locked || opts.shot) && !rig.transitioning;
+    const active = playing && !ui.paused && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && !ui.codexOpen && (input.locked || opts.shot) && !rig.transitioning;
     if (active && input.hit('KeyM')) rig.setMode(rig.mode === 'follow' ? 'orbit' : 'follow', 1.4);
     const look = input.sensitivity;
     let yaw = 0;
@@ -776,6 +841,7 @@ export async function startGame(opts: GameOptions) {
         else ui.toast('No O₂ canisters — craft them from ice');
       }
       if (input.hit('KeyB')) openBuild();
+      if (input.hit('KeyJ')) openCodex();
       if (input.hit('KeyC')) {
         if (!base.research.done.includes('conveyor')) ui.toast('Research conveyors first (at a research station)');
         else { beltMode = true; beltFrom = null; ui.toast('Conveyor: click the machine that sends, then the one that receives'); }
@@ -813,6 +879,7 @@ export async function startGame(opts: GameOptions) {
           belts.add(belt, pts);
           sound.place();
           ui.pickup(`Belt: ${MACHINES[beltFrom.id].name} → ${MACHINES[target.id].name}`, ITEMS.conveyor.color);
+          if (!flags.firstBelt) { flags.firstBelt = true; ui.sarathi(EVENT_LINES.first_belt, 8); }
           endBelt();
           advanceGoals();
           save();
@@ -847,12 +914,29 @@ export async function startGame(opts: GameOptions) {
         refreshFactory();
         ui.pickup(`Placed ${ITEMS[building.item].name}`, ITEMS[building.item].color);
         sound.place();
-        if (MACHINES[m.id].powerKW < 0 && !powerNetworks(base, nearShelter).netOf.has(m.uid!)) ui.sarathi(SARATHI_EVENTS.noPower);
+        if (MACHINES[m.id].powerKW < 0 && !powerNetworks(base, nearShelter).netOf.has(m.uid!)) ui.sarathi(EVENT_LINES.no_power ?? SARATHI_EVENTS.noPower);
+        else if (!flags[`placed_${m.id}`] && MACHINE_LINES[m.id]) ui.sarathi(MACHINE_LINES[m.id], 8);
+        flags[`placed_${m.id}`] = true;
         cancelBuild();
         advanceGoals();
         save();
       }
     }
+
+    // Scanner (hold right mouse): learn what something is; adds it to the Codex.
+    let scanning = false;
+    if (walk && !building && !beltMode && input.down('Mouse2')) {
+      const t = scanTarget();
+      scanning = true;
+      if (!t) { prompt = 'Scanner: aim at a plant, rock, creature or machine'; scanTimer = 0; }
+      else if (codexKnown.includes(t)) { prompt = `${codexById(t)!.title.split(':')[0]} — already in your Codex (<b>J</b>)`; scanTimer = 0; }
+      else {
+        scanTimer += dt;
+        ui.progress(Math.min(1, scanTimer / 0.9));
+        prompt = `Scanning… ${codexById(t)!.title.split(':')[0]}`;
+        if (scanTimer >= 0.9) { scanTimer = 0; unlockCodex(t); }
+      }
+    } else scanTimer = 0;
 
     // Mining laser.
     let lasering = false;
@@ -909,7 +993,7 @@ export async function startGame(opts: GameOptions) {
         if (!flags.rangeHint) { ui.toast('Too far — walk closer and aim at the ground or a crystal'); flags.rangeHint = true; }
       }
     }
-    if (!lasering) { digTimer = 0; oreTimer = 0; ui.progress(0); }
+    if (!lasering && !scanning) { digTimer = 0; oreTimer = 0; ui.progress(0); }
     player.setAim(laserTo);
 
     // Sun, sky and light for the place you stand.
@@ -981,7 +1065,7 @@ export async function startGame(opts: GameOptions) {
       if (lastBand !== null && (band !== 'thriving' || lastBand !== 'stable' || !flags.toldThriving)) { ui.sarathi(msg, 8); ui.toast(`Harmony: ${BAND_TEXT[band]}`); if (band === 'thriving') flags.toldThriving = true; }
       lastBand = band;
     }
-    if (rig.mode === 'orbit' && playing) flags.sawPlanet = true;
+    if (rig.mode === 'orbit' && playing) { flags.sawPlanet = true; for (const id of ['jivagraha', 'harmony_air', 'harmony_water', 'harmony_soil']) if (!codexKnown.includes(id)) unlockCodex(id); }
     ui.harmony({ value: hv, band: BAND_TEXT[band], ...base.harmony }, playing && rig.mode === 'orbit');
 
     tmpCol.copy(cols.nightH).lerp(cols.dayH, day).lerp(cols.setH, sunset * 0.35).lerp(cols.dayZ, 0.35 * day);
@@ -1009,7 +1093,7 @@ export async function startGame(opts: GameOptions) {
       if (res.researched) {
         const node = researchById(res.researched)!;
         ui.toast(`Research complete: ${node.name}`);
-        ui.sarathi(`${SARATHI_EVENTS.researched} ${node.name}. ${node.note}`, 8);
+        ui.sarathi(RESEARCH_LINES[node.id] ?? `${SARATHI_EVENTS.researched} ${node.name}. ${node.note}`, 8);
         sound.goal();
         refreshFactory();
         advanceGoals();
@@ -1034,7 +1118,10 @@ export async function startGame(opts: GameOptions) {
         if (m.id === 'power_pylon') on = res.supply.has(m.uid!);
         else if (d.process?.fuel) on = (m.burn ?? 0) > 0;
         else if (d.process) on = (m.burn ?? 0) > 0 && sup > 0.2;
-        else if (d.drill) on = !!m.mine && sup > 0.2 && total(m.out) < (d.outCap ?? 20);
+        else if (d.drill) {
+          on = !!m.mine && sup > 0.2 && total(m.out) < (d.outCap ?? 20);
+          if (total(m.out) >= (d.outCap ?? 20) && !flags.drillFullTold) { flags.drillFullTold = true; ui.sarathi(EVENT_LINES.drill_full, 8); }
+        }
         else if (d.research) on = researchReady(base) && sup > 0.2;
         else if (d.storage) on = total(m.inv) > 0;
         else if (d.filter) on = !!m.working;
@@ -1079,6 +1166,8 @@ export async function startGame(opts: GameOptions) {
       for (const m of base.machines) if ((m.id === 'smelter' || m.id === 'coal_burner' || m.id === 'silicon_furnace') && (m.burn ?? 0) > 0) { const d = V(m.pos).distanceTo(pos); if (near === null || d < near) near = d; }
       sound.smelter(near);
     }
+    // Music for the moment: title, day, night, underground, or a restless planet.
+    sound.playMusic(!playing ? 'title_theme' : band === 'collapse' ? 'guardian_awake' : underground ? 'jiva_underground' : night > 0.6 ? 'jiva_night' : 'jiva_day');
     sound.update(dt, night, me.grounded ? Math.hypot(me.vel.x, me.vel.y, me.vel.z) : 0,
       Math.min(1, base.machines.filter((m) => m.working || m.fuelOn).length / 8), harmonyValue(base.harmony) / 100);
     resTimer -= dt;
@@ -1106,6 +1195,8 @@ export async function startGame(opts: GameOptions) {
     stats: () => ({ calls: renderer.info.render.calls, triangles: renderer.info.render.triangles }),
     state: () => ({ pos: { ...me.pos }, grounded: me.grounded, fuel: me.jetFuel, alt: altitude(me, groundR), oxygen: base.oxygen, power: base.power, shelterO2: base.shelterO2, goal: CHAPTER1_GOALS[goalIndex].id, pack: pack.slots, machines: base.machines.length, smelters: base.machines.filter((m) => m.id === 'smelter').map((m) => ({ inv: m.inv, out: m.out, burn: m.burn, made: m.made, fed: m.fedByBelt })) }),
     base: () => base,
+    codex: () => [...codexKnown],
+    openCodex: () => { codexKnown.push(...CODEX.slice(0, 6).map((c) => c.id).filter((id) => !codexKnown.includes(id))); openCodex(); },
     pollute: (air: number, water: number, soil: number) => {
       base.harmony.air = air; base.harmony.water = water; base.harmony.soil = soil;
       const hv = harmonyValue(base.harmony);   // skip the slow fade so screenshots show it at once

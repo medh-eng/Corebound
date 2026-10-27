@@ -1,4 +1,4 @@
-// Living things that answer Harmony. M3: glow-moths (Jyotipatang) drifting around the plants near
+// Living things that answer Harmony. M3: glow-moths (Jyotishalabha) drifting around the plants near
 // you; more when the world is healthy, none when it collapses. Never harmful, never harmed.
 import * as THREE from 'three';
 import { shared } from '../art/materials';
@@ -16,6 +16,18 @@ export class Fauna {
   private q = new THREE.Quaternion();
   private s = new THREE.Vector3();
   private p = new THREE.Vector3();
+  private live: THREE.Vector3[] = [];
+
+  /** The nearest moth close to a ray (for the scanner). */
+  nearRay(o: THREE.Vector3, d: THREE.Vector3, maxT: number): number | null {
+    let best: number | null = null;
+    for (const p of this.live) {
+      const oc = p.clone().sub(o); const t = oc.dot(d);
+      if (t < 0 || t > maxT) continue;
+      if (oc.lengthSq() - t * t < 0.8 * 0.8 && (best === null || t < best)) best = t;
+    }
+    return best;
+  }
 
   constructor(private ground: (dir: THREE.Vector3) => number) {
     // A moth: two soft wing quads; wings flap in the vertex shader.
@@ -70,6 +82,7 @@ export class Fauna {
   update(time: number, player: THREE.Vector3, abundance: number) {
     if (this.anchor.distanceTo(player) > 22) this.scatter(player);
     const n = Math.round(MAX * Math.max(0, Math.min(1, abundance)));
+    this.live.length = 0;
     for (let i = 0; i < n; i++) {
       const m = this.moths[i];
       const k = time * m.sp + m.ph;
@@ -80,6 +93,7 @@ export class Fauna {
       this.s.setScalar(1);
       this.m4.compose(this.p, this.q, this.s);
       this.mesh.setMatrixAt(i, this.m4);
+      this.live.push(this.p.clone());
     }
     this.mesh.count = n;
     this.mesh.instanceMatrix.needsUpdate = true;

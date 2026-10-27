@@ -1,7 +1,7 @@
 # T-013: Tests that check the game data fits together
 
 - **Assigned to:** ChatGPT (Codex)
-- **Status:** review
+- **Status:** done (merged 2026-10-27)
 - **Priority:** P1
 - **Deliver to:** pull request from branch `chatgpt/T-013-data-checks`
 - **Depends on:** nothing (can be done together with T-010)
