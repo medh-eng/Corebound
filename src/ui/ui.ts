@@ -1,10 +1,10 @@
 // Menus and heads-up display (plain DOM over the 3D canvas).
 import { assetUrl } from '../render/assets';
 import { CREDITS } from '../data/credits';
-import { TIPS } from '../data/tips';
 import { ITEMS, RECIPES, type ItemId, type Recipe } from '../data/items';
 import { RESEARCH, type ResearchNode } from '../data/research';
 import type { Slot } from '../systems/inventory';
+import { TIPS } from '../data/tips';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
 
@@ -30,13 +30,13 @@ const KEYS: [string, string][] = [
 export interface Goal { key: string; text: string; done?: boolean; mystery?: boolean }
 
 export class UI {
+  private loadingTipTimer = 0;
   onCraft: (r: Recipe) => void = () => {};
   onPlace: (id: ItemId) => void = () => {};
   onBuild: (id: ItemId) => void = () => {};
   onResearch: (id: string) => void = () => {};
   onResearchLoad: () => void = () => {};
   private sarathiTimer = 0;
-  private loadingTipTimer = 0;
 
   constructor() {
     const keys = KEYS.map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
