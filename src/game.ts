@@ -541,7 +541,7 @@ export async function startGame(opts: GameOptions) {
   let last = performance.now();
   let acc = 0;
   let digTimer = 0, oreTimer = 0, goalTimer = 0, saveTimer = 20;
-  let wasNight = false, lowWarned = false, resTimer = 0, lampOn = false, researchTimer = 0;
+  let wasNight = false, lowWarned = false, resTimer = 0, lampOn = false, researchTimer = 0, itemCodexTimer = 1;
 
   const begin = (resume: boolean) => {
     sound.start();
@@ -1135,6 +1135,13 @@ export async function startGame(opts: GameOptions) {
         if (v.root.userData.smoke) (v.root.userData.smoke as THREE.Points).visible = on;
       }
       researchTimer -= dt;
+      // Items and gases have no shape to scan: their Codex entries open when you first hold or make them.
+      itemCodexTimer -= dt;
+      if (itemCodexTimer <= 0) {
+        itemCodexTimer = 1;
+        for (const id of ['iron_plate', 'silicon', 'o2_canister', 'methane'] as ItemId[]) if (pack.count(id) > 0) unlockCodex(id);
+        if (base.machines.some((m) => m.id === 'electrolyzer' && (m.made ?? 0) > 0)) { unlockCodex('oxygen'); unlockCodex('hydrogen'); }
+      }
       if (ui.researchOpen && researchTimer <= 0) { renderResearch(); researchTimer = 0.4; }
       const baseNight = 1 - daylight(sunElevation(days, P(domeDir)));
       if (baseNight > 0.8 && !wasNight) { wasNight = true; ui.sarathi(SARATHI_EVENTS.nightFalls); if (goalIndex >= 8) flags.sawNight = true; }

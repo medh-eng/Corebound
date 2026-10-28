@@ -18,7 +18,7 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 | # | What | Where it goes | Prompt |
 | --- | --- | --- | --- |
 | 1 | **Prof. Huxley 3D model** from `turnaround/huxley_front_square.png` (Hunyuan3D), then Mixamo clips `Talking`, `Thinking`, `Pointing`, `Idle` | `art-inbox/models/huxley.glb` and `art-inbox/models/huxley/*.fbx` | §4, §11. If Mixamo cannot rig him (arms too close to the body), make one more front image in an A-pose and try again |
-| 2 | **Root Guardian, restless**: `guardian_root_restless.png` | `art-inbox/concept/` | §5.2 |
+| 2 | **Root Guardian, calm and restless, with no face**: make `guardian_root.png` again and add `guardian_root_restless.png`. Sarvam noticed the first one has a bearded human face, which turns it into a tree god; Mooladri is built in code from roots and has no face | `art-inbox/concept/` | §5.2 |
 | 3 | **Jivagraha creatures as 3D**: a gentle grazer and a small burrower (turnaround image, then textured GLB) | `art-inbox/turnaround/`, `art-inbox/models/` | §5.1, task T-015 |
 | 4 | **Story props for the demo**: `escape_module`, `cryo_pod`, `translator`, `memory_log`, `huxley_projector`, `quantum_fragment`, `o2_canister` (turnaround, then GLB) | `art-inbox/turnaround/`, `art-inbox/models/` | §6.3, §8 |
 | 5 | **Rover**, **starter ship**, **launch pad**, **vehicle bay** models (for the demo's ending) | `art-inbox/models/` | §6.3, §7 |
@@ -34,7 +34,7 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 
 ### ✓ Received so far (all in the game unless noted)
 
-- **Images:** style tests, key art (day, night, tall, wide), logo, store art (main capsule, header, vertical, library hero), 20+ world and Guardian concepts, Custodian and Huxley concept and turnarounds, Jivagraha textures (grass, soil, rock, sandstone), night sky and space panoramas.
+- **Images** (Sarvam reviewed 14 concepts on 2026-10-28: all fine except the Root Guardian's face, row 2; the rest only matter if they are redone for the store) — style tests, key art (day, night, tall, wide), logo, store art (main capsule, header, vertical, library hero), 20+ world and Guardian concepts, Custodian and Huxley concept and turnarounds, Jivagraha textures (grass, soil, rock, sandstone), night sky and space panoramas.
 - **3D models:** Custodian (rigged, 11 animations including two dances and a salute), shelter dome, solar lotus, battery, electrolyzer, smelter, auto-drill, storage silo, research station, coal burner, silicon furnace, bio-filter, conveyor.
 - **Music:** title theme, Jivagraha day, night and underground, Guardian awake and calm, three factory layers.
 - **Sound effects:** footsteps (grass, rock, metal, sand, snow), jump, land, jetpack, laser (start, loop, on rock, on crystal), digging, low oxygen, breathing, canister, blackout, helmet lamp, a whoosh and a ship engine (also used to make menu, machine, power and smelter sounds).
@@ -92,6 +92,9 @@ shapes (curved petal panels, petal-shaped fins and canopies), never held or sat 
 All of this as secular architecture and geometric ornament only: no deities, no idols, no shrines
 or temples, no minarets, no crosses, no shikhara spires, no kalash pot finials, no religious
 symbols of any kind, no ritual objects.
+No faces on Guardians, drones or machines. Flowers grow from moss, soil or rock, never on
+pedestals or plinths. Arches are shallow, cusped or flat-topped, never pointed Gothic or Moorish.
+Tools never look like guns.
 Rich, harmonious colours, not neon. Friendly and wondrous, never scary or violent.
 No text, no letters, no logos, no watermark, no signature, no border.
 No elephants or cows used as decoration, no turbans, moustaches or bindis used as costume on
@@ -263,7 +266,7 @@ Save to `art-inbox/concept/`. Show each one **calm** (friendly, glowing) and **r
 
 | File | Status | Prompt |
 | --- | --- | --- |
-| ✓ `guardian_root.png` | ✓ | Add `guardian_root_restless.png`: `The same giant root guardian rising from the forest, its glowing roots tense and lifting the ground, mushrooms dimming, birds flying away; majestic and sad, not attacking.` |
+| `guardian_root.png` (again) | P1 | `A colossal faceless guardian made of living roots and mossy bark rising from a glowing forest, a crown of root tips carrying soft golden light, mushrooms and ferns on its shoulders, a tiny astronaut for scale; calm, ancient, gentle. No face, no eyes, no beard.` Then `guardian_root_restless.png`: `The same faceless giant root guardian rising from the forest, its glowing roots tense and lifting the ground, mushrooms dimming, birds flying away; majestic and sad, not attacking.` |
 | ✓ `guardian_magma.png` | ✓ | Add `guardian_magma_calm.png`: `The same lava serpent resting peacefully in a cooled lava lake, its glow soft and gentle, heat lichen blooming around it.` |
 | `guardian_dune.png` | P3 | `The Dune Leviathan: an enormous creature that swims through desert sand like a whale through water, its back covered in overlapping plates of translucent silica glass that glow when the sun hits them, a huge gentle eye, sand pouring off it as it surfaces; a tiny astronaut on a dune for scale. Calm and majestic.` + `guardian_dune_restless.png` (`...the same creature restless, raising sandstorms with its fins, dunes trembling, not attacking.`) |
 | ✓ `guardian_ice.png` | ✓ | Add `guardian_ice_restless.png`: `The same ice leviathan deep under the ice, releasing clouds of glowing ink that dim every light around it, restless, not attacking.` |

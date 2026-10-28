@@ -14,16 +14,17 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | [T-006](T-006-translations-ch1.md) | Hindi and Marathi, Chapter 1 | Sarvam AI | P3 | waiting (text freeze at M4); glossary and pilot done ✓ (PR #7) |
 | [T-010](T-010-inventory-tests.md) | Unit tests for the backpack and crafting | ChatGPT (Codex) | P1 | done ✓ (PR #5, 47 tests) |
 | [T-011](T-011-loading-tips.md) | Tips on the loading screen | ChatGPT (Codex) | P2 | done ✓ (PR #9) |
-| [T-012](T-012-cultural-review.md) | Cultural review of art and music prompts | Sarvam AI | P2 | done ✓ (PR #4, applied to PROMPTS.md) |
+| [T-012](T-012-cultural-review.md) | Cultural review of art and music prompts | Sarvam AI | P2 | done ✓ (PR #4, applied to PROMPTS.md); art follow-up PR #15 applied too |
 | [T-013](T-013-data-checks.md) | Tests that check the game data fits together | ChatGPT (Codex) | P1 | done ✓ (PR #10) |
 | [T-014](T-014-research-lines.md) | SARATHI lines for research and new machines | ChatGPT (chat) | P2 | done ✓ (PR #11; in the game) |
 | [T-016](T-016-codex-panel.md) | The Codex panel (M3) | ChatGPT (Codex) | P1 | done ✓ (PR #8; opens with J) |
 | [T-017](T-017-flora-names.md) | Names for Jivagraha's plants, rocks and the bloom | Sarvam AI | P2 | done ✓ (PR #12; Sarvam's suggested set is in the Codex) |
 | [T-019](T-019-log-viewer.md) | The memory-log viewer (M4) | ChatGPT (Codex) | P1 | done ✓ (PR #13; wired to E/Esc; logs placed in M4) |
-| [T-020](T-020-codex-machines.md) | Codex entries for the remaining machines and items | ChatGPT (chat) | P2 | todo: **not delivered yet** |
+| [T-020](T-020-codex-machines.md) | Codex entries for the remaining machines and items | ChatGPT (chat) | P2 | done ✓ (PR #14; 8 entries in the Codex) |
 | [T-021](T-021-codex-logs-tab.md) | A "Logs" tab in the Codex (M4) | ChatGPT (Codex) | P1 | todo (new) |
 | [T-022](T-022-chapter1-scenes.md) | Chapter 1 scenes: waking up, the Root Guardian, the lift-off | ChatGPT (chat) | P1 | todo (new) |
 | [T-023](T-023-flora-respellings.md) | Voice respellings for the plant and rock names | Sarvam AI | P3 | todo (new) |
+| [T-024](T-024-art-review-rest.md) | Cultural review of the remaining concepts and the turnarounds | Sarvam AI | P2 | todo (new) |
 | [T-018](T-018-codex-text.md) | Codex entries for Jivagraha and Harmony | ChatGPT (chat) | P2 | done ✓ (PR #11; in the game) |
 
 ## Commander
