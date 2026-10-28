@@ -2,6 +2,15 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
+## 2026-10-28
+
+- **Sound effects** are from Pixabay (Commander). Recorded in `docs/LICENCES.md`; the Credits now say "Music and sound effects: artists on Pixabay".
+- **T-019 merged (ChatGPT):** the memory-log viewer. Huxley's messages glow blue-gold, SARATHI's corrupted records glitch, text plays like a recording; E or Esc closes it. Logs get placed in the world in M4.
+- **T-017 merged (Sarvam):** plant and rock names. The Director took Sarvam's suggested set: Jyotivata (banyan), Deepashirsha (mushroom tree), Jyotiguccha (glow-mushrooms), Deepalata (ferns), Shantakamala (lotus pads), Sheetashikhara (ice), Lohashila (iron ore), Kajjala (carbon), Dhavala (sandstone), **Sakshi** ("witness") for the bloom. The HUD keeps "the bloom" in English; the Codex shows the names.
+- **T-020** (ChatGPT, Codex entries for the research station, silo, pylon, conveyor, silicon, plates, oxygen, canister) has not arrived yet.
+- **New tasks:** T-021 Logs tab in the Codex (ChatGPT Codex), T-022 Chapter 1 scenes: waking up, Mooladri, the lift-off (ChatGPT chat), T-023 voice respellings (Sarvam).
+- 159 tests pass.
+
 ## 2026-10-27 (night)
 
 - **Credits** now thank the Warli painters, the Manganiyar and Langa musicians, the dhokra metal-casters and the bidri artisans, and credit the Pixabay music artists (Commander said yes).

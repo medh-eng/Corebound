@@ -39,3 +39,18 @@ export const CREATURE_NAMES: Record<string, Name> = {
 /** The Szynthars' own name for the grove-and-grass belt of Marubhumi where their packs were born
  *  (Medhanshu's word, kept as he wrote it). */
 export const SZYNTHAR_HOMELAND: Name = { name: 'Padakanan', deva: 'पादकानन', say: 'PAA-duh-KAA-nuh-nun', meaning: 'the grove at the foot (of the dunes)' };
+
+/** Plants, rocks and the bloom of Jivagraha, chosen 2026-10-28 from Sarvam AI's suggested set (team-inbox/writing/T-017-flora-names.md).
+ *  The HUD and goals keep the English words ("the bloom"); these names live in the Codex. */
+export const FLORA_NAMES: Record<string, Name> = {
+  banyan: { name: 'Jyotivata', deva: 'ज्योतिवट', say: 'JYOH-tee-vut', meaning: 'light-banyan' },
+  mushroom_tree: { name: 'Deepashirsha', deva: 'दीपशीर्ष', say: 'DEEP-uh-SHEER-shuh', meaning: 'lamp-headed' },
+  glow_mushroom: { name: 'Jyotiguccha', deva: 'ज्योतिगुच्छ', say: 'JYOH-tee-GOO-chhuh', meaning: 'light-cluster' },
+  fern: { name: 'Deepalata', deva: 'दीपलता', say: 'DEEP-uh-LUH-taa', meaning: 'lamp-creeper' },
+  lotus_pad: { name: 'Shantakamala', deva: 'शान्तकमल', say: 'SHAAN-tuh-KUH-mul', meaning: 'calm lotus' },
+  ice_crystal: { name: 'Sheetashikhara', deva: 'शीतशिखर', say: 'SHEE-tuh-SHEE-khuh-ruh', meaning: 'cold spire' },
+  iron_ore: { name: 'Lohashila', deva: 'लोहशिला', say: 'LOH-huh-SHEE-laa', meaning: 'iron-rock' },
+  carbon: { name: 'Kajjala', deva: 'कज्जल', say: 'KUJ-juh-luh', meaning: 'lamp-black, soot' },
+  sandstone: { name: 'Dhavala', deva: 'धवल', say: 'DHUH-vuh-luh', meaning: 'white, pale' },
+  bloom: { name: 'Sakshi', deva: 'साक्षी', say: 'SAAK-shee', meaning: 'witness' },
+};

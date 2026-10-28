@@ -1,7 +1,7 @@
 # T-017: Names for Jivagraha's plants, rocks and the bloom
 
 - **Assigned to:** Sarvam AI
-- **Status:** todo
+- **Status:** done
 - **Priority:** P2 (M3 Codex)
 - **Deliver to:** `team-inbox/writing/T-017-flora-names.md`
 - **Depends on:** nothing

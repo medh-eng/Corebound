@@ -30,7 +30,7 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 | 11 | **Voice test** (T-005): record SARATHI's 5 test lines in Sarvam Bulbul | `art-inbox/audio/voice/tests/` | §14 and `art-inbox/audio/voice/tests/T-005-voice-test-sheet.md` |
 | 12 | **Teaser clips** for the demo trailer | `art-inbox/video/` | §10 |
 
-**Licences:** music is from Pixabay (recorded in `docs/LICENCES.md`, thank you). **Still needed:** which site or tool the **sound effects** came from (the footsteps, laser, jetpack and so on), so they can be listed too. From now on, writing the source in the upload's commit message is enough.
+**Licences:** ✓ music and sound effects are from Pixabay (recorded in `docs/LICENCES.md`, thank you). From now on, writing the source in the upload's commit message is enough.
 
 ### ✓ Received so far (all in the game unless noted)
 
@@ -526,7 +526,7 @@ If a tool needs a credit line, tell the Director: it goes on the Credits screen 
 
 ## 13. Sound effects
 
-**Tools:** **ElevenLabs Sound Effects** (elevenlabs.io; free monthly credits; type the prompt, choose the length) or any similar text-to-sound tool. Freesound.org also works, but use only **CC0** sounds and note the link in the commit message.
+**Tools:** **Pixabay Sound Effects** (pixabay.com/sound-effects; free, no credit needed; what you have used so far; search a few words from the prompt, e.g. "drill motor loop", "cave ambience"). Long files are fine: the Director cuts and loops them. Or **ElevenLabs Sound Effects** (elevenlabs.io; free monthly credits; type the prompt, choose the length) or any similar text-to-sound tool. Freesound.org also works, but use only **CC0** sounds and note the link in the commit message.
 
 **Format:** WAV (or high-quality OGG/MP3), short and clean, no music, no voices unless asked. **Loops** must start and end smoothly (say "seamless loop" in the prompt). Save to `art-inbox/audio/sfx/<file>.wav`.
 

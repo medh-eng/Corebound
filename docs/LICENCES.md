@@ -17,7 +17,7 @@ Pixabay Content License: free for commercial use, no attribution required; the f
 | Files | Source | Licence |
 | --- | --- | --- |
 | `dragon-studio-simple-whoosh-03-433005.mp3` | Pixabay, artist **Dragon Studio** (from the file name) | Pixabay Content License |
-| All other effects | **Not yet known: Commander to confirm the site or tool** | — |
+| All other effects (footsteps, laser, jetpack, breathing, UI, ship and so on) | Pixabay (Commander, 2026-10-28) | Pixabay Content License |
 
 ## Images, models and video
 

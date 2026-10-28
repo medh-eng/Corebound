@@ -379,4 +379,6 @@ Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manua
 | 2026-10-27 | Recorded music is chosen by situation (title; Jivagraha day, night, underground; Guardian awake when Harmony collapses) and crossfades; recorded factory layers join as more machines run; code-made pads only fill gaps | Owner music arrived |
 | 2026-10-27 | Szynthar is said **SIN-thar** | Medhanshu's choice |
 | 2026-10-27 | Credits add a thank-you to the craft traditions that shaped the look and music (Warli, Manganiyar and Langa, dhokra, bidri) and a music credit to Pixabay artists | Commander's decision (Sarvam's suggestion) |
+| 2026-10-28 | Sound effects are from Pixabay; the Credits say "Music and sound effects: artists on Pixabay" | Commander |
+| 2026-10-28 | Jivagraha's plants, rocks and the bloom get Codex names (Sarvam's suggested set; the bloom is **Sakshi**, "witness"); the HUD and goals keep the English words; the bloom is never a "0 of N" collectible | Director, under the Commander's "choose your names" |
 | Open | price; repo visibility at launch; final art direction sign-off | **owner** |

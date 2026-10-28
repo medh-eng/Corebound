@@ -1,4 +1,5 @@
 // Corebound — Chapter 1 on Jivagraha: dig, build and breathe on a living world.
+import { CHAPTER1_LOGS } from './data/logs';
 import * as THREE from 'three';
 import { JIVAGRAHA } from './data/worlds';
 import { START_BASE } from './data/base';
@@ -500,6 +501,9 @@ export async function startGame(opts: GameOptions) {
   };
   const openCodex = () => { sound.uiOpen(); ui.renderCodex(codexKnown, codexNew); ui.setCodex(true); codexNew.length = 0; if (document.pointerLockElement) document.exitPointerLock(); };
   const closeCodex = () => { ui.setCodex(false); if (playing && !opts.shot) input.lock(); };
+  // Memory logs (T-019 viewer). World placement comes in M4; for now only the test hook opens one.
+  const openLog = (id: string, reaction?: string) => { const log = CHAPTER1_LOGS.find((l) => l.id === id); if (!log) return false; sound.uiOpen(); ui.showLog(log, reaction); if (document.pointerLockElement) document.exitPointerLock(); return true; };
+  const closeLog = () => { ui.hideLog(); if (playing && !opts.shot) input.lock(); };
   const openResearch = () => { sound.uiOpen(); renderResearch(); ui.setResearch(true); if (document.pointerLockElement) document.exitPointerLock(); };
   const closeResearch = () => { ui.setResearch(false); if (playing && !opts.shot) input.lock(); };
   const loadResearchParts = () => {
@@ -570,17 +574,18 @@ export async function startGame(opts: GameOptions) {
   }
 
   document.addEventListener('pointerlockchange', () => {
-    if (!document.pointerLockElement && playing && !opts.shot && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && !ui.codexOpen) { save(); ui.showPause(() => input.lock()); }
+    if (!document.pointerLockElement && playing && !opts.shot && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && !ui.codexOpen && !ui.logOpen) { save(); ui.showPause(() => input.lock()); }
   });
   renderer.domElement.addEventListener('click', () => { sound.start(); });
   addEventListener('pointerdown', () => sound.start(), { once: true });   // title music after the first click
-  renderer.domElement.addEventListener('click', () => { if (playing && !input.locked && !opts.shot && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && !ui.codexOpen) { ui.hidePause(); input.lock(); } });
+  renderer.domElement.addEventListener('click', () => { if (playing && !input.locked && !opts.shot && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && !ui.codexOpen && !ui.logOpen) { ui.hidePause(); input.lock(); } });
   addEventListener('keydown', (e) => {
     if (!playing) return;
     if (e.code === 'Tab') { e.preventDefault(); if (ui.buildOpen) closeBuild(false); if (ui.researchOpen) ui.setResearch(false); if (ui.packOpen) closePack(); else { cancelBuild(); endBelt(); openPack(); } }
     // Closing keys must not also count as a fresh press in the game this frame.
     if ((e.code === 'KeyB' || e.code === 'Escape') && ui.buildOpen) { e.preventDefault(); closeBuild(); setTimeout(() => input.pressed.delete(e.code)); }
     if ((e.code === 'KeyE' || e.code === 'Escape') && ui.researchOpen) { e.preventDefault(); closeResearch(); setTimeout(() => input.pressed.delete(e.code)); }
+    if ((e.code === 'KeyE' || e.code === 'Escape') && ui.logOpen) { e.preventDefault(); closeLog(); setTimeout(() => input.pressed.delete(e.code)); return; }
     if ((e.code === 'KeyJ' || e.code === 'Escape') && ui.codexOpen) { e.preventDefault(); closeCodex(); setTimeout(() => input.pressed.delete(e.code)); }
   });
 
@@ -786,7 +791,7 @@ export async function startGame(opts: GameOptions) {
     if (input.hit('KeyH')) ui.toggleHelp();
     if (input.wheel && !building) rig.dist = THREE.MathUtils.clamp(rig.dist + input.wheel * 0.8, 3.5, 14);
 
-    const active = playing && !ui.paused && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && !ui.codexOpen && (input.locked || opts.shot) && !rig.transitioning;
+    const active = playing && !ui.paused && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && !ui.codexOpen && !ui.logOpen && (input.locked || opts.shot) && !rig.transitioning;
     if (active && input.hit('KeyM')) rig.setMode(rig.mode === 'follow' ? 'orbit' : 'follow', 1.4);
     const look = input.sensitivity;
     let yaw = 0;
@@ -1196,6 +1201,7 @@ export async function startGame(opts: GameOptions) {
     state: () => ({ pos: { ...me.pos }, grounded: me.grounded, fuel: me.jetFuel, alt: altitude(me, groundR), oxygen: base.oxygen, power: base.power, shelterO2: base.shelterO2, goal: CHAPTER1_GOALS[goalIndex].id, pack: pack.slots, machines: base.machines.length, smelters: base.machines.filter((m) => m.id === 'smelter').map((m) => ({ inv: m.inv, out: m.out, burn: m.burn, made: m.made, fed: m.fedByBelt })) }),
     base: () => base,
     codex: () => [...codexKnown],
+    showLog: (id: string, reaction?: string) => openLog(id, reaction),
     openCodex: () => { codexKnown.push(...CODEX.slice(0, 6).map((c) => c.id).filter((id) => !codexKnown.includes(id))); openCodex(); },
     pollute: (air: number, water: number, soil: number) => {
       base.harmony.air = air; base.harmony.water = water; base.harmony.soil = soil;
