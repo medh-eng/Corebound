@@ -1,7 +1,7 @@
 # T-020: Codex entries for the remaining machines and items
 
 - **Assigned to:** ChatGPT (chat)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-020-codex-machines.md`
 
