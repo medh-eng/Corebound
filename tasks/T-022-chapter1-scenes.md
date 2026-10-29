@@ -1,7 +1,7 @@
 # T-022: Chapter 1 scenes: waking up, the Root Guardian and the lift-off
 
 - **Assigned to:** ChatGPT (chat)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P1 (M4)
 - **Deliver to:** `team-inbox/writing/T-022-chapter1-scenes.md`
 
