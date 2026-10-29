@@ -48,11 +48,16 @@ export class UI {
   onBuild: (id: ItemId) => void = () => {};
   onResearch: (id: string) => void = () => {};
   onResearchLoad: () => void = () => {};
+  onLog: (id: string) => void = () => {};
   private sarathiTimer = 0;
-  private codexFilter: CodexKind | 'all' = 'all';
+  private codexFilter: CodexKind | 'all' | 'logs' = 'all';
   private codexSelected: string | null = null;
   private codexUnlocked = new Set<string>();
   private codexNew = new Set<string>();
+  private foundLogs: StoryLog[] = [];
+  private logSelected: string | null = null;
+  private newLogs = new Set<string>();
+  private logTotal: number | undefined;
 
   constructor() {
     const keys = KEYS.map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
@@ -105,6 +110,7 @@ export class UI {
           <button class="btn small" data-kind="mineral" aria-pressed="false">Minerals</button>
           <button class="btn small" data-kind="machine" aria-pressed="false">Machines</button>
           <button class="btn small" data-kind="world" aria-pressed="false">Worlds</button>
+          <button class="btn small" data-kind="logs" aria-pressed="false">Logs</button>
         </div>
         <div class="codex-columns"><nav class="codex-list" aria-label="Discovered entries"></nav><article class="codex-entry" aria-live="polite"></article></div>
         <div class="note codex-count"></div>
@@ -194,17 +200,22 @@ export class UI {
     $('#codex .codex-filters').addEventListener('click', (e) => {
       const tab = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-kind]');
       if (!tab) return;
-      this.codexFilter = tab.dataset.kind as CodexKind | 'all';
+      this.codexFilter = tab.dataset.kind as CodexKind | 'all' | 'logs';
       this.drawCodex();
     });
     $('#codex .codex-list').addEventListener('click', (e) => {
       const entry = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-entry]');
       if (!entry) return;
-      this.codexSelected = entry.dataset.entry!;
+      if (this.codexFilter === 'logs') this.logSelected = entry.dataset.entry!;
+      else this.codexSelected = entry.dataset.entry!;
       this.drawCodex();
       // Rebuilding the list replaces the clicked button; keep keyboard focus on it.
       [...document.querySelectorAll<HTMLButtonElement>('#codex [data-entry]')]
-        .find((button) => button.dataset.entry === this.codexSelected)?.focus();
+        .find((button) => button.dataset.entry === (this.codexFilter === 'logs' ? this.logSelected : this.codexSelected))?.focus();
+    });
+    $('#codex .codex-entry').addEventListener('click', (e) => {
+      const play = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-play-log]');
+      if (play) this.onLog(play.dataset.playLog!);
     });
     $('#log-close').onclick = () => this.hideLog();
     $('#log').addEventListener('click', (e) => {
@@ -434,7 +445,19 @@ export class UI {
     this.drawCodex();
   }
 
+  /** Found logs are supplied in discovery order; the newest is listed first. */
+  renderLogs(found: StoryLog[], newIds: string[] = [], total?: number) {
+    this.foundLogs = [...found].reverse();
+    this.newLogs = new Set(newIds);
+    this.logTotal = total;
+    this.drawCodex();
+  }
+
   private drawCodex() {
+    if (this.codexFilter === 'logs') {
+      this.drawLogs();
+      return;
+    }
     const unlocked = CODEX.filter((entry) => this.codexUnlocked.has(entry.id));
     const visible = unlocked.filter((entry) => this.codexFilter === 'all' || entry.kind === this.codexFilter);
     const selected = visible.find((entry) => entry.id === this.codexSelected) ?? visible[0];
@@ -443,6 +466,7 @@ export class UI {
       tab.setAttribute('aria-pressed', String(tab.dataset.kind === this.codexFilter));
     });
     const list = $('#codex .codex-list');
+    list.setAttribute('aria-label', 'Discovered entries');
     list.replaceChildren();
     for (const entry of visible) {
       const button = document.createElement('button');
@@ -485,6 +509,53 @@ export class UI {
       detail.textContent = unlocked.length ? 'No discoveries in this category yet.' : 'Scan your surroundings to discover Codex entries.';
     }
     $('#codex .codex-count').textContent = `${CODEX.length - unlocked.length} still to discover`;
+  }
+
+  private drawLogs() {
+    document.querySelectorAll<HTMLButtonElement>('#codex [data-kind]').forEach((tab) => {
+      tab.setAttribute('aria-pressed', String(tab.dataset.kind === 'logs'));
+    });
+    const list = $('#codex .codex-list');
+    list.setAttribute('aria-label', 'Discovered logs');
+    list.replaceChildren();
+    const selected = this.foundLogs.find((log) => log.id === this.logSelected) ?? this.foundLogs[0];
+    this.logSelected = selected?.id ?? null;
+    for (const log of this.foundLogs) {
+      const button = document.createElement('button');
+      button.className = 'recipe';
+      button.dataset.entry = log.id;
+      button.setAttribute('aria-pressed', String(log.id === selected?.id));
+      button.textContent = log.title || log.speaker || log.id;
+      if (this.newLogs.has(log.id)) {
+        const badge = document.createElement('small');
+        badge.className = 'codex-new';
+        badge.textContent = 'new';
+        button.append(badge);
+      }
+      list.append(button);
+    }
+    const detail = $('#codex .codex-entry');
+    detail.replaceChildren();
+    if (selected) {
+      const title = document.createElement('h3');
+      title.textContent = selected.title || selected.speaker || selected.id;
+      const speaker = document.createElement('p');
+      speaker.className = 'codex-log-speaker';
+      speaker.textContent = selected.speaker || 'Unknown speaker';
+      const where = document.createElement('p');
+      where.className = 'codex-log-where';
+      where.textContent = selected.where || 'Location unknown';
+      const play = document.createElement('button');
+      play.className = 'btn small codex-log-play';
+      play.dataset.playLog = selected.id;
+      play.textContent = 'Play';
+      play.setAttribute('aria-label', `Play ${title.textContent}`);
+      detail.append(title, speaker, where, play);
+    } else {
+      detail.textContent = 'No logs found yet. They are hidden in the wreckage.';
+    }
+    $('#codex .codex-count').textContent = this.logTotal === undefined
+      ? '' : `${Math.max(0, this.logTotal - this.foundLogs.length)} still to discover`;
   }
 
   renderPack(slots: (Slot | null)[], canCraft: (r: Recipe) => boolean, unlocked: (r: Recipe) => boolean = () => true) {
