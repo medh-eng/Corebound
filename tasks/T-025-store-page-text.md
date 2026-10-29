@@ -1,7 +1,7 @@
 # T-025: Store page text for the Chapter 1 demo (itch.io and Steam)
 
 - **Assigned to:** ChatGPT (chat)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P2 (M4)
 - **Deliver to:** `team-inbox/writing/T-025-store-text.md`
 
