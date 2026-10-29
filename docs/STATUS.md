@@ -2,6 +2,34 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
+## 2026-10-29 (afternoon)
+
+**Android:** yes. The game now plays on Android phones and tablets in Chrome, and installs to the home screen like an app (full screen, landscape). First version:
+- **On-screen controls:** a joystick wherever your left thumb lands (push to the edge to run); drag anywhere else to look; **Mine**, **Jump**, **Use**, **Scan** on the right (hold Mine and slide to aim); a bottom row with Bag, Build, Belt, Codex, Planet, O₂, Pick up and Dance; **Place / Turn / Cancel** while building; ✕ closes panels.
+- **Goals, tips and prompts** name the buttons instead of keys on a phone ("hold Mine", "tap Use").
+- **Phone graphics preset:** screen resolution, no shadows (can be turned on), lighter glow, 40% of the grass and ferns. Trees, rocks and ore are unchanged.
+- **Checked** on an emulated Android screen (800 × 360): the HUD fits, walking with the joystick, holding Mine collects ice, Bag opens the backpack and ✕ closes it. A real phone test by the Commander is next (frame rate: add `?fps=1`). Play Store later (roadmap: phone track).
+
+**Worker deliveries, all reviewed and merged (5 pull requests):**
+- **T-021 (ChatGPT Codex):** a Logs tab in the Codex. Wired up: logs you have opened are kept and can be played again.
+- **T-022 (ChatGPT chat):** Chapter 1 scene lines (waking up, Mooladri's three calming steps, the Fragment chamber, the lift-off) are in `src/data/scenes.ts`, ready for M4. New tests check every line is short, free of violent words, and never gives Mooladri a face.
+- **T-025 (ChatGPT chat):** store page text and an AI-disclosure draft, kept for M4; one fix ("crowned with glowing root tips"). Needs your approval before publishing.
+- **T-023 (Sarvam):** voice respellings for the ten plant and rock names (stored with the names), and four Codex lines fixed so the English explains the Sanskrit (Deepalata gives light and creeps; Deepashirsha glows rather than reflects; Kajjala is lamp-black; Sakshi means witness). Kajjala kept.
+- **T-024 (Sarvam):** a careful review of the new art. Acted on at once in code: **Huxley's hologram** no longer stands in a column of light with arms spread (Sarvam: that reads as a darshan); he now stands half-turned on a small emitter with his gestures softened. **SARATHI** is repainted from brass to off-white ceramic with copper trim (Sarvam: an all-brass bud on feet reads as a shrine lamp). Three lines added to the style bible (no arch-and-lotus niches, no bell mouths on machines, holograms with hands at rest).
+
+**Your three models did not arrive:** nothing new reached GitHub after 10:58. GitHub's web upload refuses files over 25 MB, which is the likely reason. Please upload `cryo_pod.glb`, `vehicle_bay.glb` and `sabatier_reactor.glb` again (smaller export if needed).
+
+**Licences:** Huxley and SARATHI were made with Triple 3D. Its terms allow commercial use without attribution; keep generations private there (public ones may be shown by Triple 3D). Recorded in `docs/LICENCES.md`.
+
+**Waiting for the Commander:**
+- Upload the three models again.
+- Play on your phone and tell the Director the frame rate and what feels awkward.
+- Decide Mooladri's body: your humanoid giant of roots, or Sarvam's buttressed trunk (no shoulders, chest or fingers). The crown stays.
+- Were the earlier models (the Custodian and the machines) also made with Triple 3D?
+- Approve the store text (T-025) when M4 comes; say "go" for M4.
+
+**New worker tasks:** T-027 privacy notice and phone help (ChatGPT chat). T-026 text size (ChatGPT Codex) can start now; it was updated to build on the phone scaling.
+
 ## 2026-10-29
 
 **Your uploads, now in the game** (press Ctrl+F5 first):

@@ -6,6 +6,10 @@ import { ITEMS, RECIPES, type ItemId, type Recipe } from '../data/items';
 import { RESEARCH, type ResearchNode } from '../data/research';
 import type { Slot } from '../systems/inventory';
 import { TIPS } from '../data/tips';
+import { forTouch } from '../data/controls';
+
+/** Keyboard words become on-screen button names on phones and tablets. */
+const T = (text: string) => forTouch(text, document.body.classList.contains('touch'));
 
 /** Pictures behind the loading screen (the Commander's art), one chosen at random. */
 const LOADING_ART = ['key_art', 'crash_site', 'system_overview'];
@@ -165,7 +169,7 @@ export class UI {
         }
       }
       lastTip = remaining.pop() ?? '';
-      tip.textContent = lastTip;
+      tip.textContent = T(lastTip);
     };
     nextTip();
     this.loadingTipTimer = window.setInterval(nextTip, 5000);
@@ -588,13 +592,13 @@ export class UI {
 
   goals(list: Goal[]) {
     $('#goals').innerHTML = list
-      .map((g) => `<div class="g ${g.done ? 'done' : ''} ${g.mystery ? 'mystery' : ''}"><span class="k">${g.key}</span>${g.done ? '✓ ' : ''}${g.text}</div>`)
+      .map((g) => `<div class="g ${g.done ? 'done' : ''} ${g.mystery ? 'mystery' : ''}"><span class="k">${g.key}</span>${g.done ? '✓ ' : ''}${T(g.text)}</div>`)
       .join('');
   }
 
   toast(text: string) {
     const t = $('#toast');
-    t.textContent = text;
+    t.textContent = T(text);
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2600);
   }
@@ -610,7 +614,7 @@ export class UI {
   sarathi(line: string, seconds = 7) {
     const s = $('#sarathi');
     s.classList.remove('hidden');
-    $('#sarathi .line').textContent = line;
+    $('#sarathi .line').textContent = T(line);
     clearTimeout(this.sarathiTimer);
     this.sarathiTimer = window.setTimeout(() => s.classList.add('hidden'), seconds * 1000);
   }
@@ -618,7 +622,7 @@ export class UI {
   prompt(text: string | null) {
     const p = $('#prompt');
     p.classList.toggle('hidden', !text);
-    if (text) p.innerHTML = text;
+    if (text) p.innerHTML = T(text);
   }
 
   progress(v: number) {

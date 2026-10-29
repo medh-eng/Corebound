@@ -39,6 +39,9 @@ void main() {
   gl_FragColor = vec4(col * a, a);
 }`;
 
+/** How strongly each clip shows over the idle (1 = full Mixamo gesture). */
+const GESTURE: Record<string, number> = { idle: 1, talk: 0.3, talk_2: 0.45, think: 0.6, point: 0.4 };
+
 export class HoloPortrait {
   private renderer: THREE.WebGLRenderer | null = null;
   private scene = new THREE.Scene();
@@ -72,18 +75,23 @@ export class HoloPortrait {
       m.castShadow = m.receiveShadow = false;
     });
     this.scene.add(model);
-    // The projector he stands on: a glowing ring and a faint beam.
-    const disc = new THREE.Mesh(new THREE.RingGeometry(0.28, 0.42, 48),
-      new THREE.MeshBasicMaterial({ color: '#7fd0ff', transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false }));
-    disc.rotation.x = -Math.PI / 2; disc.position.y = 0.01;
-    const fade = document.createElement('canvas'); fade.width = 4; fade.height = 128;
-    const fg = fade.getContext('2d')!; const grad = fg.createLinearGradient(0, 0, 0, 128);
-    grad.addColorStop(0, 'rgba(255,255,255,0)'); grad.addColorStop(0.7, 'rgba(255,255,255,0.35)'); grad.addColorStop(1, 'rgba(255,255,255,1)');
-    fg.fillStyle = grad; fg.fillRect(0, 0, 4, 128);
-    const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.42, 2.0, 32, 1, true),
-      new THREE.MeshBasicMaterial({ color: '#4aa8ff', map: new THREE.CanvasTexture(fade), transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false }));
-    beam.position.y = 1.0;
-    this.scene.add(disc, beam);
+    // A small round emitter at his feet (Sarvam, T-024: a recording, not an apparition; no column of
+    // light, no halo). A dark copper puck with a thin ring of light and a short glow just above it.
+    const puck = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.28, 0.06, 40),
+      new THREE.MeshBasicMaterial({ color: '#5a3a26' }));
+    puck.position.y = -0.03;
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.19, 0.23, 48),
+      new THREE.MeshBasicMaterial({ color: '#7fd0ff', transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false }));
+    ring.rotation.x = -Math.PI / 2; ring.position.y = 0.002;
+    const fade = document.createElement('canvas'); fade.width = 4; fade.height = 64;
+    const fg = fade.getContext('2d')!; const grad = fg.createLinearGradient(0, 0, 0, 64);
+    grad.addColorStop(0, 'rgba(255,255,255,0)'); grad.addColorStop(1, 'rgba(255,255,255,1)');
+    fg.fillStyle = grad; fg.fillRect(0, 0, 4, 64);
+    const glow = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.22, 0.28, 32, 1, true),
+      new THREE.MeshBasicMaterial({ color: '#4aa8ff', map: new THREE.CanvasTexture(fade), transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false }));
+    glow.position.y = 0.14;
+    this.scene.add(puck, ring, glow);
+    model.rotation.y = -0.5; // half-turned, speaking to someone just off to the side
     this.mixer = new THREE.AnimationMixer(model);
     this.clips = clips;
     // Stand him on the projector: measure the posed, skinned body as it will be drawn, then scale it
@@ -101,17 +109,22 @@ export class HoloPortrait {
     box = measure();
     const mid = box.getCenter(new THREE.Vector3());
     model.position.set(model.position.x - mid.x, model.position.y - box.min.y, model.position.z - mid.z);
-    this.camera.position.set(0.2, 1.2, 4.3);
-    this.camera.lookAt(0, 0.92, 0);
+    this.camera.position.set(0.35, 1.25, 4.1);
+    this.camera.lookAt(0, 0.95, 0);
     this.ready = true;
   }
 
+  /** Plays a gesture clip at a fraction of its strength over the breathing idle, so his hands stay
+   *  low and relaxed (no wide, palms-up poses: Sarvam's T-024 review). */
   private play(name: string) {
-    const clip = this.clips.find((c) => c.name === name) ?? this.clips[0];
-    if (!clip || !this.mixer) return;
+    const clip = this.clips.find((c) => c.name === name);
+    if (!this.mixer) return;
+    const idle = this.clips.find((c) => c.name === 'idle');
+    if (idle) { const a = this.mixer.clipAction(idle); if (!a.isRunning()) { a.setEffectiveWeight(GESTURE.idle); a.play(); } }
+    if (!clip) return;
     const next = this.mixer.clipAction(clip);
-    next.reset().play();
-    if (this.action && this.action !== next) this.action.crossFadeTo(next, 0.5, false);
+    next.reset(); next.setEffectiveWeight(GESTURE[name] ?? 0.35); next.fadeIn(0.6).play();
+    if (this.action && this.action !== next) this.action.fadeOut(0.6);
     this.action = next;
     this.nextClip = this.time + Math.max(3, clip.duration);
   }
@@ -127,7 +140,7 @@ export class HoloPortrait {
       this.renderer.setClearColor(0x000000, 0);
     }
     this.turn = 0;
-    this.play('talk');
+    this.play('talk_2');
     window.cancelAnimationFrame(this.frame);
     this.last = performance.now();
     this.frame = window.requestAnimationFrame(this.tick);
@@ -143,7 +156,7 @@ export class HoloPortrait {
       r.setPixelRatio(Math.min(2, devicePixelRatio)); r.setSize(w, h, false);
       this.camera.aspect = w / Math.max(1, h); this.camera.updateProjectionMatrix();
     }
-    if (this.time > this.nextClip) this.play(['talk_2', 'think', 'talk', 'point', 'talk'][this.turn++ % 5]);
+    if (this.time > this.nextClip) this.play(['think', 'talk', 'talk_2', 'point', 'talk_2'][this.turn++ % 5]);
     this.mixer?.update(dt);
     for (const u of this.uniforms) u.uTime.value = this.time;
     r.render(this.scene, this.camera);

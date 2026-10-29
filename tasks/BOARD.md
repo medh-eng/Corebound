@@ -21,12 +21,13 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | [T-017](T-017-flora-names.md) | Names for Jivagraha's plants, rocks and the bloom | Sarvam AI | P2 | done ✓ (PR #12; Sarvam's suggested set is in the Codex) |
 | [T-019](T-019-log-viewer.md) | The memory-log viewer (M4) | ChatGPT (Codex) | P1 | done ✓ (PR #13; wired to E/Esc; logs placed in M4) |
 | [T-020](T-020-codex-machines.md) | Codex entries for the remaining machines and items | ChatGPT (chat) | P2 | done ✓ (PR #14; 8 entries in the Codex) |
-| [T-021](T-021-codex-logs-tab.md) | A "Logs" tab in the Codex (M4) | ChatGPT (Codex) | P1 | todo (not received yet) |
-| [T-022](T-022-chapter1-scenes.md) | Chapter 1 scenes: waking up, the Root Guardian, the lift-off | ChatGPT (chat) | P1 | todo (not received yet) |
-| [T-023](T-023-flora-respellings.md) | Voice respellings for the plant and rock names | Sarvam AI | P3 | todo (new) |
-| [T-024](T-024-art-review-rest.md) | Cultural review of the remaining concepts, the new art and the Huxley and SARATHI models | Sarvam AI | P2 | todo (widened 2026-10-29) |
-| [T-025](T-025-store-page-text.md) | Store page text for the demo (itch.io and Steam), AI disclosure draft | ChatGPT (chat) | P2 | todo (new) |
-| [T-026](T-026-codex-text-size.md) | A text size setting | ChatGPT (Codex) | P2 | todo (new; start after T-021) |
+| [T-021](T-021-codex-logs-tab.md) | A "Logs" tab in the Codex (M4) | ChatGPT (Codex) | P1 | done ✓ (PR #16; wired: logs you open are kept and replay from the Codex) |
+| [T-022](T-022-chapter1-scenes.md) | Chapter 1 scenes: waking up, the Root Guardian, the lift-off | ChatGPT (chat) | P1 | done ✓ (PR #17; in `src/data/scenes.ts`, used in M4) |
+| [T-023](T-023-flora-respellings.md) | Voice respellings for the plant and rock names | Sarvam AI | P3 | done ✓ (PR #19; respellings in `names.ts`, four Codex lines fixed) |
+| [T-024](T-024-art-review-rest.md) | Cultural review of the remaining concepts, the new art and the Huxley and SARATHI models | Sarvam AI | P2 | done ✓ (PR #20; hologram restaged, SARATHI repainted, three style-bible lines added) |
+| [T-025](T-025-store-page-text.md) | Store page text for the demo (itch.io and Steam), AI disclosure draft | ChatGPT (chat) | P2 | done ✓ (PR #18; used for the store pages in M4, after the Commander approves) |
+| [T-026](T-026-codex-text-size.md) | A text size setting | ChatGPT (Codex) | P2 | todo (T-021 is merged: can start) |
+| [T-027](T-027-privacy-and-phone-help.md) | Privacy notice and "playing on a phone" help | ChatGPT (chat) | P2 | todo (new) |
 | [T-018](T-018-codex-text.md) | Codex entries for Jivagraha and Harmony | ChatGPT (chat) | P2 | done ✓ (PR #11; in the game) |
 
 ## Commander
@@ -40,7 +41,10 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | — | Huxley 3D model and Mixamo clips | P1 | done ✓ (2026-10-29) |
 | — | SARATHI 3D model | P2 | done ✓ (2026-10-29) |
 | — | Root Guardian without a face | P1 | done ✓ (2026-10-29) |
-| — | Say which 3D tool made Huxley and SARATHI (licences) | P1 | **next** (one line in chat) |
+| — | Say which 3D tool made Huxley and SARATHI (licences) | P1 | done ✓ (Triple 3D) |
+| — | Upload again: cryo pod, vehicle bay, Sabatier reactor (did not reach GitHub) | P1 | **next** |
+| — | Play on an Android phone; report frame rate and anything awkward | P1 | **next** |
+| — | Decide Mooladri's body: humanoid or buttressed trunk (Sarvam) | P1 | **next** |
 | — | Escape module and cryo-pod models (reference: `concept/jiva_crash_site.png`) | P1 | **next** |
 | — | Turn on GitHub Pages | — | done ✓ |
 | — | Play M2 and M3, then say "go" for M4 | — | **next** |
@@ -52,5 +56,6 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | D-002 | M2 Build and automate | done ✓ (first version) |
 | D-003 | Rig tool: per-character animation folders | done ✓ (2026-10-29: `npm run rig -- huxley`; clips in `art-inbox/models/<character>/`) |
 | D-007 | Huxley hologram and SARATHI drone in the game | done ✓ (2026-10-29) |
+| D-008 | Android: touch controls, Phone preset, installable app (phone track P1) | done ✓ first version (2026-10-29); tuning after the Commander's phone test |
 | D-005 | Store art for the store pages and loading screen | M4 |
 | D-006 | M3 Harmony and life | first version done ✓; scanner/Codex waits for T-016/T-017/T-018 |

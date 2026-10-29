@@ -1,4 +1,4 @@
-// Keyboard, mouse and gamepad, merged into one simple state the game reads each frame.
+// Keyboard, mouse, gamepad and touch, merged into one simple state the game reads each frame.
 export class Input {
   keys = new Set<string>();
   pressed = new Set<string>();
@@ -7,6 +7,10 @@ export class Input {
   wheel = 0;
   locked = false;
   sensitivity = 0.0022;
+  /** Touch play (phones and tablets): no pointer lock; the on-screen controls feed this state. */
+  touch = false;
+  /** On-screen joystick, -1..1 (y down = backwards), added to the gamepad's left stick. */
+  stick = { x: 0, y: 0 };
   private padPrev: boolean[] = [];
 
   constructor(private canvas: HTMLCanvasElement) {
@@ -30,12 +34,16 @@ export class Input {
     });
     addEventListener('mouseup', (e) => this.keys.delete(`Mouse${e.button}`));
     document.addEventListener('pointerlockchange', () => { if (!document.pointerLockElement) { this.keys.delete('Mouse0'); this.keys.delete('Mouse2'); } });
-    addEventListener('contextmenu', (e) => { if (this.locked || this.alwaysLocked) e.preventDefault(); });   // right mouse = scanner
+    addEventListener('contextmenu', (e) => { if (this.locked || this.alwaysLocked || this.touch) e.preventDefault(); });   // right mouse = scanner
     addEventListener('wheel', (e) => { this.wheel += Math.sign(e.deltaY); }, { passive: true });
     document.addEventListener('pointerlockchange', () => { this.locked = document.pointerLockElement === this.canvas; });
   }
 
-  lock() { this.canvas.requestPointerLock?.(); }
+  lock() { if (!this.touch) this.canvas.requestPointerLock?.(); }
+
+  /** On-screen buttons: press and release a key or mouse button by its code (e.g. 'Mouse0'). */
+  press(code: string) { this.keys.add(code); this.pressed.add(code); }
+  release(code: string) { this.keys.delete(code); }
 
   /** Testing: treat the mouse as captured without pointer lock. */
   alwaysLocked = false;
@@ -47,7 +55,9 @@ export class Input {
   pollPad(): { lx: number; ly: number; rx: number; ry: number } {
     const pads = navigator.getGamepads?.() ?? [];
     const p = pads.find((x) => x);
-    if (!p) return { lx: 0, ly: 0, rx: 0, ry: 0 };
+    // The touch joystick runs when pushed nearly to its edge.
+    if (Math.hypot(this.stick.x, this.stick.y) > 0.92) this.keys.add('ShiftTouch'); else this.keys.delete('ShiftTouch');
+    if (!p) return { lx: this.stick.x, ly: this.stick.y, rx: 0, ry: 0 };
     const dz = (v: number) => (Math.abs(v) < 0.15 ? 0 : v);
     const map: [number, string][] = [[0, 'Space'], [1, 'ShiftLeft'], [2, 'KeyE'], [3, 'KeyM'], [4, 'KeyB'], [5, 'KeyQ'], [7, 'Mouse0'], [8, 'Tab'], [10, 'ShiftLeft'], [9, 'Escape']];
     for (const [i, code] of map) {
@@ -56,7 +66,8 @@ export class Input {
       if (b) this.keys.add(code); else if (this.padPrev[i]) this.keys.delete(code);
       this.padPrev[i] = b;
     }
-    return { lx: dz(p.axes[0] ?? 0), ly: dz(p.axes[1] ?? 0), rx: dz(p.axes[2] ?? 0), ry: dz(p.axes[3] ?? 0) };
+    const c = (v: number) => Math.max(-1, Math.min(1, v));
+    return { lx: c(dz(p.axes[0] ?? 0) + this.stick.x), ly: c(dz(p.axes[1] ?? 0) + this.stick.y), rx: dz(p.axes[2] ?? 0), ry: dz(p.axes[3] ?? 0) };
   }
 
   endFrame() {

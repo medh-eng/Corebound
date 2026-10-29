@@ -17,23 +17,27 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 
 | # | What | Where it goes | Prompt |
 | --- | --- | --- | --- |
-| 1 | **Quick answer, no art:** which 3D tool made `huxley.glb` and `sarathi.glb` (Hunyuan3D, TRELLIS, Tripo, Meshy…)? Just tell the Director in chat | — | §11 (for the licences list) |
-| 2 | **Escape module and cryo-pod** (the demo opens inside them): turnaround image, then textured GLB. Attach `concept/jiva_crash_site.png` as the reference: your crash-site picture is now the look | `art-inbox/turnaround/`, `art-inbox/models/escape_module.glb`, `art-inbox/models/cryo_pod.glb` | §6.3 |
-| 3 | **Jivagraha creatures as 3D**: a gentle grazer and a small burrower (turnaround image, then textured GLB) | `art-inbox/turnaround/`, `art-inbox/models/` | §5.1, task T-015 |
-| 4 | **Story props**: `translator`, `memory_log`, `quantum_fragment`, `o2_canister` (turnaround, then GLB). `huxley_projector` is optional now (a code-made one works) | `art-inbox/turnaround/`, `art-inbox/models/` | §8 |
-| 5 | **Rover**, **starter ship**, **launch pad**, **vehicle bay** models (for the demo's ending) | `art-inbox/models/` | §6.3, §7 |
-| 6 | **Sabatier reactor model** (a code-made one stands in) | `art-inbox/models/` | §6.3 |
-| 7 | **Machine sound loops**: `auto_drill_loop`, `conveyor_loop`, `research_loop`, `coal_burner_loop`, `electrolyzer_loop`, `battery_hum`, `solar_lotus_open` | `art-inbox/audio/sfx/` | §13.4 |
-| 8 | **Ambience**: `amb_jiva_day`, `amb_jiva_night`, `amb_cave` | `art-inbox/audio/sfx/` | §13.7 |
-| 9 | **Music still missing**: `memory_log`, `spaceflight` | `art-inbox/audio/music/` | §12 |
-| 10 | **Voice test** (T-005): record SARATHI's 5 test lines in Sarvam Bulbul | `art-inbox/audio/voice/tests/` | §14 and `art-inbox/audio/voice/tests/T-005-voice-test-sheet.md` |
-| 11 | **Teaser clips** for the demo trailer | `art-inbox/video/` | §10 |
+| 1 | **Upload the three models again: `cryo_pod.glb`, `vehicle_bay.glb`, `sabatier_reactor.glb`.** They did not reach GitHub (nothing arrived after 10:58 on 29 October). GitHub's web upload refuses files over **25 MB**; if a file is bigger, export it from Triple 3D at a lower detail setting, or tell the Director the size | `art-inbox/models/` | §6.3 |
+| 2 | **Play on your Android phone** (see the box below) and tell the Director the frame rate and anything awkward | — | — |
+| 3 | **Decide Mooladri's body** (no art needed yet): keep your humanoid giant of roots, or Sarvam's suggestion, a **buttressed trunk** with branch-limbs ending in root clusters (no shoulders, chest or fingers)? The crown of glowing root tips stays either way | — | `team-inbox/writing/T-012-art-followup.md` §7.1 |
+| 4 | **Escape module** (the demo opens inside it): turnaround image, then textured GLB. Attach `concept/jiva_crash_site.png` as the reference. Sarvam's note: give it a flatter side, landing legs and a hatch frame, and a squared duct instead of a flared pipe, so it reads as a capsule and not a pot | `art-inbox/turnaround/`, `art-inbox/models/escape_module.glb` | §6.3 |
+| 5 | **Jivagraha creatures as 3D**: a gentle grazer and a small burrower (turnaround image, then textured GLB) | `art-inbox/turnaround/`, `art-inbox/models/` | §5.1, task T-015 |
+| 6 | **Story props**: `translator`, `memory_log`, `quantum_fragment`, `o2_canister` (turnaround, then GLB) | `art-inbox/turnaround/`, `art-inbox/models/` | §8 |
+| 7 | **Rover**, **starter ship**, **launch pad** models (for the demo's ending) | `art-inbox/models/` | §6.3, §7 |
+| 8 | *Optional:* **SARATHI again in ceramic** with Sarvam's prompt in §4 (the game repaints the brass one in code meanwhile) | `art-inbox/models/sarathi.glb` | §4 |
+| 9 | **Machine sound loops**: `auto_drill_loop`, `conveyor_loop`, `research_loop`, `coal_burner_loop`, `electrolyzer_loop`, `battery_hum`, `solar_lotus_open` | `art-inbox/audio/sfx/` | §13.4 |
+| 10 | **Ambience**: `amb_jiva_day`, `amb_jiva_night`, `amb_cave` | `art-inbox/audio/sfx/` | §13.7 |
+| 11 | **Music still missing**: `memory_log`, `spaceflight` | `art-inbox/audio/music/` | §12 |
+| 12 | **Voice test** (T-005): record SARATHI's 5 test lines in Sarvam Bulbul | `art-inbox/audio/voice/tests/` | §14 and `art-inbox/audio/voice/tests/T-005-voice-test-sheet.md` |
+| 13 | **Teaser clips** for the demo trailer | `art-inbox/video/` | §10 |
+
+**Play on an Android phone** (new, 29 October): open https://medh-eng.github.io/Corebound/ in Chrome on the phone, turn it sideways and tap New game (it goes full screen). Left thumb: touch anywhere on the left and slide to walk (push to the edge to run). Right thumb: drag to look; hold **Mine** and slide to aim the laser. The bottom row has Bag, Build, Belt, Codex, Planet, O₂, Pick up and Dance; ✕ closes a panel. To keep it like an app: Chrome menu ⋮ → **Add to Home screen** (or **Install app**). To see the frame rate, open https://medh-eng.github.io/Corebound/?fps=1 instead.
 
 **See what arrived on 29 October** (press Ctrl+F5 first):
 - SARATHI floats beside you as soon as you play: https://medh-eng.github.io/Corebound/
 - Huxley's hologram, talking, in his first message (it opens about 6 seconds after you press Start): https://medh-eng.github.io/Corebound/?log=huxley_01
 
-**Licences:** ✓ music and sound effects are from Pixabay (recorded in `docs/LICENCES.md`, thank you). From now on, writing the source in the upload's commit message is enough (for example "huxley.glb made with Hunyuan3D").
+**Licences:** ✓ music and sound effects are from Pixabay (recorded in `docs/LICENCES.md`, thank you). From now on, writing the source in the upload's commit message is enough (for example "rover.glb made with Triple 3D"). ✓ Huxley and SARATHI: Triple 3D (its terms allow selling the game; keep your generations private in Triple 3D).
 
 ### ✓ Received so far (all in the game unless noted)
 
@@ -99,6 +103,9 @@ symbols of any kind, no ritual objects.
 No faces on Guardians, drones or machines. Flowers grow from moss, soil or rock, never on
 pedestals or plinths. Arches are shallow, cusped or flat-topped, never pointed Gothic or Moorish.
 Tools never look like guns.
+No arch outline containing a lotus or any motif (no niche, no jharokha, no mihrab).
+No bells and no flared bell mouths on machinery; vents are slotted grilles or squared ducts.
+Holograms are recordings: figures stand or sit with hands at rest, never arms spread with palms up.
 Rich, harmonious colours, not neon. Friendly and wondrous, never scary or violent.
 No text, no letters, no logos, no watermark, no signature, no border.
 No elephants or cows used as decoration, no turbans, moustaches or bindis used as costume on
@@ -205,7 +212,7 @@ Received ✓ `vayu_orbit`, `vayu_surface` (sky islands). Add:
 
 ### 3.7 Shunyapath (the wreck world): P3
 
-Received ✓ `shunya_orbit`, `shunya_surface`. Add:
+Received ✓ `shunya_orbit`, `shunya_surface`. Sarvam (T-024): `shunya_orbit` shows small domes with pointed caps and arched gateways (they read as shrines); when this world's turn comes, remake it showing **the wreck** instead: hull plates, ribs, a broken ship's spine, an airlock. Add:
 
 | File | Prompt |
 | --- | --- |
@@ -229,7 +236,7 @@ background, even soft studio lighting, no shadows, no props in hands.
 | --- | --- | --- | --- |
 | Custodian | ✓ | `custodian.png`, `custodian_rigged.glb` | Received. |
 | Custodian suit modules | P3 | `custodian_suits.png` | `Four versions of the same astronaut suit side by side: heat-shielded with gold reflective plates; cold-insulated with quilted padding and fur-like trim; toxin-filter with a big round filter backpack and mask; pressure-sealed with extra rings and a glass collar.` (reference `custodian.png`). Suit modules may be added as attachments, so no new 3D model unless Claude asks. |
-| SARATHI | ✓ model (2026-10-29) | `sarathi_turnaround.png`, `sarathi.glb` | `A small floating drone shaped like a lotus bud: off-white ceramic petals that can open and close, a copper ring around the middle, one large warm amber eye-lens, small thruster glow underneath, a cracked petal showing it is damaged.` (reference `sarathi.png`). Single object, not rigged; Claude animates petals in code if the petals are separate parts. |
+| SARATHI | ✓ model (2026-10-29) | `sarathi_turnaround.png`, `sarathi.glb` | ✓ Model in the game (brass, repainted in code). *Optional remake* (Sarvam, T-024): `SARATHI, a small floating drone the size of a football, off-white ceramic shell with copper trim and jaali lattice vents; a lotus-bud silhouette with blunt, rounded petal panels that stop level with the rim, one panel cracked and slightly displaced; glowing cyan light from inside the vents; no feet, it hovers on a soft glow; no pointed tips, no crown, no gold body, no face.` Single object, not rigged. |
 | Prof. Orion Huxley | ✓ concept, turnarounds, rigged model and clips (2026-10-29) | `huxley.png`, `huxley_turnaround.png`, `huxley_rigged.glb` | `A specific individual with consistent features: an older scientist, around sixty, kind and tired face, short grey beard, round glasses, long lab coat over a simple high-collared mission uniform with a small lotus emblem, hands that like to gesture when he talks.` In the game he appears as a blue-gold hologram: Claude adds the hologram look in code, so make him in normal colours. Mixamo clips: Talking, Thinking, Pointing, Idle. |
 | Alion Voss | P3 | `voss.png`, `voss_turnaround.png`, `voss_rigged.glb` | `A friendly alien traveller: tall and slender, smooth blue-grey skin with soft bioluminescent freckles, large dark eyes, two small head-fins, wearing a patched space jacket with many pockets and a homemade radio device on the belt; curious, brave, a little tired.` Humanoid so Mixamo works. Clips: Idle, Talking, Waving, Walking, Sitting (trapped pose: Lying idle). |
 | Jivagraha people | P3 | `people_jiva.png` | `A small community of gentle forest people about one metre tall, moth-like with soft fuzzy antennae, woven leaf cloaks, carrying lanterns of glowing fungus; they tend giant mushroom gardens.` |

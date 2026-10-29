@@ -22,7 +22,7 @@ Start with what you can carry. Explore luminous forests, scan strange life, gath
 
 Every machine leaves its mark. Smoke hazes the sky. The water and soil change. The forest responds to how you build, and careful choices can help it recover. The Harmony system makes your decisions visible across the whole planet.
 
-Deep below the trees stirs Mooladri, the Root Guardian: a towering shape of roots and mossy bark, crowned with glowing branches. Its home needs understanding. Trace its roots, move machinery, restore the air and replant the bloom to calm it and open the valley.
+Deep below the trees stirs Mooladri, the Root Guardian: a towering shape of roots and mossy bark, crowned with glowing root tips. Its home needs understanding. Trace its roots, move machinery, restore the air and replant the bloom to calm it and open the valley.
 
 SARATHI, your damaged ship AI, offers precise advice and the occasional dry observation. Recover recordings, follow clues about Project Amarnath, and prepare your first launch. Jivagraha is only the beginning. Beyond it lie six more locations, starting with the mineral-rich world Taptashila.
 

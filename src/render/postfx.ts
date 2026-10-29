@@ -29,17 +29,19 @@ export interface PostFX {
   resize(w: number, h: number): void;
 }
 
-export function buildPostFX(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera): PostFX {
+/** `phone`: no multisampling and a quarter-size bloom, for phone graphics chips. */
+export function buildPostFX(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera, phone = false): PostFX {
   const size = renderer.getSize(new THREE.Vector2());
-  const target = new THREE.WebGLRenderTarget(size.x, size.y, { type: THREE.HalfFloatType, samples: 4 });
+  const bs = phone ? 4 : 2;
+  const target = new THREE.WebGLRenderTarget(size.x, size.y, { type: THREE.HalfFloatType, samples: phone ? 0 : 4 });
   const composer = new EffectComposer(renderer, target);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(size.x / 2, size.y / 2), 0.55, 0.65, 0.92);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(size.x / bs, size.y / bs), 0.55, 0.65, 0.92);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
   composer.addPass(new ShaderPass(GradeShader));
   return {
     composer, bloom,
-    resize(w, h) { composer.setSize(w, h); bloom.resolution.set(w / 2, h / 2); },
+    resize(w, h) { composer.setSize(w, h); bloom.resolution.set(w / bs, h / bs); },
   };
 }

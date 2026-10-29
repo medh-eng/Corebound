@@ -75,7 +75,8 @@ export function surfaceMatrix(terrain: Terrain, d: THREE.Vector3, yaw: number, s
   return m;
 }
 
-export function scatterWorld(terrain: Terrain, seed: number, baseDir: THREE.Vector3, keepClear: { pos: THREE.Vector3; radius: number }[]): ScatterResult {
+/** `density` thins the grass and ferns only (phones); trees, rocks and landmarks never change. */
+export function scatterWorld(terrain: Terrain, seed: number, baseDir: THREE.Vector3, keepClear: { pos: THREE.Vector3; radius: number }[], density = 1): ScatterResult {
   const r = rng(seed + 7);
   const sea = terrain.seaLevel;
   const group = new THREE.Group();
@@ -133,12 +134,12 @@ export function scatterWorld(terrain: Terrain, seed: number, baseDir: THREE.Vect
     },
     {
       name: 'fern', geoms: [F.fernBush(71, 'green'), F.fernBush(72, 'tropical'), F.fernBush(73, 'ember'), F.fernBush(74, 'green')], material: matLeaf,
-      count: SCATTER.fern.count, scale: [0.7, 1.8], sink: 0.05, minDeg: 1.6, tilt: 0.6,
+      count: Math.round(SCATTER.fern.count * density), scale: [0.7, 1.8], sink: 0.05, minDeg: 1.6, tilt: 0.6,
       rule: (s, slope) => (ground(s, 0.3) && s.rock < 0.35 && slope < 0.25 ? 0.2 + 0.8 * s.forest : 0),
     },
     {
       name: 'grass', geoms: [F.grassTuft(81), F.grassTuft(82)], material: matGrass,
-      count: SCATTER.grass.count, scale: [0.8, 1.5], sink: 0.02, minDeg: 0, tilt: 0.9,
+      count: Math.round(SCATTER.grass.count * density), scale: [0.8, 1.5], sink: 0.02, minDeg: 0, tilt: 0.9,
       rule: (s, slope, d) => (ground(s, 0.25) && s.rock < 0.25 && slope < 0.3 ? 0.35 + 0.65 * THREE.MathUtils.smoothstep(d.dot(baseDir), 0.7, 0.97) : 0),
     },
     {

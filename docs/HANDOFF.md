@@ -1,6 +1,7 @@
 # Corebound handoff (28 October 2026, updated 29 October)
 
-> **29 October:** Huxley (rigged, five clips) and SARATHI models are in the game: SARATHI floats beside the Custodian; Huxley appears as a hologram in his recordings. Mooladri is faceless (the Commander's new concepts). New tasks T-025 and T-026. Details in `docs/STATUS.md`.
+> **29 October:** Huxley (rigged, five clips) and SARATHI models are in the game: SARATHI floats beside the Custodian; Huxley appears as a hologram in his recordings. Mooladri is faceless (the Commander's new concepts).
+> **29 October, afternoon:** the game plays on **Android** (touch controls, Phone preset, installable; phone track in `docs/ROADMAP.md`). T-021 to T-025 merged. Open: T-026 (Codex), T-027 (ChatGPT chat). Details in `docs/STATUS.md`.
 
 This file covers four things:
 
@@ -204,8 +205,9 @@ Then do your Director duties:
 5. Tell me what changed and what needs my decision.
 
 Where we are: M0–M3 have first versions built (159 tests pass); Huxley and SARATHI models are in.
-Open tasks: T-021 and T-026 (ChatGPT Codex), T-022 and T-025 (ChatGPT chat), T-023 and T-024 (Sarvam),
-T-005 (my voice test). Mooladri is faceless (decided). Next milestone is M4, the Chapter 1 demo.
+Android works in the browser (touch controls; scripts/playtest-touch.mjs). Open tasks: T-026 (ChatGPT
+Codex, text size), T-027 (ChatGPT chat, privacy notice and phone help), T-005 (my voice test).
+Mooladri is faceless (decided); its body shape is my decision. Next milestone is M4, the Chapter 1 demo.
 Start it only after I say go.
 
 Rules: no violence; the GDD is the source of truth (log every design decision there); never merge
@@ -217,7 +219,8 @@ Practical notes from the last chat:
 - Screenshots: `node scripts/screenshots.mjs "/?shot=1" out.png 1280 720 0 "<js>"`. Test hooks are on
   window.__game (setTime, teleport, give, place, simulate, openCodex, showLog, pollute, planetView, and more).
   The headless browser is slow: keep commands under 10 minutes and use few frames.
-- Playtests: scripts/playtest-m2.mjs and scripts/playtest-mouse.mjs.
+- Playtests: scripts/playtest-m2.mjs, scripts/playtest-mouse.mjs and scripts/playtest-touch.mjs (phone screen).
+- Phones: ?touch=1 forces touch controls, ?q=phone the phone preset, ?fps=1 shows the frame rate.
 - Rigged characters: Mixamo FBX clips go in art-inbox/models/<character>/, then `npm run rig -- <character>`
   with the dev server running (clip lists in src/tools/rig.ts). Preview a log: /?log=huxley_01.
 - After pushing, run `git fetch origin '+refs/heads/main:refs/remotes/origin/main'`.

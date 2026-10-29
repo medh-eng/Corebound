@@ -36,6 +36,23 @@ export class SarathiDrone {
         const m = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined;
         if (!m || !(o as THREE.Mesh).isMesh || !m.map) return;
         m.emissive = new THREE.Color('#ffe2b8'); m.emissiveMap = m.map; m.emissiveIntensity = 0;
+        // Sarvam (T-024): an all-brass bud reads as a lamp kept at a shrine. Until a ceramic model
+        // arrives, repaint it in the style bible's materials: off-white ceramic shell, copper only in
+        // the darker trim, cyan glow kept. The shading of the painted texture is kept.
+        m.metalnessMap = null; m.metalness = 0.12; m.roughness = 0.5;
+        m.customProgramCacheKey = () => 'sarathi-ceramic';
+        m.onBeforeCompile = (sh) => {
+          sh.fragmentShader = sh.fragmentShader.replace('#include <map_fragment>', `#include <map_fragment>
+            {
+              vec3 c = diffuseColor.rgb;
+              float l = dot(c, vec3(0.299, 0.587, 0.114));
+              float teal = smoothstep(0.03, 0.15, (c.g + c.b) * 0.5 - c.r);
+              vec3 ceramic = vec3(0.93, 0.9, 0.84) * (0.35 + 1.6 * smoothstep(0.0, 0.45, l));
+              vec3 copper = vec3(0.62, 0.34, 0.2) * (0.6 + 1.2 * l);
+              float trim = smoothstep(0.16, 0.08, l);
+              diffuseColor.rgb = mix(mix(ceramic, copper, trim), c, teal);
+            }`);
+        };
         this.mats.push(m);
       });
       this.body.add(model);

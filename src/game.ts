@@ -9,6 +9,7 @@ import { CODEX, codexById } from './data/codex';
 import { RESEARCH_LINES, MACHINE_LINES, EVENT_LINES } from './data/lines';
 import { CHAPTER1_GOALS, SARATHI_EVENTS } from './data/story';
 import { SarathiDrone } from './render/sarathi';
+import { TouchControls } from './ui/touch';
 import { HoloPortrait } from './render/hologram';
 import { Terrain } from './core/terrain';
 import { VoxelWorld, type Dig } from './core/voxels';
@@ -49,7 +50,8 @@ declare global {
 }
 
 export interface GameOptions {
-  quality: 'low' | 'high';
+  quality: 'low' | 'high' | 'phone';
+  touch?: boolean;      // on-screen controls (phones and tablets)
   skipTitle: boolean;
   timeOffset: number;   // days added to the starting time (0.5 = night)
   view: 'follow' | 'orbit';
@@ -60,6 +62,7 @@ export interface GameOptions {
   near?: string;        // testing: start near a landmark kind (e.g. 'banyan')
   alt?: number;         // testing: start this many metres in the air
   log?: string;         // preview: open this memory log a few seconds after the game starts
+  fps?: boolean;        // show the frame rate from the start (F3 on a keyboard)
 }
 
 const SAVE_KEY = 'corebound.save.v1';
@@ -90,12 +93,13 @@ function readSave(): SaveData | null {
 export async function startGame(opts: GameOptions) {
   const world = JIVAGRAHA;
   const ui = new UI();
-  const low = opts.quality === 'low';
+  const low = opts.quality !== 'high';
+  const phone = opts.quality === 'phone';
   matQuality.detail = !low;
   loadGroundTextures((n) => assetUrl(`textures/${n}.webp`));
 
   const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance', preserveDrawingBuffer: opts.shot });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, low ? 1 : 1.5));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, phone ? 1 : low ? 1 : 1.5));
   renderer.setSize(innerWidth, innerHeight);
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1.0;
@@ -108,6 +112,7 @@ export async function startGame(opts: GameOptions) {
   const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.1, 9000);
   const input = new Input(renderer.domElement);
   input.alwaysLocked = opts.shot;
+  const touch = opts.touch ? new TouchControls(input) : null;
   try { const sv = Number(localStorage.getItem('corebound.sens')); if (sv > 0) input.sensitivity = sv; } catch { /* default */ }
   const sound = new Sound();
 
@@ -173,7 +178,7 @@ export async function startGame(opts: GameOptions) {
   ui.loading('Growing the forest', 0.5); await nextFrame();
   const scatter = scatterWorld(terrain, world.seed, up0, [
     { pos: domePoint, radius: 8 }, { pos: lotusPoint, radius: 4 }, { pos: spawnPoint, radius: 4.5 },
-  ]);
+  ], phone ? 0.4 : 1);
   scene.add(scatter.group);
   colliders.push(...scatter.colliders);
   scene.add(decorateBase(terrain, { up: up0, forward, right }, { dome: domePoint }));
@@ -209,7 +214,7 @@ export async function startGame(opts: GameOptions) {
   sun.shadow.normalBias = 0.14;
   scene.add(sun, sun.target);
   // Shadows setting: 2 high, 1 low, 0 off.
-  let shadowLevel = low ? 1 : 2;
+  let shadowLevel = phone ? 0 : low ? 1 : 2;
   try { const v = localStorage.getItem('corebound.shadows'); if (v !== null) shadowLevel = Number(v); } catch { /* default */ }
   const setShadows = (lvl: number) => {
     const wasOn = sun.castShadow;
@@ -267,7 +272,7 @@ export async function startGame(opts: GameOptions) {
   const rig = new CameraRig(camera, R, groundRV);
   if (opts.pitch !== undefined) rig.pitch = opts.pitch;
   if (opts.dist !== undefined) rig.dist = opts.dist;
-  const post = buildPostFX(renderer, scene, camera);
+  const post = buildPostFX(renderer, scene, camera, phone);
 
   // ── Game state ────────────────────────────────────────
   const pack = new Backpack(8);
@@ -507,17 +512,26 @@ export async function startGame(opts: GameOptions) {
     const powered = !!st && (lastSupply.get(st.uid!) ?? 0) > 0.2;
     ui.renderResearch(base.research, (id) => pack.count(id), powered);
   };
-  const openCodex = () => { sound.uiOpen(); ui.renderCodex(codexKnown, codexNew); ui.setCodex(true); codexNew.length = 0; if (document.pointerLockElement) document.exitPointerLock(); };
+  const openCodex = () => { sound.uiOpen(); ui.renderCodex(codexKnown, codexNew); ui.renderLogs(foundLogs(), newLogs, STORY_LOGS.length); ui.setCodex(true); codexNew.length = 0; newLogs.length = 0; if (document.pointerLockElement) document.exitPointerLock(); };
   const closeCodex = () => { ui.setCodex(false); if (playing && !opts.shot) input.lock(); };
   // Memory logs (T-019 viewer). World placement comes in M4; for now only the test hook opens one.
   const huxley = new HoloPortrait();
+  // Found logs are remembered as flags (log_<id>) so the Codex's Logs tab (T-021) can play them again.
+  const STORY_LOGS = CHAPTER1_LOGS.filter((l) => !l.id.startsWith('sarathi_log_react'));
+  const newLogs: string[] = [];
+  const foundLogs = () => Object.keys(flags).filter((k) => k.startsWith('log_')).map((k) => STORY_LOGS.find((l) => `log_${l.id}` === k)).filter((l): l is (typeof STORY_LOGS)[number] => !!l);
   const openLog = (id: string, reaction?: string) => {
     const log = CHAPTER1_LOGS.find((l) => l.id === id); if (!log) return false;
+    if (STORY_LOGS.includes(log) && !flags[`log_${id}`]) { flags[`log_${id}`] = true; newLogs.push(id); }
     sound.uiOpen(); ui.showLog(log, reaction);
     if (/huxley/i.test(log.speaker ?? '')) void huxley.start(document.getElementById('log-holo') as HTMLCanvasElement);
     if (document.pointerLockElement) document.exitPointerLock(); return true;
   };
   const closeLog = () => { ui.hideLog(); if (playing && !opts.shot) input.lock(); };
+  ui.onLog = (id) => { ui.setCodex(false); openLog(id); };
+  if (touch) touch.onClose = () => {
+    if (ui.logOpen) closeLog(); else if (ui.packOpen) closePack(); else if (ui.buildOpen) closeBuild(); else if (ui.researchOpen) closeResearch(); else if (ui.codexOpen) closeCodex();
+  };
   const openResearch = () => { sound.uiOpen(); renderResearch(); ui.setResearch(true); if (document.pointerLockElement) document.exitPointerLock(); };
   const closeResearch = () => { ui.setResearch(false); if (playing && !opts.shot) input.lock(); };
   const loadResearchParts = () => {
@@ -549,7 +563,7 @@ export async function startGame(opts: GameOptions) {
 
   // ── State and loop ────────────────────────────────────
   let playing = false;
-  let showStats = false;
+  let showStats = !!opts.fps;
   let fpsAvg = 60;
   let frames = 0;
   let last = performance.now();
@@ -558,6 +572,7 @@ export async function startGame(opts: GameOptions) {
   let wasNight = false, lowWarned = false, resTimer = 0, lampOn = false, researchTimer = 0, itemCodexTimer = 1;
 
   const begin = (resume: boolean) => {
+    if (touch) TouchControls.enterFullscreen();
     sound.start();
     const d = resume ? readSave() : null;
     if (d) load(d);
@@ -806,7 +821,7 @@ export async function startGame(opts: GameOptions) {
     if (input.hit('KeyH')) ui.toggleHelp();
     if (input.wheel && !building) rig.dist = THREE.MathUtils.clamp(rig.dist + input.wheel * 0.8, 3.5, 14);
 
-    const active = playing && !ui.paused && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && !ui.codexOpen && !ui.logOpen && (input.locked || opts.shot) && !rig.transitioning;
+    const active = playing && !ui.paused && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && !ui.codexOpen && !ui.logOpen && (input.locked || input.touch || opts.shot) && !rig.transitioning;
     if (active && input.hit('KeyM')) rig.setMode(rig.mode === 'follow' ? 'orbit' : 'follow', 1.4);
     const look = input.sensitivity;
     let yaw = 0;
@@ -820,7 +835,7 @@ export async function startGame(opts: GameOptions) {
     const walk = active && rig.mode === 'follow';
     const fwd = walk ? (input.down('KeyW') || input.down('ArrowUp') ? 1 : 0) - (input.down('KeyS') || input.down('ArrowDown') ? 1 : 0) - pad.ly : 0;
     const side = walk ? (input.down('KeyD') || input.down('ArrowRight') ? 1 : 0) - (input.down('KeyA') || input.down('ArrowLeft') ? 1 : 0) + pad.lx : 0;
-    const sprint = input.down('ShiftLeft') || input.down('ShiftRight');
+    const sprint = input.down('ShiftLeft') || input.down('ShiftRight') || input.down('ShiftTouch');
     const jumpHit = walk && input.hit('Space');
     acc += dt;
     const STEP = 1 / 60;
@@ -1207,6 +1222,10 @@ export async function startGame(opts: GameOptions) {
 
     player.update(dt, pos, up, V(me.vel), heading, me.grounded, me.jetting, shared.uTime.value);
     drone.update(dt, pos, up, heading, { visible: playing && rig.mode === 'follow', underground });
+    touch?.update({
+      mode: !playing || ui.paused ? 'hidden' : ui.packOpen || ui.buildOpen || ui.researchOpen || ui.codexOpen || ui.logOpen ? 'panel' : rig.mode === 'orbit' ? 'orbit' : 'play',
+      building: !!building, belt: beltMode, near: !!near,
+    });
     laser.update(dt, laserTo ? player.muzzle : null, laserTo, laserN);
     rig.update(dt, pos, up, heading);
   };

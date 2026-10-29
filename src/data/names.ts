@@ -1,7 +1,7 @@
 // Names of Guardians, peoples and creatures, chosen 2026-10-27 from Sarvam AI's options
 // (team-inbox/writing/T-004-names.md); three corrected after Sarvam's review (T-004-names-review.md). "say" is a pronunciation guide (capitals = stressed).
 
-export interface Name { name: string; deva: string; say: string; meaning: string }
+export interface Name { name: string; deva: string; say: string; meaning: string; /** respelling for an Indian-English text-to-speech voice (Sarvam, T-023); Hindi and Marathi voices use `deva` */ voice?: string }
 
 export const GUARDIAN_NAMES: Record<string, Name> = {
   jivagraha: { name: 'Mooladri', deva: 'मूलाद्रि', say: 'MOO-lah-dree', meaning: 'root-mountain' },
@@ -43,14 +43,14 @@ export const SZYNTHAR_HOMELAND: Name = { name: 'Padakanan', deva: 'पादक�
 /** Plants, rocks and the bloom of Jivagraha, chosen 2026-10-28 from Sarvam AI's suggested set (team-inbox/writing/T-017-flora-names.md).
  *  The HUD and goals keep the English words ("the bloom"); these names live in the Codex. */
 export const FLORA_NAMES: Record<string, Name> = {
-  banyan: { name: 'Jyotivata', deva: 'ज्योतिवट', say: 'JYOH-tee-vut', meaning: 'light-banyan' },
-  mushroom_tree: { name: 'Deepashirsha', deva: 'दीपशीर्ष', say: 'DEEP-uh-SHEER-shuh', meaning: 'lamp-headed' },
-  glow_mushroom: { name: 'Jyotiguccha', deva: 'ज्योतिगुच्छ', say: 'JYOH-tee-GOO-chhuh', meaning: 'light-cluster' },
-  fern: { name: 'Deepalata', deva: 'दीपलता', say: 'DEEP-uh-LUH-taa', meaning: 'lamp-creeper' },
-  lotus_pad: { name: 'Shantakamala', deva: 'शान्तकमल', say: 'SHAAN-tuh-KUH-mul', meaning: 'calm lotus' },
-  ice_crystal: { name: 'Sheetashikhara', deva: 'शीतशिखर', say: 'SHEE-tuh-SHEE-khuh-ruh', meaning: 'cold spire' },
-  iron_ore: { name: 'Lohashila', deva: 'लोहशिला', say: 'LOH-huh-SHEE-laa', meaning: 'iron-rock' },
-  carbon: { name: 'Kajjala', deva: 'कज्जल', say: 'KUJ-juh-luh', meaning: 'lamp-black, soot' },
-  sandstone: { name: 'Dhavala', deva: 'धवल', say: 'DHUH-vuh-luh', meaning: 'white, pale' },
-  bloom: { name: 'Sakshi', deva: 'साक्षी', say: 'SAAK-shee', meaning: 'witness' },
+  banyan: { name: 'Jyotivata', deva: 'ज्योतिवट', say: 'JYOH-tee-vut', meaning: 'light-banyan', voice: 'Jyoh tee vaa taa' },
+  mushroom_tree: { name: 'Deepashirsha', deva: 'दीपशीर्ष', say: 'DEEP-uh-SHEER-shuh', meaning: 'lamp-headed', voice: 'Dee pa sheer shaa' },
+  glow_mushroom: { name: 'Jyotiguccha', deva: 'ज्योतिगुच्छ', say: 'JYOH-tee-GOO-chhuh', meaning: 'light-cluster', voice: 'Jyoh tee gooch chhaa' },
+  fern: { name: 'Deepalata', deva: 'दीपलता', say: 'DEEP-uh-LUH-taa', meaning: 'lamp-creeper', voice: 'Dee pa la taa' },
+  lotus_pad: { name: 'Shantakamala', deva: 'शान्तकमल', say: 'SHAAN-tuh-KUH-mul', meaning: 'calm lotus', voice: 'Shaan ta ka ma la' },
+  ice_crystal: { name: 'Sheetashikhara', deva: 'शीतशिखर', say: 'SHEE-tuh-SHEE-khuh-ruh', meaning: 'cold spire', voice: 'Shee ta shi kha ra' },
+  iron_ore: { name: 'Lohashila', deva: 'लोहशिला', say: 'LOH-huh-SHEE-laa', meaning: 'iron-rock', voice: 'Lo ha shi laa' },
+  carbon: { name: 'Kajjala', deva: 'कज्जल', say: 'KUJ-juh-luh', meaning: 'lamp-black, soot', voice: 'Kuj ja la' },
+  sandstone: { name: 'Dhavala', deva: 'धवल', say: 'DHUH-vuh-luh', meaning: 'white, pale', voice: 'Dha va la' },
+  bloom: { name: 'Sakshi', deva: 'साक्षी', say: 'SAAK-shee', meaning: 'witness', voice: 'Saak shee' },
 };

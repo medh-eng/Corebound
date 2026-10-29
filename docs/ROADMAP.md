@@ -70,6 +70,13 @@ Hindi and Marathi translations (Sarvam AI); balancing across worlds; settings an
 ### M11 Beyond (optional)
 Co-op, translations, more worlds — chosen from player feedback. Human artist polish pass if sales justify it.
 
+## Phone track (Android), alongside the milestones
+
+The Commander asked for Android on 2026-10-29. The game stays one game: the phone version is the same build with touch controls and a lighter graphics preset.
+- **P1 — play in the phone's browser (done 2026-10-29, first version):** on-screen controls, Phone preset, landscape full screen, install to the home screen. **Next:** the Commander plays on his own phone and reports the frame rate (open https://medh-eng.github.io/Corebound/?fps=1 to see it in the corner) and anything awkward.
+- **P2 — tune on real phones:** button sizes and spacing, a left-handed layout, frame-rate presets after the Commander's test; text size (T-026).
+- **P3 — Play Store:** wrap the web build as an Android app (a Trusted Web Activity, or Capacitor if we need offline files); needs a Google Play developer account (one-time fee) in the Commander's name, a privacy policy and the store listing (from T-025). Best done with the Chapter 1 demo in M4.
+
 ## Publishing
 
 | Where | When | Cost | Notes |

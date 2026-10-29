@@ -296,7 +296,9 @@ Rules: wow in minute one; hands busy by minute 3; three goals always visible; so
 
 ## 16. Modes and options
 
-Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manual slots. Graphics presets (Low for Steam Deck/integrated GPUs). Rebindable keys, text size, subtitles, colour-blind support. English first; text externalised for translation (Hindi and Marathi next, with Sarvam AI).
+Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manual slots. Graphics presets (Low for Steam Deck/integrated GPUs; Phone for phones and tablets).
+
+**Phones and tablets (Android first, from 2026-10-29):** the same game runs in the phone's browser and can be installed to the home screen as an app (full screen, landscape). On-screen controls: a joystick wherever the left thumb lands (push to the edge to run); drag anywhere else to look; Mine, Jump, Use and Scan buttons on the right (holding Mine or Scan and sliding also aims); a row for Bag, Build, Belt, Codex, Planet, O₂, Pick up and Dance; Place, Turn and Cancel appear while building; ✕ closes panels. Goals, tips and prompts name the buttons instead of keys (`src/data/controls.ts`). The Phone preset draws at screen resolution, without shadows (they can be turned on) or multisampling, with a quarter-size glow and 40% of the grass and ferns. A Play Store version comes later as a wrapper around the same game. Rebindable keys, text size, subtitles, colour-blind support. English first; text externalised for translation (Hindi and Marathi next, with Sarvam AI).
 
 **Credits:** "A game by Medhanshu Shahane." No team list. A thank-you line to the Indian craft traditions that inspired the game, and a music credit to Pixabay artists. Tools and AI use are listed in the store's AI-content disclosure, not in the credits.
 
@@ -328,7 +330,7 @@ Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manua
 | 2026-10-18 | Spherical worlds with diggable smooth-voxel terrain; foundation pads for building | 3D equivalent of round worlds + polar grid |
 | 2026-10-18 | Owner produces art with AI tools from the Prompt Pack; Claude builds world, effects, procedural creatures | Division of labour for a big 3D game |
 | 2026-10-18 | Chapter 1 (Jivagraha) completed as a free demo before worlds 2–5; hook test with 5 new players | Learn what is fun before building more |
-| 2026-10-18 | Mobile dropped for the 3D version; Steam Deck is the handheld target | Factory building in 3D needs mouse/gamepad |
+| 2026-10-18 | Mobile dropped for the 3D version; Steam Deck is the handheld target (reversed 2026-10-29: Android added) | Factory building in 3D needs mouse/gamepad |
 | 2026-10-25 | Jivagraha radius 150 m (was ~250) | Strong, visible curvature from the ground in the look test |
 | 2026-10-25 | M0 uses Three.js WebGLRenderer + Neutral tone mapping and a light saturation grade; WebGPU later | Widest browser support; colours closest to the concept art |
 | 2026-10-25 | Collision is an analytic height field + circle colliders until diggable terrain; Rapier arrives with M1 | Simplest robust walking on a sphere for the look test |
@@ -385,4 +387,7 @@ Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manua
 | 2026-10-29 | SARATHI floats beside the Custodian (off the left shoulder, lower in tunnels) as the Commander's lotus-bud model; when it speaks, two rings of light and a soft beam open above its petals. No face: the concept's hologram face became rings only | Style bible: no faces on drones; gives SARATHI's lines a body before M4 |
 | 2026-10-29 | Prof. Huxley's recordings show him as a full-body blue-gold hologram on a projector beside the text (the Commander's rigged model; talking, thinking and pointing clips) | First use of the Huxley model; the same hologram stands in the wreckage in M4 |
 | 2026-10-29 | The loading screen shows one of three pieces of the Commander's art at random (key art, crash site, star system) | New art arrived |
+| 2026-10-29 | **Android phones and tablets are a target again**: on-screen touch controls, a Phone graphics preset, installable from the browser; Play Store later (§16) | Commander: "I want that" |
+| 2026-10-29 | SARATHI's brass model is repainted in code as off-white ceramic with copper trim; Huxley's hologram stands half-turned on a small emitter (no column of light), with his talking gestures played at partial strength over his idle | Sarvam (T-024): an all-brass bud reads as a shrine lamp; arms spread in a column of light reads as a darshan |
+| 2026-10-29 | Found memory logs are kept and can be replayed from the Codex's Logs tab | T-021 |
 | Open | price; repo visibility at launch; final art direction sign-off | **owner** |
