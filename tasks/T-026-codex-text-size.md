@@ -1,7 +1,7 @@
 # T-026: A text size setting
 
 - **Assigned to:** ChatGPT (Codex)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P2 (M4: settings and accessibility, GDD §16)
 - **Deliver to:** pull request from branch `chatgpt/T-026-text-size`
 - **Start after:** T-021 is merged (both change `src/ui/ui.ts`) — merged 2026-10-29, so start now; work from the latest `main`
