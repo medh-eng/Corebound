@@ -84,6 +84,7 @@ export class UI {
         <label class="slider"><span>Master volume</span><input type="range" id="vol-master" min="0" max="1" step="0.05"></label>
         <label class="slider"><span>Mouse sensitivity</span><input type="range" id="sens" min="0.0008" max="0.005" step="0.0002"></label>
         <label class="slider"><span>Shadows</span><select id="shadows"><option value="2">High</option><option value="1">Low</option><option value="0">Off</option></select></label>
+        <label class="slider"><span>Text size</span><select id="text-size"><option value="1">Normal</option><option value="1.15">Large</option><option value="1.3">Larger</option></select></label>
         <details><summary>Controls</summary><div class="keys">${keys}</div></details>
       </div></div>
       <div id="credits" class="hidden" role="dialog" aria-modal="true" aria-label="${CREDITS.button}"><div class="card">
@@ -153,6 +154,22 @@ export class UI {
         <div id="tags"></div>
         <div id="planet" class="panel hidden"></div>
       </div>`);
+    const textSize = $('#text-size') as HTMLSelectElement;
+    let initialTextSize = 1;
+    try {
+      const saved = Number(window.localStorage.getItem('corebound.textSize'));
+      if ([1, 1.15, 1.3].includes(saved)) initialTextSize = saved;
+    } catch { /* Storage may be unavailable in private browsing. */ }
+    textSize.value = String(initialTextSize);
+    document.documentElement.style.setProperty('--text-scale', String(initialTextSize));
+    textSize.onchange = () => {
+      const scale = Number(textSize.value);
+      if (![1, 1.15, 1.3].includes(scale)) return;
+      document.documentElement.style.setProperty('--text-scale', String(scale));
+      try {
+        window.localStorage.setItem('corebound.textSize', String(scale));
+      } catch { /* Keep the setting for this session even when storage fails. */ }
+    };
     const tip = $('#loading .tip');
     let remaining: string[] = [];
     let lastTip = '';
