@@ -1,7 +1,7 @@
 # T-021: A "Logs" tab in the Codex
 
 - **Assigned to:** ChatGPT (Codex)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P1 (M4)
 - **Deliver to:** pull request from branch `chatgpt/T-021-codex-logs-tab`
 
