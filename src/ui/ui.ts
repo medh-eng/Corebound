@@ -1,5 +1,6 @@
 // Menus and heads-up display (plain DOM over the 3D canvas).
 import { assetUrl } from '../render/assets';
+import { sharedSound } from '../audio/sound';
 import { CREDITS } from '../data/credits';
 import { CODEX, type CodexKind } from '../data/codex';
 import { ITEMS, RECIPES, type ItemId, type Recipe } from '../data/items';
@@ -81,6 +82,7 @@ export class UI {
         <h3>Settings</h3>
         <label class="slider"><span>Music</span><input type="range" id="vol-music" min="0" max="1" step="0.05"></label>
         <label class="slider"><span>Sound effects</span><input type="range" id="vol-sfx" min="0" max="1" step="0.05"></label>
+        <label class="slider"><span>SARATHI's voice</span><input type="range" id="vol-voice" min="0" max="1" step="0.05"></label>
         <label class="slider"><span>Master volume</span><input type="range" id="vol-master" min="0" max="1" step="0.05"></label>
         <label class="slider"><span>Mouse sensitivity</span><input type="range" id="sens" min="0.0008" max="0.005" step="0.0002"></label>
         <label class="slider"><span>Shadows</span><select id="shadows"><option value="2">High</option><option value="1">Low</option><option value="0">Off</option></select></label>
@@ -284,9 +286,9 @@ export class UI {
   /** Hooks for the pause menu. */
   menu: {
     save: () => string; load: () => void; home: () => void;
-    settings: () => { music: number; sfx: number; master: number; sens: number; shadows: number };
-    change: (k: 'music' | 'sfx' | 'master' | 'sens' | 'shadows', v: number) => void;
-  } = { save: () => '', load: () => {}, home: () => {}, settings: () => ({ music: 0.5, sfx: 0.8, master: 0.8, sens: 0.0022, shadows: 2 }), change: () => {} };
+    settings: () => { music: number; sfx: number; master: number; voice: number; sens: number; shadows: number };
+    change: (k: 'music' | 'sfx' | 'master' | 'voice' | 'sens' | 'shadows', v: number) => void;
+  } = { save: () => '', load: () => {}, home: () => {}, settings: () => ({ music: 0.5, sfx: 0.8, master: 0.8, voice: 0.9, sens: 0.0022, shadows: 2 }), change: () => {} };
 
   showPause(onResume: () => void) {
     $('#pause').classList.remove('hidden');
@@ -298,7 +300,7 @@ export class UI {
     sh.value = String(this.menu.settings().shadows);
     sh.onchange = () => this.menu.change('shadows', Number(sh.value));
     const s = this.menu.settings();
-    for (const k of ['music', 'sfx', 'master'] as const) {
+    for (const k of ['music', 'sfx', 'voice', 'master'] as const) {
       const el = $(`#vol-${k}`) as HTMLInputElement;
       el.value = String(s[k]);
       el.oninput = () => this.menu.change(k, Number(el.value));
@@ -615,6 +617,7 @@ export class UI {
     const s = $('#sarathi');
     s.classList.remove('hidden');
     $('#sarathi .line').textContent = T(line);
+    sharedSound()?.speakVoice(line);
     clearTimeout(this.sarathiTimer);
     this.sarathiTimer = window.setTimeout(() => s.classList.add('hidden'), seconds * 1000);
   }
