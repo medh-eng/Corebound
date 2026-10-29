@@ -17,25 +17,29 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 
 | # | What | Where it goes | Prompt |
 | --- | --- | --- | --- |
-| 1 | **Prof. Huxley 3D model** from `turnaround/huxley_front_square.png` (Hunyuan3D), then Mixamo clips `Talking`, `Thinking`, `Pointing`, `Idle` | `art-inbox/models/huxley.glb` and `art-inbox/models/huxley/*.fbx` | §4, §11. If Mixamo cannot rig him (arms too close to the body), make one more front image in an A-pose and try again |
-| 2 | **Root Guardian, calm and restless, with no face**: make `guardian_root.png` again and add `guardian_root_restless.png`. Sarvam noticed the first one has a bearded human face, which turns it into a tree god; Mooladri is built in code from roots and has no face | `art-inbox/concept/` | §5.2 |
+| 1 | **Quick answer, no art:** which 3D tool made `huxley.glb` and `sarathi.glb` (Hunyuan3D, TRELLIS, Tripo, Meshy…)? Just tell the Director in chat | — | §11 (for the licences list) |
+| 2 | **Escape module and cryo-pod** (the demo opens inside them): turnaround image, then textured GLB. Attach `concept/jiva_crash_site.png` as the reference: your crash-site picture is now the look | `art-inbox/turnaround/`, `art-inbox/models/escape_module.glb`, `art-inbox/models/cryo_pod.glb` | §6.3 |
 | 3 | **Jivagraha creatures as 3D**: a gentle grazer and a small burrower (turnaround image, then textured GLB) | `art-inbox/turnaround/`, `art-inbox/models/` | §5.1, task T-015 |
-| 4 | **Story props for the demo**: `escape_module`, `cryo_pod`, `translator`, `memory_log`, `huxley_projector`, `quantum_fragment`, `o2_canister` (turnaround, then GLB) | `art-inbox/turnaround/`, `art-inbox/models/` | §6.3, §8 |
+| 4 | **Story props**: `translator`, `memory_log`, `quantum_fragment`, `o2_canister` (turnaround, then GLB). `huxley_projector` is optional now (a code-made one works) | `art-inbox/turnaround/`, `art-inbox/models/` | §8 |
 | 5 | **Rover**, **starter ship**, **launch pad**, **vehicle bay** models (for the demo's ending) | `art-inbox/models/` | §6.3, §7 |
-| 6 | **SARATHI 3D model** (lotus drone, petals as separate parts if possible) | `art-inbox/models/sarathi.glb` | §4 |
-| 7 | **Sabatier reactor model** (a code-made one stands in) | `art-inbox/models/` | §6.3 |
-| 8 | **Machine sound loops**: `auto_drill_loop`, `conveyor_loop`, `research_loop`, `coal_burner_loop`, `electrolyzer_loop`, `battery_hum`, `solar_lotus_open` | `art-inbox/audio/sfx/` | §13.4 |
-| 9 | **Ambience**: `amb_jiva_day`, `amb_jiva_night`, `amb_cave` | `art-inbox/audio/sfx/` | §13.7 |
-| 10 | **Music still missing**: `memory_log`, `spaceflight` | `art-inbox/audio/music/` | §12 |
-| 11 | **Voice test** (T-005): record SARATHI's 5 test lines in Sarvam Bulbul | `art-inbox/audio/voice/tests/` | §14 and `art-inbox/audio/voice/tests/T-005-voice-test-sheet.md` |
-| 12 | **Teaser clips** for the demo trailer | `art-inbox/video/` | §10 |
+| 6 | **Sabatier reactor model** (a code-made one stands in) | `art-inbox/models/` | §6.3 |
+| 7 | **Machine sound loops**: `auto_drill_loop`, `conveyor_loop`, `research_loop`, `coal_burner_loop`, `electrolyzer_loop`, `battery_hum`, `solar_lotus_open` | `art-inbox/audio/sfx/` | §13.4 |
+| 8 | **Ambience**: `amb_jiva_day`, `amb_jiva_night`, `amb_cave` | `art-inbox/audio/sfx/` | §13.7 |
+| 9 | **Music still missing**: `memory_log`, `spaceflight` | `art-inbox/audio/music/` | §12 |
+| 10 | **Voice test** (T-005): record SARATHI's 5 test lines in Sarvam Bulbul | `art-inbox/audio/voice/tests/` | §14 and `art-inbox/audio/voice/tests/T-005-voice-test-sheet.md` |
+| 11 | **Teaser clips** for the demo trailer | `art-inbox/video/` | §10 |
 
-**Licences:** ✓ music and sound effects are from Pixabay (recorded in `docs/LICENCES.md`, thank you). From now on, writing the source in the upload's commit message is enough.
+**See what arrived on 29 October** (press Ctrl+F5 first):
+- SARATHI floats beside you as soon as you play: https://medh-eng.github.io/Corebound/
+- Huxley's hologram, talking, in his first message (it opens about 6 seconds after you press Start): https://medh-eng.github.io/Corebound/?log=huxley_01
+
+**Licences:** ✓ music and sound effects are from Pixabay (recorded in `docs/LICENCES.md`, thank you). From now on, writing the source in the upload's commit message is enough (for example "huxley.glb made with Hunyuan3D").
 
 ### ✓ Received so far (all in the game unless noted)
 
-- **Images** (Sarvam reviewed 14 concepts on 2026-10-28: all fine except the Root Guardian's face, row 2; the rest only matter if they are redone for the store) — style tests, key art (day, night, tall, wide), logo, store art (main capsule, header, vertical, library hero), 20+ world and Guardian concepts, Custodian and Huxley concept and turnarounds, Jivagraha textures (grass, soil, rock, sandstone), night sky and space panoramas.
-- **3D models:** Custodian (rigged, 11 animations including two dances and a salute), shelter dome, solar lotus, battery, electrolyzer, smelter, auto-drill, storage silo, research station, coal burner, silicon furnace, bio-filter, conveyor.
+- **29 October:** ✓ **Prof. Huxley 3D model** with five Mixamo clips (Breathing Idle, Talking, Talking 2, Thinking, Pointing): rigged and in the game as a blue-gold hologram in his memory recordings. ✓ **SARATHI 3D model**: in the game, floating beside the Custodian; the dark ball the 3D tool made above the petals (from the hologram in the concept) was cut off, and code-made rings of light open there when SARATHI speaks. ✓ **Root Guardian, calm and restless, with no face**: exactly right; this is the look Mooladri will be built to. ✓ **Crash site** and **star-system overview**: now shown on the loading screen; the crash site is the reference for the escape module (row 2). Store images were uploaded a second time into `concept/`; they were already in `style/`, so the copies were removed.
+- **Images** (Sarvam reviewed 14 concepts on 2026-10-28: all fine except the Root Guardian's face, now fixed) — style tests, key art (day, night, tall, wide), logo, store art (main capsule, header, vertical, library hero), 20+ world and Guardian concepts, Custodian and Huxley concept and turnarounds, Jivagraha textures (grass, soil, rock, sandstone), night sky and space panoramas.
+- **3D models:** Custodian (rigged, 11 animations including two dances and a salute), Prof. Huxley (rigged, 5 animations), SARATHI, shelter dome, solar lotus, battery, electrolyzer, smelter, auto-drill, storage silo, research station, coal burner, silicon furnace, bio-filter, conveyor.
 - **Music:** title theme, Jivagraha day, night and underground, Guardian awake and calm, three factory layers.
 - **Sound effects:** footsteps (grass, rock, metal, sand, snow), jump, land, jetpack, laser (start, loop, on rock, on crystal), digging, low oxygen, breathing, canister, blackout, helmet lamp, a whoosh and a ship engine (also used to make menu, machine, power and smelter sounds).
 
@@ -144,7 +148,7 @@ Concept art shows Claude the look, colour and mood. Save to `art-inbox/concept/`
 
 The old `vayu_*` images (sky islands) now belong to **Vayumandala's cloud reefs**: keep them.
 
-### 3.1 Star system overview: P2
+### 3.1 Star system overview: ✓ both received (2026-10-29)
 
 | File | Prompt (after the style bible) |
 | --- | --- |
@@ -225,8 +229,8 @@ background, even soft studio lighting, no shadows, no props in hands.
 | --- | --- | --- | --- |
 | Custodian | ✓ | `custodian.png`, `custodian_rigged.glb` | Received. |
 | Custodian suit modules | P3 | `custodian_suits.png` | `Four versions of the same astronaut suit side by side: heat-shielded with gold reflective plates; cold-insulated with quilted padding and fur-like trim; toxin-filter with a big round filter backpack and mask; pressure-sealed with extra rings and a glass collar.` (reference `custodian.png`). Suit modules may be added as attachments, so no new 3D model unless Claude asks. |
-| SARATHI | P2 | `sarathi_turnaround.png`, `sarathi.glb` | `A small floating drone shaped like a lotus bud: off-white ceramic petals that can open and close, a copper ring around the middle, one large warm amber eye-lens, small thruster glow underneath, a cracked petal showing it is damaged.` (reference `sarathi.png`). Single object, not rigged; Claude animates petals in code if the petals are separate parts. |
-| Prof. Orion Huxley | ✓ concept and turnarounds · ⏳ **3D model next** (use `turnaround/huxley_front_square.png`) | `huxley.png`, `huxley_turnaround.png`, `huxley_rigged.glb` | `A specific individual with consistent features: an older scientist, around sixty, kind and tired face, short grey beard, round glasses, long lab coat over a simple high-collared mission uniform with a small lotus emblem, hands that like to gesture when he talks.` In the game he appears as a blue-gold hologram: Claude adds the hologram look in code, so make him in normal colours. Mixamo clips: Talking, Thinking, Pointing, Idle. |
+| SARATHI | ✓ model (2026-10-29) | `sarathi_turnaround.png`, `sarathi.glb` | `A small floating drone shaped like a lotus bud: off-white ceramic petals that can open and close, a copper ring around the middle, one large warm amber eye-lens, small thruster glow underneath, a cracked petal showing it is damaged.` (reference `sarathi.png`). Single object, not rigged; Claude animates petals in code if the petals are separate parts. |
+| Prof. Orion Huxley | ✓ concept, turnarounds, rigged model and clips (2026-10-29) | `huxley.png`, `huxley_turnaround.png`, `huxley_rigged.glb` | `A specific individual with consistent features: an older scientist, around sixty, kind and tired face, short grey beard, round glasses, long lab coat over a simple high-collared mission uniform with a small lotus emblem, hands that like to gesture when he talks.` In the game he appears as a blue-gold hologram: Claude adds the hologram look in code, so make him in normal colours. Mixamo clips: Talking, Thinking, Pointing, Idle. |
 | Alion Voss | P3 | `voss.png`, `voss_turnaround.png`, `voss_rigged.glb` | `A friendly alien traveller: tall and slender, smooth blue-grey skin with soft bioluminescent freckles, large dark eyes, two small head-fins, wearing a patched space jacket with many pockets and a homemade radio device on the belt; curious, brave, a little tired.` Humanoid so Mixamo works. Clips: Idle, Talking, Waving, Walking, Sitting (trapped pose: Lying idle). |
 | Jivagraha people | P3 | `people_jiva.png` | `A small community of gentle forest people about one metre tall, moth-like with soft fuzzy antennae, woven leaf cloaks, carrying lanterns of glowing fungus; they tend giant mushroom gardens.` |
 | Taptashila people | P3 | `people_tapta.png` | `Sturdy miner people with stone-like shell plates on their backs, small bright eyes, heavy gloves, living in carved cliff homes lit by lava light; traders of metals.` |
@@ -266,7 +270,7 @@ Save to `art-inbox/concept/`. Show each one **calm** (friendly, glowing) and **r
 
 | File | Status | Prompt |
 | --- | --- | --- |
-| `guardian_root.png` (again) | P1 | `A colossal faceless guardian made of living roots and mossy bark rising from a glowing forest, a crown of root tips carrying soft golden light, mushrooms and ferns on its shoulders, a tiny astronaut for scale; calm, ancient, gentle. No face, no eyes, no beard.` Then `guardian_root_restless.png`: `The same faceless giant root guardian rising from the forest, its glowing roots tense and lifting the ground, mushrooms dimming, birds flying away; majestic and sad, not attacking.` |
+| ✓ `guardian_root.png` and `guardian_root_restless.png` (faceless, 2026-10-29) | ✓ | `A colossal faceless guardian made of living roots and mossy bark rising from a glowing forest, a crown of root tips carrying soft golden light, mushrooms and ferns on its shoulders, a tiny astronaut for scale; calm, ancient, gentle. No face, no eyes, no beard.` Then `guardian_root_restless.png`: `The same faceless giant root guardian rising from the forest, its glowing roots tense and lifting the ground, mushrooms dimming, birds flying away; majestic and sad, not attacking.` |
 | ✓ `guardian_magma.png` | ✓ | Add `guardian_magma_calm.png`: `The same lava serpent resting peacefully in a cooled lava lake, its glow soft and gentle, heat lichen blooming around it.` |
 | `guardian_dune.png` | P3 | `The Dune Leviathan: an enormous creature that swims through desert sand like a whale through water, its back covered in overlapping plates of translucent silica glass that glow when the sun hits them, a huge gentle eye, sand pouring off it as it surfaces; a tiny astronaut on a dune for scale. Calm and majestic.` + `guardian_dune_restless.png` (`...the same creature restless, raising sandstorms with its fins, dunes trembling, not attacking.`) |
 | ✓ `guardian_ice.png` | ✓ | Add `guardian_ice_restless.png`: `The same ice leviathan deep under the ice, releasing clouds of glowing ink that dim every light around it, restless, not attacking.` |
@@ -312,7 +316,7 @@ Turnaround to `art-inbox/turnaround/<name>.png`, model to `art-inbox/models/<nam
 | `settling_pond` | *code* | Claude makes this (it is mostly water). |
 | `vehicle_bay` | 4 m | `A vehicle bay: an open-fronted garage with an arched ceramic roof, a copper crane arm, a turntable platform, tool racks, amber lights; big enough for a small rover.` |
 | `launch_pad` | 3 m (pad 12 m wide) | `A round rocket launch pad: a wide stepped ceramic platform with lotus-petal blast shields around the edge, four copper gantry towers with fuel hoses, glowing landing ring lights.` |
-| `escape_module` | 3 m | `A crashed escape capsule: rounded off-white ceramic and copper pod, half tilted, scorch marks, a cracked round window, a door hanging open, one cryo-pod visible inside with faint amber light.` |
+| `escape_module` | 3 m | (reference: `concept/jiva_crash_site.png`) `A crashed escape capsule: rounded off-white ceramic and copper pod, half tilted, scorch marks, a cracked round window, a door hanging open, one cryo-pod visible inside with faint amber light.` |
 | `cryo_pod` | 2.2 m | `A cryo-sleep pod: a reclined capsule with a curved frosted glass lid, ceramic body, copper pipes, small amber warning lights, mist spilling out.` |
 
 ### 6.4 P3: later worlds

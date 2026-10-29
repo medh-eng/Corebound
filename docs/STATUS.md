@@ -2,6 +2,32 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
+## 2026-10-29
+
+**Your uploads, now in the game** (press Ctrl+F5 first):
+- **SARATHI** floats beside you, off your left shoulder (lower in tunnels), bobbing and leaning as it follows. When it speaks, two rings of light and a soft beam open above its petals. The 3D tool had turned the hologram face in the concept into a dark ball above the petals; the Director cut it off, which also keeps the "no faces on drones" rule. Its paintwork glows a little at night. https://medh-eng.github.io/Corebound/
+- **Prof. Huxley** is rigged with your five Mixamo clips (Breathing Idle, Talking, Talking 2, Thinking, Pointing). He appears as a full-body blue-gold hologram on a projector beside the text of his recordings, changing gestures as he talks. Logs are placed in the world in M4; to see him now: https://medh-eng.github.io/Corebound/?log=huxley_01 (press Start; his message opens after about 6 seconds).
+- **Root Guardian, calm and restless, faceless:** exactly right. Taken as your answer to the open question: Mooladri is faceless, with a crown of glowing root tips (logged in the GDD).
+- **Crash site** and **star-system overview**: the loading screen now shows one of three pictures at random (key art, crash site, star system). The crash site is the reference for the escape module.
+- **Tidied:** `guardian_root-.png` became `guardian_root.png` (the bearded one is kept in the history); `sarthi.glb` became `sarathi.glb`; Huxley's clips moved into `art-inbox/models/huxley/`; the four store images uploaded again into `concept/` were exact copies of the ones in `style/`, so the copies were removed.
+
+**Problems found and fixed in the tools (no work for you):**
+- Huxley's model was uploaded to Mixamo centred on his middle, while Mixamo's animations stand on the ground, so every clip lifted him about half a metre into the air. The rig tool now moves the clips back onto his body.
+- The asset tool measured rigged characters by their mesh instead of their skeleton; it now measures the skeleton.
+- The rig tool now takes any character (`npm run rig -- huxley`), with clips in `art-inbox/models/<character>/` (Director task D-003 done).
+
+**Checked:** 159 unit tests, the M2 factory playtest (station → research → drill → belt → smelter → silo with 5 plates), the mouse playtest, screenshots by day and night with SARATHI speaking, Huxley's hologram in two recordings, `npm run build`.
+
+**No worker deliveries** since the handoff: nothing new in `team-inbox/` and no open pull requests. T-021, T-022, T-023 and T-024 are still waiting to be passed to the workers.
+
+**New worker tasks:** T-025 store page text and an AI-disclosure draft (ChatGPT chat), T-026 a text size setting (ChatGPT Codex, after T-021). T-024 (Sarvam) now also covers the new concepts and the Huxley and SARATHI models (pictures in `docs/review/2026-10-29/`).
+
+**Waiting for the Commander:**
+- Which 3D tool made `huxley.glb` and `sarathi.glb` (for the licences list).
+- Play M2 and M3 and say "go" for M4.
+- Pass T-021 and T-026 to ChatGPT Codex, T-022 and T-025 to ChatGPT chat, T-023 and T-024 to Sarvam.
+- Next art: the escape module and cryo-pod (the demo opens inside them), then the creatures and props (checklist at the top of PROMPTS.md).
+
 ## 2026-10-28
 
 - **Sound effects** are from Pixabay (Commander). Recorded in `docs/LICENCES.md`; the Credits now say "Music and sound effects: artists on Pixabay".

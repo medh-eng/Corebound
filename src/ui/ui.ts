@@ -6,6 +6,9 @@ import { ITEMS, RECIPES, type ItemId, type Recipe } from '../data/items';
 import { RESEARCH, type ResearchNode } from '../data/research';
 import type { Slot } from '../systems/inventory';
 import { TIPS } from '../data/tips';
+
+/** Pictures behind the loading screen (the Commander's art), one chosen at random. */
+const LOADING_ART = ['key_art', 'crash_site', 'system_overview'];
 import type { StoryLog } from '../data/logs';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
@@ -54,7 +57,7 @@ export class UI {
   constructor() {
     const keys = KEYS.map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
     document.body.insertAdjacentHTML('beforeend', `
-      <div id="loading" style="background-image:url('${assetUrl('ui/key_art.webp')}')">
+      <div id="loading" style="background-image:url('${assetUrl(`ui/${LOADING_ART[Math.floor(Math.random() * LOADING_ART.length)]}.webp`)}')">
         <div class="box"><img alt="Corebound" src="${assetUrl('ui/logo.webp')}"><div class="msg">Preparing Jivagraha</div><div class="bar"><i></i></div><div class="tip"></div></div>
       </div>
       <div id="title" class="hidden">
@@ -108,6 +111,7 @@ export class UI {
       </div></div>
       <div id="log" class="hidden" role="dialog" aria-modal="true" aria-labelledby="log-title" aria-describedby="log-speaker log-transcript">
         <div class="card" tabindex="-1">
+          <canvas id="log-holo" aria-hidden="true"></canvas>
           <div id="log-speaker"></div>
           <h2 id="log-title"></h2>
           <div class="log-reading">

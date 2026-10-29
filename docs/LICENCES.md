@@ -21,7 +21,12 @@ Pixabay Content License: free for commercial use, no attribution required; the f
 
 ## Images, models and video
 
-Made by the Commander with AI tools (Gemini for images; image-to-3D tools for models; Mixamo for animation). Before release: list the tool for each 3D model and check each tool's terms for commercial use (see PROMPTS.md §11), and write the Steam AI-content disclosure.
+Made by the Commander with AI tools (Gemini for images; image-to-3D tools for models; Mixamo for animation).
+
+| Model | Made with | Animation |
+| --- | --- | --- |
+| `huxley.glb` (2026-10-29) | *tool not yet recorded: asked the Commander* | Mixamo (Breathing Idle, Talking, Talking 2, Thinking, Pointing) |
+| `sarathi.glb` (uploaded as `sarthi.glb`, 2026-10-29) | *tool not yet recorded: asked the Commander* | none (animated in code) | Before release: list the tool for each 3D model and check each tool's terms for commercial use (see PROMPTS.md §11), and write the Steam AI-content disclosure.
 
 ## Writing
 

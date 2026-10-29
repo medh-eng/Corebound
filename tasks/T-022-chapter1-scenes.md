@@ -26,3 +26,4 @@ M4 turns Jivagraha into a finished demo. Your memory logs (T-001) are in; these 
 - **No violence.** Mooladri is calmed, never defeated, hurt, stunned or "beaten". No weapon words (no "fire", "target", "shoot"; the laser is a mining tool).
 - SARATHI: one sentence of guidance, then at most one dry remark. Lines under 30 words, said aloud in under 8 seconds.
 - British spelling. Keep "the bloom" in English in these lines (its Codex name is Sakshi).
+- **Mooladri has no face** (decided 2026-10-29): a giant of roots and mossy bark with a crown of glowing root tips. Never write eyes, a face, a gaze or a voice for it; show its mood through its roots, the ground, the light in its crown and the forest around it. Look at `art-inbox/concept/guardian_root.png` and `guardian_root_restless.png`.

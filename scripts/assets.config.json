@@ -69,6 +69,17 @@
       "targetTriangles": 6000,
       "height": 0.55,
       "textureSize": 1024
+    },
+    "huxley_rigged": {
+      "targetTriangles": 40000,
+      "height": 1.78,
+      "textureSize": 1024
+    },
+    "sarathi": {
+      "cutAbove": 0.75,
+      "targetTriangles": 15000,
+      "height": 0.65,
+      "textureSize": 1024
     }
   },
   "images": {
@@ -124,6 +135,16 @@
       "dir": "sky",
       "unmark": true,
       "pano": true
+    },
+    "crash_site": {
+      "src": "concept/jiva_crash_site.png",
+      "width": 1920,
+      "unmark": true
+    },
+    "system_overview": {
+      "src": "concept/system_overview.png",
+      "width": 1920,
+      "unmark": true
     }
   }
 }

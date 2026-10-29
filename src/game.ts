@@ -8,6 +8,8 @@ import { researchById } from './data/research';
 import { CODEX, codexById } from './data/codex';
 import { RESEARCH_LINES, MACHINE_LINES, EVENT_LINES } from './data/lines';
 import { CHAPTER1_GOALS, SARATHI_EVENTS } from './data/story';
+import { SarathiDrone } from './render/sarathi';
+import { HoloPortrait } from './render/hologram';
 import { Terrain } from './core/terrain';
 import { VoxelWorld, type Dig } from './core/voxels';
 import { Mat } from './core/geology';
@@ -57,6 +59,7 @@ export interface GameOptions {
   dist?: number;
   near?: string;        // testing: start near a landmark kind (e.g. 'banyan')
   alt?: number;         // testing: start this many metres in the air
+  log?: string;         // preview: open this memory log a few seconds after the game starts
 }
 
 const SAVE_KEY = 'corebound.save.v1';
@@ -241,6 +244,11 @@ export async function startGame(opts: GameOptions) {
   const player = new PlayerView();
   await player.load();
   scene.add(player.root, player.tool);
+  // SARATHI floats beside you and opens a ring of light whenever it speaks.
+  const drone = new SarathiDrone();
+  await drone.load();
+  scene.add(drone.root);
+  { const say = ui.sarathi.bind(ui); ui.sarathi = (line: string, seconds = 7) => { drone.speak(Math.min(seconds, 2 + line.length / 18)); say(line, seconds); }; }
   const me: MoverState = {
     pos: P(spawnPoint.clone().addScaledVector(up0, 0.05)), vel: { x: 0, y: 0, z: 0 },
     heading: P(forward), grounded: true, jetFuel: 1, jetting: false,
@@ -502,7 +510,13 @@ export async function startGame(opts: GameOptions) {
   const openCodex = () => { sound.uiOpen(); ui.renderCodex(codexKnown, codexNew); ui.setCodex(true); codexNew.length = 0; if (document.pointerLockElement) document.exitPointerLock(); };
   const closeCodex = () => { ui.setCodex(false); if (playing && !opts.shot) input.lock(); };
   // Memory logs (T-019 viewer). World placement comes in M4; for now only the test hook opens one.
-  const openLog = (id: string, reaction?: string) => { const log = CHAPTER1_LOGS.find((l) => l.id === id); if (!log) return false; sound.uiOpen(); ui.showLog(log, reaction); if (document.pointerLockElement) document.exitPointerLock(); return true; };
+  const huxley = new HoloPortrait();
+  const openLog = (id: string, reaction?: string) => {
+    const log = CHAPTER1_LOGS.find((l) => l.id === id); if (!log) return false;
+    sound.uiOpen(); ui.showLog(log, reaction);
+    if (/huxley/i.test(log.speaker ?? '')) void huxley.start(document.getElementById('log-holo') as HTMLCanvasElement);
+    if (document.pointerLockElement) document.exitPointerLock(); return true;
+  };
   const closeLog = () => { ui.hideLog(); if (playing && !opts.shot) input.lock(); };
   const openResearch = () => { sound.uiOpen(); renderResearch(); ui.setResearch(true); if (document.pointerLockElement) document.exitPointerLock(); };
   const closeResearch = () => { ui.setResearch(false); if (playing && !opts.shot) input.lock(); };
@@ -557,6 +571,7 @@ export async function startGame(opts: GameOptions) {
     if (!opts.shot) input.lock();
     setTimeout(() => ui.toast('Jivagraha'), 3800);
     setTimeout(() => ui.sarathi(CHAPTER1_GOALS[goalIndex].sarathi, 10), d ? 1000 : 5200);
+    if (opts.log) setTimeout(() => openLog(opts.log!), 6500);
   };
 
   if (opts.view === 'orbit') { rig.mode = 'orbit'; rig.orbitPitch = 0.75; }
@@ -1191,6 +1206,7 @@ export async function startGame(opts: GameOptions) {
     }
 
     player.update(dt, pos, up, V(me.vel), heading, me.grounded, me.jetting, shared.uTime.value);
+    drone.update(dt, pos, up, heading, { visible: playing && rig.mode === 'follow', underground });
     laser.update(dt, laserTo ? player.muzzle : null, laserTo, laserN);
     rig.update(dt, pos, up, heading);
   };
@@ -1209,6 +1225,9 @@ export async function startGame(opts: GameOptions) {
     base: () => base,
     codex: () => [...codexKnown],
     showLog: (id: string, reaction?: string) => openLog(id, reaction),
+    /** Opens a log and waits until Huxley's hologram has drawn (for screenshots). */
+    showLogReady: async (id: string) => { openLog(id); await huxley.start(document.getElementById('log-holo') as HTMLCanvasElement); huxley.renderOnce(2.2); },
+    say: (line: string, seconds?: number) => ui.sarathi(line, seconds),
     openCodex: () => { codexKnown.push(...CODEX.slice(0, 6).map((c) => c.id).filter((id) => !codexKnown.includes(id))); openCodex(); },
     pollute: (air: number, water: number, soil: number) => {
       base.harmony.air = air; base.harmony.water = water; base.harmony.soil = soil;

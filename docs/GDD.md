@@ -217,7 +217,7 @@ Rendered through sky/fog colour, vegetation shader parameters, water tint, parti
 
 | World | Guardian (name, meaning) | Puzzle | Ally bonus |
 | --- | --- | --- | --- |
-| Jivagraha | Root Guardian: **Mooladri** (root-mountain) | Seismic scan → move drills off its roots; bio-filters clear smog; replant bloom spores | Flora absorbs 2× |
+| Jivagraha | Root Guardian: **Mooladri** (root-mountain; faceless, crown of glowing root tips) | Seismic scan → move drills off its roots; bio-filters clear smog; replant bloom spores | Flora absorbs 2× |
 | Taptashila | Magma Serpent: **Shailasarpa** (rock-serpent) | Ease vent pressure; re-route lava channels; plant heat lichen | Geothermal +50% |
 | Marubhumi | Dune Leviathan: **Balukavela** (sand-tide; silica-shelled, swims through sand) | Resonance emitter to steer it; restore an old oasis; stop drills shaking its dunes | Sandstorms reveal buried ore |
 | Himasagara | Ice Leviathan: **Himavela** (ice-tide; deep, bioluminescent) | Sonar beacons to guide it; restore vent heat; feed an algae cycle | Free heat near vents |
@@ -279,7 +279,7 @@ Rules: wow in minute one; hands busy by minute 3; three goals always visible; so
 
 - **The Custodian:** scientist, memory lost, lean white modular science suit (non-military). Carries the last Seeds of Humanity after Earth's destruction.
 - **Project Amarnath:** the secret Earth mission to carry humanity's seeds and a terraforming engine to a new star. Its true nature is revealed slowly.
-- **SARATHI:** damaged ship AI (lotus-shaped drone); guide with dry humour; bound by one directive: save the Seeds of Humanity.
+- **SARATHI:** damaged ship AI (lotus-shaped drone that floats beside you; rings of light open above it when it speaks); guide with dry humour; bound by one directive: save the Seeds of Humanity.
 - **Prof. Orion Huxley:** chief scientist of Project Amarnath, seen only as holograms in the wreckage. His first message (in the crashed ship's main deck) tells you about Project Amarnath, sends you to the front deck for the **translator**, and says the ship's manual in the damaged **control room** holds the truth.
 - **Alion Voss:** an alien traveller. After you get the translator you pick up his distress signal from an asteroid; he is trapped under his wrecked ship and speaks an unknown language. He asks you to drive off a **Szynthar** with his **resonance emitter** (a high-frequency radio device; it scares, never hurts). Once free he tells you the Szynthars' homeworld, their dislike of high-frequency sound, and that a "luminous object" appeared there centuries ago and life has flourished since. He gives you the emitter and becomes a recurring ally and quest-giver.
 - **Alien communities** on each world: quests, trade deals and pieces of the truth (see §11).
@@ -381,4 +381,8 @@ Calm / Standard / Engineer difficulty; Sandbox after world 1. Autosave + 3 manua
 | 2026-10-27 | Credits add a thank-you to the craft traditions that shaped the look and music (Warli, Manganiyar and Langa, dhokra, bidri) and a music credit to Pixabay artists | Commander's decision (Sarvam's suggestion) |
 | 2026-10-28 | Sound effects are from Pixabay; the Credits say "Music and sound effects: artists on Pixabay" | Commander |
 | 2026-10-28 | Jivagraha's plants, rocks and the bloom get Codex names (Sarvam's suggested set; the bloom is **Sakshi**, "witness"); the HUD and goals keep the English words; the bloom is never a "0 of N" collectible | Director, under the Commander's "choose your names" |
+| 2026-10-29 | **Mooladri is faceless**: a giant of roots and mossy bark with a crown of glowing root tips; restless, its roots glow and lift the ground (the Commander's new concepts `guardian_root` and `guardian_root_restless`) | Commander answered the open question by remaking the concept without a face (Sarvam: a face read as a tree god) |
+| 2026-10-29 | SARATHI floats beside the Custodian (off the left shoulder, lower in tunnels) as the Commander's lotus-bud model; when it speaks, two rings of light and a soft beam open above its petals. No face: the concept's hologram face became rings only | Style bible: no faces on drones; gives SARATHI's lines a body before M4 |
+| 2026-10-29 | Prof. Huxley's recordings show him as a full-body blue-gold hologram on a projector beside the text (the Commander's rigged model; talking, thinking and pointing clips) | First use of the Huxley model; the same hologram stands in the wreckage in M4 |
+| 2026-10-29 | The loading screen shows one of three pieces of the Commander's art at random (key art, crash site, star system) | New art arrived |
 | Open | price; repo visibility at launch; final art direction sign-off | **owner** |

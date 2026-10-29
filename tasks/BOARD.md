@@ -21,10 +21,12 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | [T-017](T-017-flora-names.md) | Names for Jivagraha's plants, rocks and the bloom | Sarvam AI | P2 | done ✓ (PR #12; Sarvam's suggested set is in the Codex) |
 | [T-019](T-019-log-viewer.md) | The memory-log viewer (M4) | ChatGPT (Codex) | P1 | done ✓ (PR #13; wired to E/Esc; logs placed in M4) |
 | [T-020](T-020-codex-machines.md) | Codex entries for the remaining machines and items | ChatGPT (chat) | P2 | done ✓ (PR #14; 8 entries in the Codex) |
-| [T-021](T-021-codex-logs-tab.md) | A "Logs" tab in the Codex (M4) | ChatGPT (Codex) | P1 | todo (new) |
-| [T-022](T-022-chapter1-scenes.md) | Chapter 1 scenes: waking up, the Root Guardian, the lift-off | ChatGPT (chat) | P1 | todo (new) |
+| [T-021](T-021-codex-logs-tab.md) | A "Logs" tab in the Codex (M4) | ChatGPT (Codex) | P1 | todo (not received yet) |
+| [T-022](T-022-chapter1-scenes.md) | Chapter 1 scenes: waking up, the Root Guardian, the lift-off | ChatGPT (chat) | P1 | todo (not received yet) |
 | [T-023](T-023-flora-respellings.md) | Voice respellings for the plant and rock names | Sarvam AI | P3 | todo (new) |
-| [T-024](T-024-art-review-rest.md) | Cultural review of the remaining concepts and the turnarounds | Sarvam AI | P2 | todo (new) |
+| [T-024](T-024-art-review-rest.md) | Cultural review of the remaining concepts, the new art and the Huxley and SARATHI models | Sarvam AI | P2 | todo (widened 2026-10-29) |
+| [T-025](T-025-store-page-text.md) | Store page text for the demo (itch.io and Steam), AI disclosure draft | ChatGPT (chat) | P2 | todo (new) |
+| [T-026](T-026-codex-text-size.md) | A text size setting | ChatGPT (Codex) | P2 | todo (new; start after T-021) |
 | [T-018](T-018-codex-text.md) | Codex entries for Jivagraha and Harmony | ChatGPT (chat) | P2 | done ✓ (PR #11; in the game) |
 
 ## Commander
@@ -34,15 +36,21 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | [T-007](T-007-commander-art-p1.md) | Jivagraha textures and night sky | P1 | done ✓ |
 | [T-008](T-008-commander-audio-p1.md) | Music and sound effects | P1 | music mostly done ✓; machine loops and ambience still wanted (see PROMPTS.md checklist) |
 | [T-009](T-009-commander-models-m2.md) | Machine models for M2 | P1 | done ✓ (all in the game) |
-| [T-015](T-015-commander-art-m3.md) | Art for M3: creatures, restless Guardian, plants, Sabatier reactor | P2 | todo (new) |
-| — | Turn on GitHub Pages (Settings → Pages → Source: GitHub Actions) | — | **needed to publish** |
-| — | Play M2 and give feedback | — | **next** |
+| [T-015](T-015-commander-art-m3.md) | Art for M3: creatures, restless Guardian, plants, Sabatier reactor | P2 | restless Guardian done ✓ (2026-10-29); creatures and Sabatier reactor still to do |
+| — | Huxley 3D model and Mixamo clips | P1 | done ✓ (2026-10-29) |
+| — | SARATHI 3D model | P2 | done ✓ (2026-10-29) |
+| — | Root Guardian without a face | P1 | done ✓ (2026-10-29) |
+| — | Say which 3D tool made Huxley and SARATHI (licences) | P1 | **next** (one line in chat) |
+| — | Escape module and cryo-pod models (reference: `concept/jiva_crash_site.png`) | P1 | **next** |
+| — | Turn on GitHub Pages | — | done ✓ |
+| — | Play M2 and M3, then say "go" for M4 | — | **next** |
 
 ## Director (Claude)
 
 | Task | Title | Status |
 | --- | --- | --- |
 | D-002 | M2 Build and automate | done ✓ (first version) |
-| D-003 | Rig tool: per-character animation folders | todo (before Huxley/Voss arrive) |
+| D-003 | Rig tool: per-character animation folders | done ✓ (2026-10-29: `npm run rig -- huxley`; clips in `art-inbox/models/<character>/`) |
+| D-007 | Huxley hologram and SARATHI drone in the game | done ✓ (2026-10-29) |
 | D-005 | Store art for the store pages and loading screen | M4 |
 | D-006 | M3 Harmony and life | first version done ✓; scanner/Codex waits for T-016/T-017/T-018 |

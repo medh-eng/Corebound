@@ -1,6 +1,6 @@
 // Model viewer: /viewer.html?m=shelter_dome — four views of one processed model.
 import * as THREE from 'three';
-import { loadModel } from '../render/assets';
+import { loadModel, loadAnimated } from '../render/assets';
 import { paintModel } from '../art/paint';
 
 declare global { interface Window { __ready?: boolean } }
@@ -8,6 +8,7 @@ declare global { interface Window { __ready?: boolean } }
 const params = new URLSearchParams(location.search);
 const name = params.get('m') ?? 'custodian';
 const paint = params.get('paint') !== '0';
+const clipName = params.get('clip'); // e.g. ?m=huxley_rigged&clip=talk&t=1.2 poses a rigged character mid-clip
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(1);
@@ -23,16 +24,30 @@ const sun = new THREE.DirectionalLight('#ffe7c2', 2.4);
 sun.position.set(3, 5, 4);
 scene.add(sun);
 
-const model = await loadModel(name);
+let model: THREE.Object3D;
+let clipList = '';
+if (clipName) {
+  const { scene: s, clips } = await loadAnimated(name);
+  model = s;
+  clipList = clips.map((c) => c.name).join(', ');
+  const clip = clips.find((c) => c.name === clipName);
+  if (clip) {
+    const mixer = new THREE.AnimationMixer(model);
+    mixer.clipAction(clip).play();
+    mixer.update(+(params.get('t') ?? '0.5'));
+  }
+} else model = await loadModel(name);
 if (paint) paintModel(name, model);
 scene.add(model);
-const box = new THREE.Box3().setFromObject(model);
+model.updateMatrixWorld(true);
+const box = new THREE.Box3().setFromObject(model, !!clipName);
 const size = box.getSize(new THREE.Vector3());
 const mid = box.getCenter(new THREE.Vector3());
 let tris = 0;
 model.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) tris += (m.geometry.index?.count ?? m.geometry.attributes.position.count) / 3; });
 document.getElementById('label')!.textContent =
-  `${name} — ${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m, ${Math.round(tris).toLocaleString()} triangles`;
+  `${name} — ${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)} m, ${Math.round(tris).toLocaleString()} triangles` +
+  (clipName ? ` — clip ${clipName} (has: ${clipList})` : '');
 
 const cam = new THREE.PerspectiveCamera(30, 1, 0.01, 100);
 const dist = Math.max(size.x, size.y, size.z) * 2.6;
