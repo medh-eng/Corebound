@@ -41,6 +41,10 @@ for (const [name, cfg] of Object.entries(config.models)) {
   const before = triangles(doc);
 
   if (cfg.cutAbove) cutAbove(doc, cfg.cutAbove);
+  // Some AI tools bake 'fully metal' into the metal/roughness map, which renders black without reflections.
+  // A blank (all-black) colour map from the tool: drop it and use a flat tint until the owner re-exports.
+  if (cfg.tint) for (const m of doc.getRoot().listMaterials()) { m.setBaseColorTexture(null); m.setBaseColorFactor(cfg.tint); }
+  if (cfg.metallic != null) for (const m of doc.getRoot().listMaterials()) m.setMetallicFactor(cfg.metallic);
   await doc.transform(dedup(), weld({ tolerance: 0.0001 }));
   // Simplify in passes until under budget (AI meshes can be very dense).
   for (let pass = 0; pass < 4 && triangles(doc) > cfg.targetTriangles; pass++) {
