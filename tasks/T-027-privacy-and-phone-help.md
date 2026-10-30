@@ -1,7 +1,7 @@
 # T-027: Privacy notice and "playing on a phone" help
 
 - **Assigned to:** ChatGPT (chat)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P2 (phone track P3 and M4: needed for the Play Store and the store pages)
 - **Deliver to:** `team-inbox/writing/T-027-privacy-and-phone-help.md`
 
