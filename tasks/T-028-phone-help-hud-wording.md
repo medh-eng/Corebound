@@ -1,7 +1,7 @@
 # T-028: Phone help card and HUD wording fixes (issues #23 and #25)
 
 - **Assigned to:** ChatGPT (Codex)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P1
 - **Branch:** `chatgpt/T-028-phone-help-hud-wording`
 

@@ -265,7 +265,12 @@ body.touch #vitals, body.touch #goals, body.touch #res, body.touch #gear, body.t
 body.touch #planet, body.touch #toast { zoom: var(--ui-scale); }
 body.touch #pack .card, body.touch #build .card, body.touch #research .card, body.touch #codex .card, body.touch #pause .card,
 body.touch #log .card, body.touch #credits .card { zoom: var(--ui-scale); max-height: calc(92vh / var(--ui-scale)); overflow-y: auto; overscroll-behavior: contain; }
-body.touch #help { display: none; }
+body.touch #help { display: block; top: 110px; bottom: auto; left: max(8px, env(safe-area-inset-left)); width: calc(40vw - max(8px, env(safe-area-inset-left))); max-width: 40vw; box-sizing: border-box; padding: 5px 8px; }
+.phone-help { text-align: left; line-height: 1.4; }
+.phone-help p { margin: 0; }
+.phone-help p + p { margin-top: 4px; }
+body.touch #help .phone-help { font-size: 10px; line-height: 1.2; }
+body.touch #help .phone-help p + p { margin-top: 1px; }
 body.touch #stats { top: auto; bottom: 120px; right: 12px; zoom: var(--ui-scale); }
 body.touch #sarathi { bottom: auto; top: 118px; }
 body.touch #prompt { top: 64%; }
