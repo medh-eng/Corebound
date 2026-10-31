@@ -2,6 +2,13 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
+## 2026-10-31
+- **Merged T-029 (PR #27):** touch movement now recovers from every interrupted gesture (finger lifted outside, cancelled touch, lost capture, panels, app in background, rotation, a new thumb taking over). Director change: the joystick is no longer reset on page resize, because Chrome's address bar resizes the page and that could itself stop a walk. Phone playtest: 13 of 13 checks pass, including a real 60-second walk.
+- **Merged T-005 voice (PR #21):** SARATHI speaks her 57 recorded lines (Bulbul, ishita) with a voice volume slider. Director fix: the code looked for `sarathi_goal_ice.mp3` but the files are `goal_ice.mp3`, so nothing would have played; a new test now checks every line has its file.
+- 190 tests pass; build passes.
+- **Still waiting on workers:** T-028 (phone help, HUD wording), T-026 changes (rebase plus screenshots), T-030, T-031, T-032, T-033. New: T-034 (music dips under voice), T-035 (listening review).
+- **Still waiting on the Commander:** colour re-export of `sabatier_reactor` and `cryo_pod`; phone retest; Mooladri's body.
+
 ## 2026-10-30
 - **Models:** `cryo_pod`, `vehicle_bay` and `sabatier_reactor` arrived and are processed (20k, 24k and 15k triangles; 332, 606 and 426 KB). The Sabatier reactor now uses the Commander's model (2.1 m tall, footprint radius 1.35). Cryo pod and vehicle bay are ready for M4. The Sabatier and cryo-pod files have an all-black colour texture, so the pipeline tints them plain copper/ceramic (new `tint` and `metallic` options) until they are re-exported.
 - **Merged:** T-027 privacy notice and phone help (PR #26).

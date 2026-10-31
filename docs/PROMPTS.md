@@ -13,12 +13,37 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 
 **✓** = received and in the game. **⏳** = wanted next. Rows without a mark are for later milestones. *code* = Claude makes it, so don't spend credits on it. The Director updates this list every time you upload.
 
+### ✓ Done recently (Director updates this)
+
+| Date | What | Result |
+| --- | --- | --- |
+| 31 Oct | **SARATHI's voice** (T-005): your 57 Bulbul recordings | ✓ In the game, with a voice volume slider in Settings |
+| 31 Oct | **Android movement lock** fix (T-029, issue #24) | ✓ In the game; all 13 phone checks pass |
+| 30 Oct | `vehicle_bay.glb` | ✓ Perfect, ready for M4 |
+| 30 Oct | `sabatier_reactor.glb`, `cryo_pod.glb` | ✓ Shapes in the game (Sabatier is now a placeable machine), but the colours are missing: see item 1 below |
+| 30 Oct | Privacy notice and phone help text (T-027) | ✓ Approved; goes on screen with T-028 |
+| 29 Oct | Huxley, SARATHI, faceless Root Guardian, Android controls | ✓ In the game |
+
+### Agents: what to paste next
+
+| Agent | Paste | Status |
+| --- | --- | --- |
+| ChatGPT Codex | `Do tasks/T-028-phone-help-hud-wording.md in medh-eng/Corebound. Follow AGENTS.md.` | ⏳ next |
+| ChatGPT Codex | `Finish tasks/T-026-codex-text-size.md in medh-eng/Corebound: do the "Changes requested" section on the existing branch. Follow AGENTS.md.` | ⏳ waiting since 30 Oct |
+| ChatGPT Codex | `Do tasks/T-034-voice-ducking-subtitles.md in medh-eng/Corebound. Follow AGENTS.md.` | ⏳ new |
+| ChatGPT chat | Writer intro (HANDOFF §3c), then the text of `tasks/T-030-codex-m4-entries.md`; then `tasks/T-031-chapter1-goals-hints.md` | ⏳ waiting since 30 Oct |
+| Sarvam AI | Adviser intro (HANDOFF §3d), then `tasks/T-032-review-new-models-mooladri.md` with model screenshots | ⏳ waiting since 30 Oct |
+| Sarvam AI | `tasks/T-033-hindi-marathi-ui.md` | ⏳ waiting since 30 Oct |
+| Sarvam AI | `tasks/T-035-voice-listening-review.md` (play it the voice files) | ⏳ new |
+
+Upload writing answers to `team-inbox/writing/` with the file name the task gives. Codex opens its own pull request.
+
 ### ⏳ Needed from you next, in this order
 
 | # | What | Where it goes | Prompt |
 | --- | --- | --- | --- |
 | 1 | **Re-export `sabatier_reactor.glb` and `cryo_pod.glb` with their colours.** ✓ All three arrived on 30 Oct and vehicle bay is perfect, but these two have an **all-black colour texture** (shape only, no paint). In Triple 3D, re-export with textures/PBR on, check the preview is coloured, and upload with the same names. Meanwhile the game shows them in plain copper and ceramic | `art-inbox/models/` | §6.3 |
-| 2 | **After the phone fixes (T-028, T-029) land, play on your phone again**: walk for 5 minutes, open panels, lock and unlock the phone. Tell the Director if movement ever stops, and the frame rate (`?fps=1`) | — | — |
+| 2 | **Play on your phone again now** (the movement fix is live): walk for 5 minutes, open and close panels, lock and unlock the phone. Tell the Director if movement ever stops, and the frame rate (add `?fps=1` to the address). Phone help and HUD wording get fixed in T-028 | — | — |
 | 3 | **Decide Mooladri's body** (no art needed yet): keep your humanoid giant of roots, or Sarvam's suggestion, a **buttressed trunk** with branch-limbs ending in root clusters (no shoulders, chest or fingers)? The crown of glowing root tips stays either way | — | `team-inbox/writing/T-012-art-followup.md` §7.1 |
 | 4 | **Escape module** (the demo opens inside it): turnaround image, then textured GLB. Attach `concept/jiva_crash_site.png` as the reference. Sarvam's note: give it a flatter side, landing legs and a hatch frame, and a squared duct instead of a flared pipe, so it reads as a capsule and not a pot | `art-inbox/turnaround/`, `art-inbox/models/escape_module.glb` | §6.3 |
 | 5 | **Jivagraha creatures as 3D**: a gentle grazer and a small burrower (turnaround image, then textured GLB) | `art-inbox/turnaround/`, `art-inbox/models/` | §5.1, task T-015 |
@@ -28,7 +53,7 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 | 9 | **Machine sound loops**: `auto_drill_loop`, `conveyor_loop`, `research_loop`, `coal_burner_loop`, `electrolyzer_loop`, `battery_hum`, `solar_lotus_open` | `art-inbox/audio/sfx/` | §13.4 |
 | 10 | **Ambience**: `amb_jiva_day`, `amb_jiva_night`, `amb_cave` | `art-inbox/audio/sfx/` | §13.7 |
 | 11 | **Music still missing**: `memory_log`, `spaceflight` | `art-inbox/audio/music/` | §12 |
-| 12 | **Voice test** (T-005): record SARATHI's 5 test lines in Sarvam Bulbul | `art-inbox/audio/voice/tests/` | §14 and `art-inbox/audio/voice/tests/T-005-voice-test-sheet.md` |
+| 12 | ✓ **Voice** (T-005): done, 57 lines in the game. Next: re-record any lines Sarvam flags in T-035 | `public/assets/audio/voice/` (same names) | §14 |
 | 13 | **Teaser clips** for the demo trailer | `art-inbox/video/` | §10 |
 
 **Play on an Android phone** (new, 29 October): open https://medh-eng.github.io/Corebound/ in Chrome on the phone, turn it sideways and tap New game (it goes full screen). Left thumb: touch anywhere on the left and slide to walk (push to the edge to run). Right thumb: drag to look; hold **Mine** and slide to aim the laser. The bottom row has Bag, Build, Belt, Codex, Planet, O₂, Pick up and Dance; ✕ closes a panel. To keep it like an app: Chrome menu ⋮ → **Add to Home screen** (or **Install app**). To see the frame rate, open https://medh-eng.github.io/Corebound/?fps=1 instead.

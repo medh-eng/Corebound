@@ -10,7 +10,7 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | [T-002](T-002-science-cards.md) | Science cards for machines and resources | ChatGPT (chat) | P2 | done ✓ (PR #11; 11 machine cards are now Codex entries) |
 | [T-003](T-003-credits-screen.md) | Credits screen | ChatGPT (Codex) | P1 | done ✓ |
 | [T-004](T-004-names.md) | Names | Sarvam AI | P2 | done ✓; Sarvam's follow-up review (PR #6) fixed three names |
-| [T-005](T-005-sarathi-voice-test.md) | SARATHI voice test | Sarvam AI + Commander | P2 | doing: **Commander to record audio** |
+| [T-005](T-005-sarathi-voice-test.md) | SARATHI voice test | Sarvam AI + Commander | P2 | done ✓ (PR #21, 31 Oct; 57 lines speak in the game; Director fixed the file names) |
 | [T-006](T-006-translations-ch1.md) | Hindi and Marathi, Chapter 1 | Sarvam AI | P3 | waiting (text freeze at M4); glossary and pilot done ✓ (PR #7) |
 | [T-010](T-010-inventory-tests.md) | Unit tests for the backpack and crafting | ChatGPT (Codex) | P1 | done ✓ (PR #5, 47 tests) |
 | [T-011](T-011-loading-tips.md) | Tips on the loading screen | ChatGPT (Codex) | P2 | done ✓ (PR #9) |
@@ -28,12 +28,14 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | [T-025](T-025-store-page-text.md) | Store page text for the demo (itch.io and Steam), AI disclosure draft | ChatGPT (chat) | P2 | done ✓ (PR #18; used for the store pages in M4, after the Commander approves) |
 | [T-026](T-026-codex-text-size.md) | A text size setting | ChatGPT (Codex) | P2 | changes requested: rebase and add 4 screenshots (see task) |
 | [T-027](T-027-privacy-and-phone-help.md) | Privacy notice and "playing on a phone" help | ChatGPT (chat) | P2 | done ✓ (PR #26; phone help goes into the game in T-028) |
-| [T-028](T-028-phone-help-hud-wording.md) | Phone help card and HUD wording fixes (#23, #25) | ChatGPT (Codex) | P1 | todo (new) |
-| [T-029](T-029-android-movement-lock.md) | Android movement sometimes stops (#24) | ChatGPT (Codex) | P1 | todo (new) |
+| [T-028](T-028-phone-help-hud-wording.md) | Phone help card and HUD wording fixes (#23, #25) | ChatGPT (Codex) | P1 | todo: **next for Codex** (start from current main) |
+| [T-029](T-029-android-movement-lock.md) | Android movement sometimes stops (#24) | ChatGPT (Codex) | P1 | done ✓ (PR #27, 31 Oct; Director kept walking through page resizes) |
 | [T-030](T-030-codex-m4-entries.md) | Codex entries for Chapter 1 objects | ChatGPT (chat) | P2 | todo (new) |
 | [T-031](T-031-chapter1-goals-hints.md) | Chapter 1 goals and SARATHI stuck hints | ChatGPT (chat) | P2 | todo (new) |
 | [T-032](T-032-review-new-models-mooladri.md) | Review of three new models; advice on Mooladri's body | Sarvam AI | P2 | todo (new) |
 | [T-033](T-033-hindi-marathi-ui.md) | Hindi and Marathi for controls, tips, phone help, privacy | Sarvam AI | P3 | todo (new) |
+| [T-034](T-034-voice-ducking-subtitles.md) | Music dips while SARATHI speaks; her text stays as long as the voice | ChatGPT (Codex) | P2 | todo (new) |
+| [T-035](T-035-voice-listening-review.md) | Listen to the 57 recordings; list any to redo | Sarvam AI + Commander | P2 | todo (new) |
 | [T-018](T-018-codex-text.md) | Codex entries for Jivagraha and Harmony | ChatGPT (chat) | P2 | done ✓ (PR #11; in the game) |
 
 ## Commander
@@ -49,7 +51,7 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | — | Root Guardian without a face | P1 | done ✓ (2026-10-29) |
 | — | Say which 3D tool made Huxley and SARATHI (licences) | P1 | done ✓ (Triple 3D) |
 | — | Upload again: cryo pod, vehicle bay, Sabatier reactor | P1 | done ✓ (30 Oct); **re-export Sabatier and cryo pod with colours** |
-| — | Play on an Android phone | P1 | done ✓ (issues #23–#25); retest after T-028/T-029 |
+| — | Play on an Android phone | P1 | done ✓ (issues #23–#25); **retest now** (movement fix is live), help/wording after T-028 |
 | — | Decide Mooladri's body: humanoid or buttressed trunk (Sarvam) | P1 | **next** |
 | — | Escape module and cryo-pod models (reference: `concept/jiva_crash_site.png`) | P1 | **next** |
 | — | Turn on GitHub Pages | — | done ✓ |

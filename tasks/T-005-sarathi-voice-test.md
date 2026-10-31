@@ -1,7 +1,7 @@
 # T-005: SARATHI voice test
 
 - **Assigned to:** Sarvam AI (Bulbul text-to-speech), run by the Commander
-- **Status:** doing: recording sheet merged 2026-10-27; the Commander still needs to record the audio in Bulbul from `art-inbox/audio/voice/tests/T-005-voice-test-sheet.md`
+- **Status:** done (31 Oct): 57 English lines recorded and playing in the game (PR #21). Listening review is T-035
 - **Priority:** P2
 - **Deliver to:** `art-inbox/audio/voice/tests/`
 - **Depends on:** nothing

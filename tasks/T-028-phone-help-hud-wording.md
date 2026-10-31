@@ -8,6 +8,9 @@
 ## Goal
 On phones the game still shows keyboard instructions in a big help panel that covers the middle of the screen (#23), and some HUD prompts repeat words: "3 3 iron plate ready", "Pick up pick up", "Use load ice" (#25).
 
+## Note (31 Oct)
+T-029 is merged and changed `src/ui/touch.ts`; start your branch from the current `main`.
+
 ## Read first
 `AGENTS.md`; issues #23 and #25 on GitHub; `src/ui/ui.ts` (the `#help` panel, around line 146, and the prompt texts); `src/ui/touch.ts` (how touch mode rewrites prompts); `src/data/controls.ts`; the "Playing on a phone" section of `team-inbox/writing/T-027-privacy-and-phone-help.md` (approved text).
 
