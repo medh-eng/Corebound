@@ -129,7 +129,14 @@ try {
     window.dispatchEvent(new Event('pagehide'));
     window.dispatchEvent(new Event('pageshow'));
   }));
-  await interrupt('resize', () => page.setViewportSize({ width: 820, height: 360 }));
+  // The address bar sliding in or out resizes the page; a held walk must keep going, not stop.
+  {
+    await startWalk(); await frames(4);
+    await page.setViewportSize({ width: 820, height: 360 }); await frames(2);
+    assert.equal(await page.locator('.t-stick').evaluate((e) => e.classList.contains('hidden')), false, 'walk survives a resize');
+    await touch('touchEnd', []); await released();
+    await restart('resize');
+  }
   await interrupt('rotation', () => page.evaluate(() => {
     window.dispatchEvent(new Event('orientationchange'));
     screen.orientation?.dispatchEvent(new Event('change'));

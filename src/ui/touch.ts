@@ -90,7 +90,6 @@ export class TouchControls {
     window.addEventListener('blur', reset);
     window.addEventListener('pagehide', reset);
     window.addEventListener('pageshow', reset);
-    window.addEventListener('resize', reset);
     window.addEventListener('orientationchange', reset);
     screen.orientation?.addEventListener('change', reset);
 

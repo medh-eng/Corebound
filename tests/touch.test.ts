@@ -122,7 +122,7 @@ describe('touch input recovery', () => {
     Object.defineProperties(e, { pointerId: { value: 1 }, target: { value: look } });
     doc.dispatchEvent(e); expect(input.stick.y).toBe(-1);
   });
-  it.each(['blur', 'pagehide', 'pageshow', 'resize', 'orientationchange'])('releases movement, camera and actions on %s', (event) => {
+  it.each(['blur', 'pagehide', 'pageshow', 'orientationchange'])('releases movement, camera and actions on %s', (event) => {
     walk(); pointer(button('Mouse0'), 'pointerdown', 2, 600); pointer(button('Space'), 'pointerdown', 3, 650);
     pointer(look, 'pointerdown', 4, 500); pointer(look, 'pointermove', 4, 530);
     win.dispatchEvent(new Event(event)); released();
