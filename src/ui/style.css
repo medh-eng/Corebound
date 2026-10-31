@@ -10,6 +10,11 @@
 }
 html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0a1c; color: var(--ink); }
 canvas { display: block; }
+body.touch, body.touch canvas, #touch, #touch .t-look, #touch .tb {
+  touch-action: none;
+  overscroll-behavior: none;
+}
+html:has(body.touch) { overscroll-behavior: none; }
 .hidden { display: none !important; }
 
 /* Loading */

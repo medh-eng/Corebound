@@ -33,6 +33,8 @@ export class TouchControls {
   private stickId: number | null = null;
   private stickOrigin = { x: 0, y: 0 };
   private looks = new Map<number, { x: number; y: number }>();
+  private pointers = new Map<number, HTMLElement>();
+  private buttons = new Map<number, { element: HTMLButtonElement; code: string }>();
   private mode: Mode = 'hidden';
 
   constructor(private input: Input) {
@@ -55,45 +57,94 @@ export class TouchControls {
     // Look area: the whole screen behind the buttons. The left part starts the joystick instead.
     const look = this.root.querySelector<HTMLElement>('.t-look')!;
     look.addEventListener('pointerdown', (e) => {
+      if (this.mode === 'hidden' || this.mode === 'panel') return;
       e.preventDefault();
-      look.setPointerCapture(e.pointerId);
-      if (this.mode === 'play' && this.stickId === null && e.clientX < innerWidth * 0.4) {
+      this.endPointer(e.pointerId);
+      if (this.mode === 'play' && e.clientX < innerWidth * 0.4) {
+        // A fresh thumb must work even if the browser lost the previous thumb's release.
+        if (this.stickId !== null) this.endPointer(this.stickId);
         this.stickId = e.pointerId;
         this.stickOrigin = { x: e.clientX, y: e.clientY };
         this.stickEl.style.left = `${e.clientX}px`; this.stickEl.style.top = `${e.clientY}px`;
         this.stickEl.classList.remove('hidden');
         this.moveStick(e.clientX, e.clientY);
       } else this.looks.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      this.capture(look, e.pointerId);
     });
     look.addEventListener('pointermove', (e) => {
       if (e.pointerId === this.stickId) this.moveStick(e.clientX, e.clientY);
       else this.lookMove(e);
     });
-    const end = (e: PointerEvent) => {
-      if (e.pointerId === this.stickId) { this.stickId = null; this.input.stick.x = this.input.stick.y = 0; this.stickEl.classList.add('hidden'); }
-      this.looks.delete(e.pointerId);
-    };
-    look.addEventListener('pointerup', end);
-    look.addEventListener('pointercancel', end);
+    // Capture phase also sees releases outside the controls or intercepted by another element.
+    const end = (e: PointerEvent) => this.endPointer(e.pointerId);
+    document.addEventListener('pointerup', end, true);
+    document.addEventListener('pointercancel', end, true);
+    document.addEventListener('lostpointercapture', (e) => {
+      const owner = this.pointers.get(e.pointerId);
+      // An old loss event can arrive after the same id has already been captured again.
+      if (owner === e.target && !owner.hasPointerCapture(e.pointerId)) this.endPointer(e.pointerId);
+    }, true);
+    const reset = () => this.reset();
+    document.addEventListener('touchcancel', reset, true);
+    document.addEventListener('visibilitychange', reset);
+    window.addEventListener('blur', reset);
+    window.addEventListener('pagehide', reset);
+    window.addEventListener('pageshow', reset);
+    window.addEventListener('orientationchange', reset);
+    screen.orientation?.addEventListener('change', reset);
 
     // Buttons. Mine and Scan also turn the camera while held.
     this.root.querySelectorAll<HTMLButtonElement>('[data-code]').forEach((b) => {
       const code = b.dataset.code!;
       const aims = code === 'Mouse0' || code === 'Mouse2';
       b.addEventListener('pointerdown', (e) => {
+        if (this.mode === 'hidden' || this.mode === 'panel') return;
         e.preventDefault(); e.stopPropagation();
-        b.setPointerCapture(e.pointerId);
+        this.endPointer(e.pointerId);
+        this.buttons.set(e.pointerId, { element: b, code });
+        this.capture(b, e.pointerId);
         b.classList.add('on');
         this.press(code);
         if (aims) this.looks.set(e.pointerId, { x: e.clientX, y: e.clientY });
       });
       if (aims) b.addEventListener('pointermove', (e) => this.lookMove(e));
-      const up = (e: PointerEvent) => { b.classList.remove('on'); this.release(code); this.looks.delete(e.pointerId); };
-      b.addEventListener('pointerup', up);
-      b.addEventListener('pointercancel', up);
       b.addEventListener('contextmenu', (e) => e.preventDefault());
     });
-    this.root.querySelector<HTMLButtonElement>('.t-close')!.addEventListener('click', (e) => { e.preventDefault(); this.onClose(); });
+    this.root.querySelector<HTMLButtonElement>('.t-close')!.addEventListener('click', (e) => { e.preventDefault(); this.reset(); this.onClose(); });
+  }
+
+  private capture(element: HTMLElement, id: number) {
+    this.pointers.set(id, element);
+    try { element.setPointerCapture(id); } catch { /* document release listeners remain available */ }
+  }
+
+  private endPointer(id: number) {
+    const owner = this.pointers.get(id);
+    this.pointers.delete(id);
+    if (id === this.stickId) {
+      this.stickId = null;
+      this.stickOrigin = { x: 0, y: 0 };
+      this.input.stick.x = this.input.stick.y = 0;
+      this.knob.style.transform = 'translate(0px, 0px)';
+      this.stickEl.classList.add('hidden');
+    }
+    this.looks.delete(id);
+    const button = this.buttons.get(id);
+    this.buttons.delete(id);
+    if (button && ![...this.buttons.values()].some((b) => b.code === button.code)) {
+      button.element.classList.remove('on');
+      this.release(button.code);
+    }
+    // Clear ownership before releasing capture: loss events may be delivered synchronously.
+    try { if (owner?.hasPointerCapture(id)) owner.releasePointerCapture(id); } catch { /* already revoked */ }
+  }
+
+  private reset() {
+    for (const id of [...this.pointers.keys()]) this.endPointer(id);
+    if (this.stickId !== null) this.endPointer(this.stickId);
+    this.looks.clear();
+    this.input.stick.x = this.input.stick.y = 0;
+    this.input.mouseDX = this.input.mouseDY = 0;
   }
 
   private moveStick(x: number, y: number) {
@@ -126,14 +177,10 @@ export class TouchControls {
   /** Called every frame by the game: shows the controls that make sense right now. */
   update(s: TouchState) {
     if (s.mode !== this.mode) {
+      this.reset();
       this.mode = s.mode;
       this.root.classList.toggle('hidden', s.mode === 'hidden');
       this.root.dataset.mode = s.mode;
-      if (s.mode !== 'play') {
-        this.stickId = null; this.input.stick.x = this.input.stick.y = 0; this.stickEl.classList.add('hidden');
-        for (const c of ['Mouse0', 'Mouse2', 'Space']) this.input.release(c);
-        this.root.querySelectorAll('.tb.on').forEach((b) => b.classList.remove('on'));
-      }
     }
     const placing = s.building || s.belt;
     this.root.classList.toggle('placing', placing);

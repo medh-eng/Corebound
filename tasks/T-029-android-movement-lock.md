@@ -1,7 +1,7 @@
 # T-029: Android movement sometimes stops working (issue #24)
 
 - **Assigned to:** ChatGPT (Codex)
-- **Status:** todo
+- **Status:** done
 - **Priority:** P1 (most important bug)
 - **Branch:** `chatgpt/T-029-android-movement-lock`
 
