@@ -11,6 +11,8 @@ export class Sound {
   private ctx: AudioContext | null = null;
   private master!: GainNode;
   private musicBus!: GainNode;
+  private musicDuck!: GainNode;
+  private musicDucked = false;
   private sfxBus!: GainNode;
   private noise!: AudioBuffer;
   private laserNodes: { stop: () => void } | null = null;
@@ -29,6 +31,7 @@ export class Sound {
   private voiceBus!: GainNode;
   private voiceSrc: AudioBufferSourceNode | null = null;
   private voiceCache = new Map<string, AudioBuffer>();
+  private voiceRequest = 0;
   /** Surface under the player's feet, for footsteps: grass, rock, metal, sand, snow. */
   surface = 'grass';
   settings: AudioSettings;
@@ -49,7 +52,9 @@ export class Sound {
     this.musicBus = ctx.createGain();
     this.sfxBus = ctx.createGain();
     this.voiceBus = ctx.createGain();
-    this.musicBus.connect(this.master);
+    // Keep the voice envelope separate so settings changes cannot cancel it or affect effects.
+    this.musicDuck = ctx.createGain();
+    this.musicBus.connect(this.musicDuck).connect(this.master);
     this.sfxBus.connect(this.master);
     this.voiceBus.connect(this.master);
     this.master.connect(ctx.destination);
@@ -126,35 +131,67 @@ export class Sound {
 
   has(name: string) { return this.buffers.has(name); }
 
-  /** Says a SARATHI line, if a recording exists for it. Silent when there is none. */
-  speakVoice(text: string) {
-    if (!this.ctx || this.settings.voice <= 0) return;
+  /** Resolves with the decoded recording's seconds when playback starts; 0 when silent. */
+  async speakVoice(text: string): Promise<number> {
+    this.stopVoice();
+    if (!this.ctx || this.settings.voice <= 0) return 0;
     const file = VOICE_FILE[text.trim()];
-    if (file) void this.playVoiceFile(file);
+    return file ? this.playVoiceFile(file, this.voiceRequest) : 0;
   }
 
   /** Cuts the line that is playing: a new line always interrupts the last one. */
   stopVoice() {
-    if (!this.voiceSrc) return;
-    try { this.voiceSrc.stop(); } catch { /* already finished */ }
+    // Invalidate pending fetches too: a late download must never speak an older subtitle.
+    this.voiceRequest++;
+    const src = this.voiceSrc;
     this.voiceSrc = null;
+    if (src) {
+      src.onended = null;
+      try { src.stop(); } catch { /* already finished */ }
+    }
+    this.duckMusic(false);
   }
 
-  private async playVoiceFile(file: string) {
-    if (!this.ctx) return;
+  private duckMusic(duck: boolean) {
+    if (!this.ctx || duck === this.musicDucked) return;
+    this.musicDucked = duck;
+    const gain = this.musicDuck.gain;
+    const t = this.ctx.currentTime;
+    if (typeof gain.cancelAndHoldAtTime === 'function') gain.cancelAndHoldAtTime(t);
+    else {
+      const value = gain.value;
+      gain.cancelScheduledValues(t);
+      gain.setValueAtTime(value, t);
+    }
+    gain.linearRampToValueAtTime(duck ? 0.45 : 1, t + (duck ? 0.25 : 0.8));
+  }
+
+  private async playVoiceFile(file: string, request: number): Promise<number> {
+    if (!this.ctx) return 0;
     const cached = this.voiceCache.get(file);
     let buf: AudioBuffer;
     if (cached) buf = cached;
     else {
-      try { buf = await this.ctx.decodeAudioData(await (await fetch(`${import.meta.env.BASE_URL}assets/audio/voice/${file}`)).arrayBuffer()); } catch { return; }
+      try { buf = await this.ctx.decodeAudioData(await (await fetch(`${import.meta.env.BASE_URL}assets/audio/voice/${file}`)).arrayBuffer()); } catch { return 0; }
       this.voiceCache.set(file, buf);
     }
-    this.stopVoice();
+    if (request !== this.voiceRequest || this.settings.voice <= 0) return 0;
     const src = this.ctx.createBufferSource(); src.buffer = buf;
     src.connect(this.voiceBus);
-    src.onended = () => { if (this.voiceSrc === src) this.voiceSrc = null; };
+    src.onended = () => {
+      if (this.voiceSrc !== src) return;
+      this.voiceSrc = null;
+      this.duckMusic(false);
+    };
     this.voiceSrc = src;
-    src.start();
+    try {
+      src.start();
+      this.duckMusic(true);
+      return buf.duration;
+    } catch {
+      this.stopVoice();
+      return 0;
+    }
   }
 
   /** Plays a recorded one-shot. Returns false when it is missing (caller can fall back). */
@@ -207,6 +244,7 @@ export class Sound {
 
   private apply() {
     if (!this.ctx) return;
+    if (this.settings.voice <= 0) this.stopVoice();
     const t = this.ctx.currentTime;
     this.master.gain.setTargetAtTime(this.settings.master, t, 0.05);
     this.musicBus.gain.setTargetAtTime(this.settings.music * 0.6, t, 0.05);

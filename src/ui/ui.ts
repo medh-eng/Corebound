@@ -55,6 +55,7 @@ export class UI {
   onResearchLoad: () => void = () => {};
   onLog: (id: string) => void = () => {};
   private sarathiTimer = 0;
+  private sarathiRequest = 0;
   private codexFilter: CodexKind | 'all' | 'logs' = 'all';
   private codexSelected: string | null = null;
   private codexUnlocked = new Set<string>();
@@ -614,12 +615,19 @@ export class UI {
   }
 
   sarathi(line: string, seconds = 7) {
+    const request = ++this.sarathiRequest;
+    const shownAt = performance.now();
     const s = $('#sarathi');
     s.classList.remove('hidden');
     $('#sarathi .line').textContent = T(line);
-    sharedSound()?.speakVoice(line);
     clearTimeout(this.sarathiTimer);
-    this.sarathiTimer = window.setTimeout(() => s.classList.add('hidden'), seconds * 1000);
+    const hideAfterVoice = (duration: number) => {
+      if (request !== this.sarathiRequest) return;
+      // Loading takes time; keep this line through playback and ignore superseded requests.
+      const remaining = Math.max(0, seconds * 1000 - (performance.now() - shownAt), duration > 0 ? (duration + 1) * 1000 : 0);
+      this.sarathiTimer = window.setTimeout(() => s.classList.add('hidden'), remaining);
+    };
+    void (sharedSound()?.speakVoice(line) ?? Promise.resolve(0)).then(hideAfterVoice, () => hideAfterVoice(0));
   }
 
   prompt(text: string | null) {
