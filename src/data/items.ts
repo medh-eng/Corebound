@@ -120,7 +120,7 @@ export const MACHINES: Record<MachineId, MachineDef> = {
   bio_filter: { id: 'bio_filter', name: 'Bio-filter', radius: 1.3, height: 2.0, powerKW: -1.5, note: 'Uses 1.5 kW. Cleans the air.', filter: true },
   settling_pond: { id: 'settling_pond', name: 'Settling pond', radius: 1.6, height: 0.6, powerKW: 0, note: 'Cleans water and soil, slowly, always.', filter: true },
   sabatier_reactor: {
-    id: 'sabatier_reactor', name: 'Sabatier reactor', radius: 1.0, height: 2.5, powerKW: -1.5, note: 'Uses 1.5 kW. CO₂ + 4 H₂ → CH₄ + 2 H₂O: cleans the air and makes methane.',
+    id: 'sabatier_reactor', name: 'Sabatier reactor', radius: 1.35, height: 2.1, powerKW: -1.5, note: 'Uses 1.5 kW. CO₂ + 4 H₂ → CH₄ + 2 H₂O: cleans the air and makes methane.',
     accepts: { hydrogen: 20 }, process: { needs: { hydrogen: 2 }, makes: { methane: 1 }, seconds: 10 }, outCap: 20,
   },
   power_pylon: { id: 'power_pylon', name: 'Power pylon', radius: 0.35, height: 4.2, powerKW: 0, note: 'Carries power 14 m; links to pylons up to 26 m away.', pylon: { range: 14, link: 26 } },

@@ -2,6 +2,12 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
+## 2026-10-30
+- **Models:** `cryo_pod`, `vehicle_bay` and `sabatier_reactor` arrived and are processed (20k, 24k and 15k triangles; 332, 606 and 426 KB). The Sabatier reactor now uses the Commander's model (2.1 m tall, footprint radius 1.35). Cryo pod and vehicle bay are ready for M4. The Sabatier and cryo-pod files have an all-black colour texture, so the pipeline tints them plain copper/ceramic (new `tint` and `metallic` options) until they are re-exported.
+- **Merged:** T-027 privacy notice and phone help (PR #26).
+- **Workers given more of the next two days:** T-028 and T-029 (Codex: phone help, HUD wording and the movement lock, issues #23–#25), T-026 changes requested (rebase plus screenshots), T-030 and T-031 (ChatGPT chat: M4 Codex entries, goals and hints), T-032 and T-033 (Sarvam: model review and Mooladri advice, Hindi and Marathi UI text).
+- **Waiting:** PR #21 (voice) needs the 57 recordings uploaded to `public/assets/audio/voice/` before review. 167 tests pass; build passes.
+
 ## 2026-10-29 (afternoon)
 
 **Android:** yes. The game now plays on Android phones and tablets in Chrome, and installs to the home screen like an app (full screen, landscape). First version:

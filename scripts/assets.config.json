@@ -80,6 +80,35 @@
       "targetTriangles": 15000,
       "height": 0.65,
       "textureSize": 1024
+    },
+    "sabatier_reactor": {
+      "targetTriangles": 15000,
+      "height": 2.1,
+      "textureSize": 1024,
+      "metallic": 0.3,
+      "tint": [
+        0.72,
+        0.45,
+        0.3,
+        1
+      ]
+    },
+    "cryo_pod": {
+      "targetTriangles": 20000,
+      "height": 1.4,
+      "textureSize": 1024,
+      "metallic": 0.3,
+      "tint": [
+        0.82,
+        0.8,
+        0.76,
+        1
+      ]
+    },
+    "vehicle_bay": {
+      "targetTriangles": 24000,
+      "height": 4.5,
+      "textureSize": 1024
     }
   },
   "images": {

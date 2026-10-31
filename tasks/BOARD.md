@@ -26,8 +26,14 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | [T-023](T-023-flora-respellings.md) | Voice respellings for the plant and rock names | Sarvam AI | P3 | done ✓ (PR #19; respellings in `names.ts`, four Codex lines fixed) |
 | [T-024](T-024-art-review-rest.md) | Cultural review of the remaining concepts, the new art and the Huxley and SARATHI models | Sarvam AI | P2 | done ✓ (PR #20; hologram restaged, SARATHI repainted, three style-bible lines added) |
 | [T-025](T-025-store-page-text.md) | Store page text for the demo (itch.io and Steam), AI disclosure draft | ChatGPT (chat) | P2 | done ✓ (PR #18; used for the store pages in M4, after the Commander approves) |
-| [T-026](T-026-codex-text-size.md) | A text size setting | ChatGPT (Codex) | P2 | todo (T-021 is merged: can start) |
-| [T-027](T-027-privacy-and-phone-help.md) | Privacy notice and "playing on a phone" help | ChatGPT (chat) | P2 | todo (new) |
+| [T-026](T-026-codex-text-size.md) | A text size setting | ChatGPT (Codex) | P2 | changes requested: rebase and add 4 screenshots (see task) |
+| [T-027](T-027-privacy-and-phone-help.md) | Privacy notice and "playing on a phone" help | ChatGPT (chat) | P2 | done ✓ (PR #26; phone help goes into the game in T-028) |
+| [T-028](T-028-phone-help-hud-wording.md) | Phone help card and HUD wording fixes (#23, #25) | ChatGPT (Codex) | P1 | todo (new) |
+| [T-029](T-029-android-movement-lock.md) | Android movement sometimes stops (#24) | ChatGPT (Codex) | P1 | todo (new) |
+| [T-030](T-030-codex-m4-entries.md) | Codex entries for Chapter 1 objects | ChatGPT (chat) | P2 | todo (new) |
+| [T-031](T-031-chapter1-goals-hints.md) | Chapter 1 goals and SARATHI stuck hints | ChatGPT (chat) | P2 | todo (new) |
+| [T-032](T-032-review-new-models-mooladri.md) | Review of three new models; advice on Mooladri's body | Sarvam AI | P2 | todo (new) |
+| [T-033](T-033-hindi-marathi-ui.md) | Hindi and Marathi for controls, tips, phone help, privacy | Sarvam AI | P3 | todo (new) |
 | [T-018](T-018-codex-text.md) | Codex entries for Jivagraha and Harmony | ChatGPT (chat) | P2 | done ✓ (PR #11; in the game) |
 
 ## Commander
@@ -42,8 +48,8 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | — | SARATHI 3D model | P2 | done ✓ (2026-10-29) |
 | — | Root Guardian without a face | P1 | done ✓ (2026-10-29) |
 | — | Say which 3D tool made Huxley and SARATHI (licences) | P1 | done ✓ (Triple 3D) |
-| — | Upload again: cryo pod, vehicle bay, Sabatier reactor (did not reach GitHub) | P1 | **next** |
-| — | Play on an Android phone; report frame rate and anything awkward | P1 | **next** |
+| — | Upload again: cryo pod, vehicle bay, Sabatier reactor | P1 | done ✓ (30 Oct); **re-export Sabatier and cryo pod with colours** |
+| — | Play on an Android phone | P1 | done ✓ (issues #23–#25); retest after T-028/T-029 |
 | — | Decide Mooladri's body: humanoid or buttressed trunk (Sarvam) | P1 | **next** |
 | — | Escape module and cryo-pod models (reference: `concept/jiva_crash_site.png`) | P1 | **next** |
 | — | Turn on GitHub Pages | — | done ✓ |

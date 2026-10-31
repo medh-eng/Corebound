@@ -17,8 +17,8 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 
 | # | What | Where it goes | Prompt |
 | --- | --- | --- | --- |
-| 1 | **Upload the three models again: `cryo_pod.glb`, `vehicle_bay.glb`, `sabatier_reactor.glb`.** They did not reach GitHub (nothing arrived after 10:58 on 29 October). GitHub's web upload refuses files over **25 MB**; if a file is bigger, export it from Triple 3D at a lower detail setting, or tell the Director the size | `art-inbox/models/` | §6.3 |
-| 2 | **Play on your Android phone** (see the box below) and tell the Director the frame rate and anything awkward | — | — |
+| 1 | **Re-export `sabatier_reactor.glb` and `cryo_pod.glb` with their colours.** ✓ All three arrived on 30 Oct and vehicle bay is perfect, but these two have an **all-black colour texture** (shape only, no paint). In Triple 3D, re-export with textures/PBR on, check the preview is coloured, and upload with the same names. Meanwhile the game shows them in plain copper and ceramic | `art-inbox/models/` | §6.3 |
+| 2 | **After the phone fixes (T-028, T-029) land, play on your phone again**: walk for 5 minutes, open panels, lock and unlock the phone. Tell the Director if movement ever stops, and the frame rate (`?fps=1`) | — | — |
 | 3 | **Decide Mooladri's body** (no art needed yet): keep your humanoid giant of roots, or Sarvam's suggestion, a **buttressed trunk** with branch-limbs ending in root clusters (no shoulders, chest or fingers)? The crown of glowing root tips stays either way | — | `team-inbox/writing/T-012-art-followup.md` §7.1 |
 | 4 | **Escape module** (the demo opens inside it): turnaround image, then textured GLB. Attach `concept/jiva_crash_site.png` as the reference. Sarvam's note: give it a flatter side, landing legs and a hatch frame, and a squared duct instead of a flared pipe, so it reads as a capsule and not a pot | `art-inbox/turnaround/`, `art-inbox/models/escape_module.glb` | §6.3 |
 | 5 | **Jivagraha creatures as 3D**: a gentle grazer and a small burrower (turnaround image, then textured GLB) | `art-inbox/turnaround/`, `art-inbox/models/` | §5.1, task T-015 |

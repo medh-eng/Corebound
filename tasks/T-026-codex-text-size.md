@@ -1,7 +1,7 @@
 # T-026: A text size setting
 
 - **Assigned to:** ChatGPT (Codex)
-- **Status:** todo
+- **Status:** changes requested (PR #22)
 - **Priority:** P2 (M4: settings and accessibility, GDD §16)
 - **Deliver to:** pull request from branch `chatgpt/T-026-text-size`
 - **Start after:** T-021 is merged (both change `src/ui/ui.ts`) — merged 2026-10-29, so start now; work from the latest `main`
@@ -26,3 +26,8 @@ Some players need bigger text. Add a **Text size** choice to the settings in the
 - [ ] `npm test` and `npm run build` pass; only the two files changed (plus this Status line)
 - [ ] Changing the setting resizes the panels at once and survives a reload
 - [ ] Screenshots in the pull request: the HUD at Normal and Larger, and the pause menu at Larger; and one phone-sized screenshot (`?touch=1` at 800 × 360) at Larger
+
+## Changes requested by the Director (30 Oct)
+1. Rebase `chatgpt/T-026-codex-text-size` onto the current `main` and resolve conflicts in `src/ui/ui.ts`.
+2. Run the dev server (`COREBOUND_BASE=/ npx vite --port 5173`) and take four screenshots with `scripts/screenshots.mjs`: HUD at Normal; HUD at Larger; pause menu at Larger; `/?touch=1` at 800×360 at Larger. Commit them under `team-inbox/screens/T-026/` and show them in the PR.
+3. Confirm nothing overlaps or runs off screen at Larger, panels scroll, and the setting survives a reload.
