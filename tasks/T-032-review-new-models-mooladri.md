@@ -1,7 +1,7 @@
 # T-032: Cultural review of three new models; advice on Mooladri's body
 
 - **Assigned to:** Sarvam AI
-- **Status:** todo
+- **Status:** review
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-032-review-models-mooladri.md`
 
