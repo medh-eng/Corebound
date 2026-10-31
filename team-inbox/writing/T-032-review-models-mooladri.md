@@ -123,3 +123,33 @@ A great column of fused roots: a **narrow trunk** that flares at the base into *
 - **Two style-bible lines would have prevented all six findings**, if you want them for the next art round: `no pointed, cusped or Moorish arches; no crest or finial at an arch apex` and `no dome caps with petal rings, no ball finials, no bell-shaped bases on machines`. The three findings on the Sabatier and the bay are all the same generator habit: when a prompt says "Indo-futurist", it reaches for temple trim rather than industrial trim.
 - **The good news is that the engineering is right in all three models.** The plumbing, the flanges, the hatches, the vents and the jaali-as-vent are the correct Indo-futurist language, and they came from the same prompts. The fixes are subtractive: take the trim off, and what is underneath is the game's look.
 - **Mooladri's body is the Commander's call.** My recommendation is the buttressed trunk, with the two root-limbs as the concession. If the humanoid is chosen, the four changes in Option A are the minimum.
+
+---
+
+## 7. Addendum: the Commander's two new concepts, reviewed
+
+Two concepts arrived the same day, both drawn on the buttressed-trunk direction: a front elevation on a plain ground, and a lit scene with the Custodian for scale. **The body is approved** — this is the shape to model. Five changes to the upper half should be made before modelling, because in a 3D build they are the parts that are hard to take out later.
+
+**What is right, and should not be changed when it is modelled.**
+
+- The base is exactly the recommendation: buttress fins flaring into root runs, wide enough to walk between, and a hollow at the foot. Moss, ferns and mushrooms grow on the surface, which is what makes it a living thing rather than a statue.
+- There is **no platform, kerb, step, cloth or offering** at its feet, and **no face** — no head at all. The two rules that mattered most are both kept.
+- The trunk stays broad for most of its height and the pale wood with green moss and a copper seam is the right palette. The Custodian for scale reads correctly: this is a landform, not a person.
+
+**The five changes.**
+
+1. **The hanging strands read as matted hair.** Two dense curtains of long thin strands falling from the upper arms is the silhouette of *jata* — the matted locks of a sadhu or an ascetic — before it reads as aerial roots, and it is also the sacred banyan's hanging curtain, which was the one tree reading I asked to avoid. **Fix:** either remove the strands, or make them **few (three or four per arm), thick, stiff and tapering, and let them reach the ground** so they read as roots that have landed. Never a dense, even, hanging curtain.
+2. **The pair of long arms with the fan between them reads as antlers, or as raised arms.** A symmetrical Y with upward-curling tips is a candelabra and a crown at once. **Fix:** make the two arms **unequal** — one longer and lower than the other — and **blunt every tip**. Fewer branches in the central fan, uneven lengths, cut flat.
+3. **The two short stubs at mid-height read as shoulders or elbows**, and they are what makes the upper half a torso. **Fix:** remove them, or turn them downward as root stubs. Keep the trunk broad past that point instead of narrowing above the fins — a waist is what turns a trunk into a body.
+4. **The single bright glow at the crown centre reads as an eye, or a flame.** **Fix:** no single bright focal point at the top. The glow lives in the seams and in several uneven tips, so there is no "face" position.
+5. **The glow is amber-orange.** Orange-red on bark reads as fire. **Fix:** calm state is **pale sap-white with a green cast**; **amber only when restless**, and even then not red.
+
+**Three notes for the modelling itself.**
+
+- **Build it asymmetric from the start.** A mirrored trunk reads as a figure; a slightly lopsided one reads as growth. This is the single cheapest way to keep the body clear of the deity reading.
+- **The strands are the expensive part.** If they are kept, model three or four per arm as simple tapered tubes, not as a groomed curtain of hundreds — they cost frames, they read as hair, and they will tangle with the player's camera.
+- **Keep the fins' gaps walkable** at roughly Custodian width or wider. Being able to stand inside the base is what makes the size land.
+
+**One note on framing, not on the model.** The lit scene puts the Custodian small and centred at the foot of a symmetrical, backlit, crowned giant — the *darshan* composition again. In the game the camera sits over the shoulder, so this framing will not occur in play. For the store art and the loading screen, shoot the Guardian **from three-quarter, off-centre, with the player's shoulder in frame**, so the picture is "a person working beside something vast", not "a person before something holy".
+
+**Verdict: approved to model, with changes 1 to 5 above.**
