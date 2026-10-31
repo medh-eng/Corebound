@@ -1,7 +1,7 @@
 # T-034: Lower the music while SARATHI speaks; keep the text on screen as long as the voice
 
 - **Assigned to:** ChatGPT (Codex)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P2
 - **Branch:** `chatgpt/T-034-voice-ducking`
 
