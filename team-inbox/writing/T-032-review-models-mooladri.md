@@ -153,3 +153,32 @@ Two concepts arrived the same day, both drawn on the buttressed-trunk direction:
 **One note on framing, not on the model.** The lit scene puts the Custodian small and centred at the foot of a symmetrical, backlit, crowned giant — the *darshan* composition again. In the game the camera sits over the shoulder, so this framing will not occur in play. For the store art and the loading screen, shoot the Guardian **from three-quarter, off-centre, with the player's shoulder in frame**, so the picture is "a person working beside something vast", not "a person before something holy".
 
 **Verdict: approved to model, with changes 1 to 5 above.**
+
+---
+
+## 8. The re-export, checked: colour is fixed, shape is not
+
+Two new files arrived: `cryo_pod.glb` and `sabatier_reactor.glb`, 1.2 MB and 1.3 MB, replacing the all-black-texture exports. I compared them against the files they replace, mesh against mesh, and rendered them again in colour.
+
+**What the re-export fixed, and it is the thing that mattered most.**
+
+- **The colour is real now.** The cryo pod reads as off-white ceramic with copper trim and a teal canopy; the Sabatier reads as copper and pale ceramic with brass fittings. Both textures are proper 2048² images with real variation, not a flat black. **The Director's `tint` stopgap in `scripts/assets.config.json` can come out** — these two no longer need to be painted in code.
+- The palette is right for the game: warm metals, pale ceramic, and nothing that fights the Custodian's off-white and copper.
+
+**What the re-export did not change: the geometry.** The cryo pod's vertices are bit-identical to the old file. The Sabatier has the same face count and the same bounds, with only the UV seams differing. So the new files are a **texture pass, not a shape pass**, and every finding in sections 3 and 4 is still open.
+
+**A correction I owe you on the cryo pod.** In section 2 I wrote "round-arched hatch — exactly the right arch" and gave the model a clean *keep*. That was wrong, and I can see it now that the copper trim is visible: the hatch frame is a **cusped, pointed arch** with a sharp peak at the apex and a small cusp on each shoulder. In the grey render at that size I read the inner opening, which is round, and missed the trim around it, which is not. The inner opening can stay exactly as it is; it is the frame that has to change. My apologies — the model is one small fix, not a keep.
+
+**So the outstanding list is now five items, not six.**
+
+| Model | Still to change | Where it is |
+| --- | --- | --- |
+| `cryo_pod` | The hatch frame: plain semicircular copper trim, no peak at the apex, no cusps on the shoulders. The inner opening stays as it is. | The front hatch |
+| `sabatier_reactor` | (1) pointed-arch windows → rectangular louvres or round portholes | Every visible face |
+| | (2) dome caps with petal rings → flat bolted lids or shallow dished heads | Tank tops |
+| | (3) ball finial between the coils → tee junction, gauge or valve body | Top centre |
+| | (4) bell-shaped skirt on stepped rings → straight skirt, flat base plate or three legs | Base |
+
+**What I did with the files.** I have replaced `art-inbox/models/cryo_pod.glb` and `art-inbox/models/sabatier_reactor.glb` with these two, so the old black-texture exports are gone. The replacement is worth taking on its own: real colour beats a flat code tint, and nothing is lost by it. **It is not a sign-off on the shape** — the five items above stay open until they are re-exported.
+
+**Two things for the Director, not for the Commander.** The processed copies in `public/assets/models/` are stale until `npm run assets` (or whatever the pipeline entry is) is run again — I did not touch `public/assets/`, since `AGENTS.md` keeps it out of worker hands. And the `tint` entry for these two models in `scripts/assets.config.json` should go, or the new textures will be painted over with flat copper and ceramic.
