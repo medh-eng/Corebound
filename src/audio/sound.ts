@@ -2,8 +2,10 @@
 // Recorded effects come from public/assets/audio/sfx (made from art-inbox/audio/sfx by
 // scripts/process-audio.py and listed in index.json). Anything without a recording falls back
 // to a sound made in code. Music is code-made (D-minor pads and bells) until owner tracks arrive.
+// SARATHI's spoken lines are recorded files (public/assets/audio/voice) mapped in data/voice.ts.
+import { VOICE_FILE } from '../data/voice';
 
-export interface AudioSettings { master: number; music: number; sfx: number }
+export interface AudioSettings { master: number; music: number; sfx: number; voice: number }
 
 export class Sound {
   private ctx: AudioContext | null = null;
@@ -23,12 +25,17 @@ export class Sound {
   private currentTrack: string | null = null;
   private loops = new Map<string, { src: AudioBufferSourceNode; gain: GainNode }>();
   private lastStep = '';
+  // SARATHI's recorded voice (Sarvam Bulbul, T-005): one file per line of text.
+  private voiceBus!: GainNode;
+  private voiceSrc: AudioBufferSourceNode | null = null;
+  private voiceCache = new Map<string, AudioBuffer>();
   /** Surface under the player's feet, for footsteps: grass, rock, metal, sand, snow. */
   surface = 'grass';
   settings: AudioSettings;
 
   constructor() {
-    let s: AudioSettings = { master: 0.8, music: 0.55, sfx: 0.8 };
+    let s: AudioSettings = { master: 0.8, music: 0.55, sfx: 0.8, voice: 0.9 };
+    current = this;
     try { s = { ...s, ...JSON.parse(localStorage.getItem('corebound.audio') ?? '{}') }; } catch { /* defaults */ }
     this.settings = s;
   }
@@ -41,8 +48,10 @@ export class Sound {
     this.master = ctx.createGain();
     this.musicBus = ctx.createGain();
     this.sfxBus = ctx.createGain();
+    this.voiceBus = ctx.createGain();
     this.musicBus.connect(this.master);
     this.sfxBus.connect(this.master);
+    this.voiceBus.connect(this.master);
     this.master.connect(ctx.destination);
     this.apply();
     const len = ctx.sampleRate * 2;
@@ -117,6 +126,37 @@ export class Sound {
 
   has(name: string) { return this.buffers.has(name); }
 
+  /** Says a SARATHI line, if a recording exists for it. Silent when there is none. */
+  speakVoice(text: string) {
+    if (!this.ctx || this.settings.voice <= 0) return;
+    const file = VOICE_FILE[text.trim()];
+    if (file) void this.playVoiceFile(file);
+  }
+
+  /** Cuts the line that is playing: a new line always interrupts the last one. */
+  stopVoice() {
+    if (!this.voiceSrc) return;
+    try { this.voiceSrc.stop(); } catch { /* already finished */ }
+    this.voiceSrc = null;
+  }
+
+  private async playVoiceFile(file: string) {
+    if (!this.ctx) return;
+    const cached = this.voiceCache.get(file);
+    let buf: AudioBuffer;
+    if (cached) buf = cached;
+    else {
+      try { buf = await this.ctx.decodeAudioData(await (await fetch(`${import.meta.env.BASE_URL}assets/audio/voice/${file}`)).arrayBuffer()); } catch { return; }
+      this.voiceCache.set(file, buf);
+    }
+    this.stopVoice();
+    const src = this.ctx.createBufferSource(); src.buffer = buf;
+    src.connect(this.voiceBus);
+    src.onended = () => { if (this.voiceSrc === src) this.voiceSrc = null; };
+    this.voiceSrc = src;
+    src.start();
+  }
+
   /** Plays a recorded one-shot. Returns false when it is missing (caller can fall back). */
   play(name: string, vol = 1, rate = 1, jitter = 0): boolean {
     const buf = this.buffers.get(name);
@@ -171,6 +211,7 @@ export class Sound {
     this.master.gain.setTargetAtTime(this.settings.master, t, 0.05);
     this.musicBus.gain.setTargetAtTime(this.settings.music * 0.6, t, 0.05);
     this.sfxBus.gain.setTargetAtTime(this.settings.sfx, t, 0.05);
+    this.voiceBus.gain.setTargetAtTime(this.settings.voice, t, 0.05);
   }
 
   private env(g: GainNode, t: number, a: number, peak: number, r: number) {
@@ -334,3 +375,7 @@ export class Sound {
   smelter(dist: number | null) { this.loop('smelter_loop', dist !== null && dist < 14, dist === null ? 0 : Math.max(0, 1 - dist / 14) * 0.8, 0.4); }
   get started() { return !!this.ctx; }
 }
+
+/** The one Sound of the running game, so the HUD can speak SARATHI's lines. */
+let current: Sound | null = null;
+export const sharedSound = () => current;
