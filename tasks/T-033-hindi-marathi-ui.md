@@ -1,7 +1,7 @@
 # T-033: Hindi and Marathi for controls, tips, phone help and the privacy notice
 
 - **Assigned to:** Sarvam AI
-- **Status:** todo
+- **Status:** review
 - **Priority:** P3
 - **Deliver to:** `team-inbox/writing/T-033-hindi-marathi-ui.md`
 
