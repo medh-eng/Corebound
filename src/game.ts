@@ -8,6 +8,7 @@ import { researchById } from './data/research';
 import { CODEX, codexById } from './data/codex';
 import { RESEARCH_LINES, MACHINE_LINES, EVENT_LINES } from './data/lines';
 import { CHAPTER1_GOALS, SARATHI_EVENTS } from './data/story';
+import { machineAction, machineOutput } from './data/controls';
 import { SarathiDrone } from './render/sarathi';
 import { TouchControls } from './ui/touch';
 import { HoloPortrait } from './render/hologram';
@@ -698,7 +699,7 @@ export async function startGame(opts: GameOptions) {
   };
   const machinePrompt = (m: PlacedMachine): string => {
     const d = MACHINES[m.id];
-    const x = ' · <b>X</b> pick up';
+    const x = ` · ${machineAction('pickup')}`;
     if (m.fault) return `${d.name} · <b>needs attention</b> · <b>E</b> fix it${x}`;
     if (d.filter) return `${d.name} · ${m.working ? 'cleaning' : d.powerKW < 0 ? 'no power' : 'idle'}${x}`;
     if (d.research) return `Research station${base.research.active ? ` · ${researchById(base.research.active)!.name}` : ''} · <b>E</b> research${x}`;
@@ -706,7 +707,7 @@ export async function startGame(opts: GameOptions) {
     if (d.drill) return `Auto-drill · mining ${m.mine ? ITEMS[m.mine].name.toLowerCase() : 'nothing'} (${Math.round((m.rich ?? 0) * 100)}% rich)${total(m.out) ? ` · ${total(m.out)} waiting` : ''}${x}`;
     if (d.accepts) {
       const what = Object.keys(d.accepts).map((k) => ITEMS[k as ItemId].name.toLowerCase()).join(' + ');
-      return `${d.name}${total(m.inv) ? ` · ${names(m.inv)} inside` : ''} · <b>E</b> load ${what}${x}`;
+      return `${d.name}${total(m.inv) ? ` · ${names(m.inv)} inside` : ''} · ${machineAction('load', what)}${x}`;
     }
     return `${d.name}${x}`;
   };
@@ -753,7 +754,9 @@ export async function startGame(opts: GameOptions) {
     if (d.process?.fuel) return (m.burn ?? 0) <= 0 && !(m.inv?.carbon) ? 'Needs carbon' : '';
     if (d.process) {
       const ready = total(m.out);
-      if (ready && !base.belts.some((b) => b.from === m.uid)) return `${ready} ${names(m.out)} ready`;
+      if (ready && !base.belts.some((b) => b.from === m.uid)) return machineOutput(
+        (Object.entries(m.out ?? {}) as [ItemId, number][]).map(([id, n]) => ({ name: ITEMS[id].name, n })),
+      );
       const missing = Object.entries(d.process.needs).filter(([k, n]) => (m.inv?.[k as ItemId] ?? 0) < (n ?? 0)).map(([k]) => ITEMS[k as ItemId].name.toLowerCase());
       if ((m.burn ?? 0) <= 0 && missing.length && !feeds) return `Needs ${missing.join(' + ')}`;
       if ((m.burn ?? 0) > 0 && (sup ?? 0) < 0.2) return 'Low power';

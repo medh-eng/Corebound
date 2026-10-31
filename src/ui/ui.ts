@@ -7,7 +7,7 @@ import { ITEMS, RECIPES, type ItemId, type Recipe } from '../data/items';
 import { RESEARCH, type ResearchNode } from '../data/research';
 import type { Slot } from '../systems/inventory';
 import { TIPS } from '../data/tips';
-import { forTouch } from '../data/controls';
+import { forTouch, PHONE_HELP } from '../data/controls';
 
 /** Keyboard words become on-screen button names on phones and tablets. */
 const T = (text: string) => forTouch(text, document.body.classList.contains('touch'));
@@ -48,6 +48,7 @@ export class UI {
   private logOpener: HTMLElement | null = null;
   private logMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   private loadingTipTimer = 0;
+  private helpTimer = 0;
   onCraft: (r: Recipe) => void = () => {};
   onPlace: (id: ItemId) => void = () => {};
   onBuild: (id: ItemId) => void = () => {};
@@ -65,7 +66,6 @@ export class UI {
   private logTotal: number | undefined;
 
   constructor() {
-    const keys = KEYS.map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
     document.body.insertAdjacentHTML('beforeend', `
       <div id="loading" style="background-image:url('${assetUrl(`ui/${LOADING_ART[Math.floor(Math.random() * LOADING_ART.length)]}.webp`)}')">
         <div class="box"><img alt="Corebound" src="${assetUrl('ui/logo.webp')}"><div class="msg">Preparing Jivagraha</div><div class="bar"><i></i></div><div class="tip"></div></div>
@@ -86,7 +86,7 @@ export class UI {
         <label class="slider"><span>Master volume</span><input type="range" id="vol-master" min="0" max="1" step="0.05"></label>
         <label class="slider"><span>Mouse sensitivity</span><input type="range" id="sens" min="0.0008" max="0.005" step="0.0002"></label>
         <label class="slider"><span>Shadows</span><select id="shadows"><option value="2">High</option><option value="1">Low</option><option value="0">Off</option></select></label>
-        <details><summary>Controls</summary><div class="keys">${keys}</div></details>
+        <details><summary>Controls</summary><div class="controls"></div></details>
       </div></div>
       <div id="credits" class="hidden" role="dialog" aria-modal="true" aria-label="${CREDITS.button}"><div class="card">
         <img alt="${CREDITS.logoAlt}" src="${assetUrl('ui/logo.webp')}">
@@ -145,7 +145,7 @@ export class UI {
         <div id="goals" class="panel"></div>
         <div id="res" class="panel"></div>
         <button id="gear" title="Menu (Esc)" aria-label="Menu">⚙</button>
-        <div id="help" class="panel"><div class="keys">${keys}</div></div>
+        <div id="help" class="panel"><div class="controls"></div></div>
         <div id="stats" class="panel hidden"></div>
         <div id="toast"></div>
         <div id="crosshair"><svg viewBox="0 0 40 40"><circle id="ring" cx="20" cy="20" r="14" fill="none" stroke="#ffb347" stroke-width="3" stroke-dasharray="0 88" transform="rotate(-90 20 20)"/></svg></div>
@@ -155,6 +155,7 @@ export class UI {
         <div id="tags"></div>
         <div id="planet" class="panel hidden"></div>
       </div>`);
+    this.renderControls();
     const tip = $('#loading .tip');
     let remaining: string[] = [];
     let lastTip = '';
@@ -291,6 +292,7 @@ export class UI {
   } = { save: () => '', load: () => {}, home: () => {}, settings: () => ({ music: 0.5, sfx: 0.8, master: 0.8, voice: 0.9, sens: 0.0022, shadows: 2 }), change: () => {} };
 
   showPause(onResume: () => void) {
+    this.renderControls();
     $('#pause').classList.remove('hidden');
     ($('#resume') as HTMLButtonElement).onclick = () => { this.hidePause(); onResume(); };
     ($('#save') as HTMLButtonElement).onclick = () => { $('#saved-note').textContent = this.menu.save(); };
@@ -323,7 +325,7 @@ export class UI {
     [...box.children].forEach((el, i) => {
       const e = el as HTMLElement; const t = list[i];
       e.style.display = t ? '' : 'none';
-      if (t) { e.className = 'tag'; e.style.transform = `translate(${t.x}px, ${t.y}px) translate(-50%, -100%)`; if (e.textContent !== t.text) e.textContent = t.text; }
+      if (t) { e.className = 'tag'; e.style.transform = `translate(${t.x}px, ${t.y}px) translate(-50%, -100%)`; const text = T(t.text); if (e.textContent !== text) e.textContent = text; }
     });
   }
   /** Harmony: colour-coded shapes in the HUD; numbers only in planet view (GDD §10). */
@@ -579,7 +581,23 @@ export class UI {
     }).join('');
   }
 
-  showHud() { $('#hud').classList.remove('hidden'); setTimeout(() => ($('#help').style.opacity = '0'), 30000); }
+  private renderControls() {
+    const touch = document.body.classList.contains('touch');
+    for (const box of document.querySelectorAll<HTMLElement>('.controls')) {
+      box.className = `controls ${touch ? 'phone-help' : 'keys'}`;
+      box.innerHTML = touch ? PHONE_HELP.map((line) => `<p>${line}</p>`).join('')
+        : KEYS.map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
+    }
+  }
+
+  showHud() {
+    // TouchControls is created after UI, so choose the help when play actually starts.
+    this.renderControls();
+    $('#hud').classList.remove('hidden');
+    $('#help').style.opacity = '1';
+    window.clearTimeout(this.helpTimer);
+    this.helpTimer = window.setTimeout(() => ($('#help').style.opacity = '0'), 20000);
+  }
   toggleHelp() { const h = $('#help'); h.style.opacity = h.style.opacity === '0' ? '1' : '0'; }
 
   vitals(o2: number, power: number, air: number, clock: string, grid: string) {
