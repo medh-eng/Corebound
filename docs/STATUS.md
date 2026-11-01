@@ -15,6 +15,15 @@
 - **Workers given more of the next two days:** T-028 and T-029 (Codex: phone help, HUD wording and the movement lock, issues #23–#25), T-026 changes requested (rebase plus screenshots), T-030 and T-031 (ChatGPT chat: M4 Codex entries, goals and hints), T-032 and T-033 (Sarvam: model review and Mooladri advice, Hindi and Marathi UI text).
 - **Waiting:** PR #21 (voice) needs the 57 recordings uploaded to `public/assets/audio/voice/` before review. 167 tests pass; build passes.
 
+## 2026-11-01
+
+**Phone test by the Commander (3 Android phones): fixed.**
+- **Glitch on two phones (ground missing, tan by day and dark blue with stars at night, mushrooms floating):** the ground and sea shaders kept a list of up to 128 dug holes in "uniform" slots: 318 slots in all, while many Android graphics chips allow only 224–256. Those shaders failed to load, so the planet's surface was not drawn and you saw the sky through it; only dug areas, plants and machines showed. The list now lives in a small texture: the busiest shader uses 79 slots. New check: `node scripts/check-uniforms.mjs`.
+- **Phone that "doesn't start":** it showed "Turn your phone sideways" while Auto-rotate was off, so turning did nothing. That screen now has **Tap to play sideways** (goes full screen in landscape even with Auto-rotate off) and **Play upright anyway**.
+- If a shader ever fails again, a red message appears on screen with the reason, to screenshot.
+- More grass on phones (65% instead of 40%).
+- Checked: 190 tests, phone, mouse and factory playtests, dug ground on the phone preset.
+
 ## 2026-10-29 (afternoon)
 
 **Android:** yes. The game now plays on Android phones and tablets in Chrome, and installs to the home screen like an app (full screen, landscape). First version:

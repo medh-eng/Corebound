@@ -49,7 +49,14 @@ export class TouchControls {
         <div class="t-tools">${TOOLS.map(([c, l]) => btn(c, l, 'tool')).join('')}</div>
         <button class="tb t-close" aria-label="Close">✕</button>
       </div>
-      <div id="rotate"><div>Turn your phone sideways to play</div></div>`);
+      <div id="rotate"><div><p>Corebound plays sideways.</p>
+        <button class="btn" id="rotate-go">Tap to play sideways</button>
+        <p class="small">If the screen does not turn, switch on Auto-rotate, or</p>
+        <button class="btn small" id="rotate-skip">Play upright anyway</button></div></div>`);
+    // Auto-rotate may be off (common on Android), so turning the phone does nothing: a tap goes full
+    // screen and asks for landscape, which works even then; or play upright.
+    document.getElementById('rotate-go')!.addEventListener('click', () => TouchControls.enterFullscreen());
+    document.getElementById('rotate-skip')!.addEventListener('click', () => document.body.classList.add('upright-ok'));
     this.root = document.getElementById('touch')!;
     this.stickEl = this.root.querySelector('.t-stick')!;
     this.knob = this.stickEl.querySelector('i')!;

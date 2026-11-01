@@ -5,11 +5,32 @@ import * as THREE from 'three';
 export const MAX_BOXES = 128;
 const boxMin: THREE.Vector4[] = Array.from({ length: MAX_BOXES }, () => new THREE.Vector4(1e9, 1e9, 1e9, 0));
 const boxMax: THREE.Vector3[] = Array.from({ length: MAX_BOXES }, () => new THREE.Vector3(-1e9, -1e9, -1e9));
+// The dug-out boxes reach the shaders as a small float texture (row 0 = min + keep-water flag,
+// row 1 = max), not as uniform arrays: 128 boxes as uniforms took 256 of the fragment shader's
+// uniform slots, more than many Android graphics chips allow (224-256), so the ground and water
+// shaders failed there and the planet showed the sky through it (Commander's phones, 2026-11-01).
+const boxData = new Float32Array(MAX_BOXES * 2 * 4);
+const boxTex = new THREE.DataTexture(boxData, MAX_BOXES, 2, THREE.RGBAFormat, THREE.FloatType);
+boxTex.minFilter = boxTex.magFilter = THREE.NearestFilter;
+boxTex.generateMipmaps = false;
+boxTex.needsUpdate = true;
+
+/** Copies the box list into the texture the shaders read (call after changing uBoxMin/uBoxMax). */
+export function syncBoxes() {
+  for (let i = 0; i < MAX_BOXES; i++) {
+    boxMin[i].toArray(boxData, i * 4);
+    boxMax[i].toArray(boxData, (MAX_BOXES + i) * 4);
+    boxData[(MAX_BOXES + i) * 4 + 3] = 0;
+  }
+  boxTex.needsUpdate = true;
+}
+syncBoxes();
 
 export const shared = {
   uBoxMin: { value: boxMin },   // w = 1 keeps water inside (rivers)
   uBoxMax: { value: boxMax },
   uBoxCount: { value: 0 },
+  uBoxTex: { value: boxTex },
   uTime: { value: 0 },
   uNight: { value: 0 },        // 0 day .. 1 night, at the player's location
   uWind: { value: 1 },
@@ -113,7 +134,7 @@ export function stylised(o: StylisedOptions = {}): THREE.MeshStandardMaterial {
       );
     }
     if (o.cutBoxes) {
-      shader.uniforms.uBoxMin = shared.uBoxMin; shader.uniforms.uBoxMax = shared.uBoxMax; shader.uniforms.uBoxCount = shared.uBoxCount;
+      shader.uniforms.uBoxTex = shared.uBoxTex; shader.uniforms.uBoxCount = shared.uBoxCount;
       vDecl.push('varying vec3 vCutP;');
       fDecl.push('varying vec3 vCutP;', CUT_GLSL);
       vs = vs.replace('#include <begin_vertex>', '#include <begin_vertex>\n vCutP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
@@ -211,15 +232,16 @@ export function paintGeometry(g: THREE.BufferGeometry, color: THREE.ColorReprese
 }
 
 const CUT_GLSL = /* glsl */ `
-  uniform vec4 uBoxMin[${MAX_BOXES}];
-  uniform vec3 uBoxMax[${MAX_BOXES}];
+  uniform highp sampler2D uBoxTex;
   uniform int uBoxCount;
   bool insideCut(vec3 p, bool water) {
     for (int i = 0; i < ${MAX_BOXES}; i++) {
       if (i >= uBoxCount) break;
-      if (water && uBoxMin[i].w > 0.5) continue;
+      vec4 bmin = texelFetch(uBoxTex, ivec2(i, 0), 0);
+      if (water && bmin.w > 0.5) continue;
+      vec3 bmax = texelFetch(uBoxTex, ivec2(i, 1), 0).xyz;
       float g = water ? 1.0 : 0.0; // water hides a little beyond the box so no slivers show in pits
-      if (all(greaterThanEqual(p, uBoxMin[i].xyz - g)) && all(lessThan(p, uBoxMax[i] + g))) return true;
+      if (all(greaterThanEqual(p, bmin.xyz - g)) && all(lessThan(p, bmax + g))) return true;
     }
     return false;
   }`;
@@ -228,7 +250,7 @@ const CUT_GLSL = /* glsl */ `
 export function cutDepthMaterial(): THREE.MeshDepthMaterial {
   const m = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
   m.onBeforeCompile = (shader) => {
-    shader.uniforms.uBoxMin = shared.uBoxMin; shader.uniforms.uBoxMax = shared.uBoxMax; shader.uniforms.uBoxCount = shared.uBoxCount;
+    shader.uniforms.uBoxTex = shared.uBoxTex; shader.uniforms.uBoxCount = shared.uBoxCount;
     shader.vertexShader = 'varying vec3 vCutP;\n' + shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vCutP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
     shader.fragmentShader = 'varying vec3 vCutP;\n' + CUT_GLSL + '\n' + shader.fragmentShader.replace('void main() {', 'void main() {\n if (insideCut(vCutP, false)) discard;');
   };
@@ -238,7 +260,7 @@ export function cutDepthMaterial(): THREE.MeshDepthMaterial {
 /** Water is hidden inside dug regions unless that region holds a river. */
 export function applyWaterCut(m: THREE.MeshStandardMaterial) {
   m.onBeforeCompile = (shader) => {
-    shader.uniforms.uBoxMin = shared.uBoxMin; shader.uniforms.uBoxMax = shared.uBoxMax; shader.uniforms.uBoxCount = shared.uBoxCount;
+    shader.uniforms.uBoxTex = shared.uBoxTex; shader.uniforms.uBoxCount = shared.uBoxCount;
     shader.vertexShader = 'varying vec3 vCutP;\n' + shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vCutP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
     shader.fragmentShader = 'varying vec3 vCutP;\n' + CUT_GLSL + '\n' + shader.fragmentShader.replace('void main() {', 'void main() {\n if (insideCut(vCutP, true)) discard;');
   };

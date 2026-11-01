@@ -106,6 +106,13 @@ export async function startGame(opts: GameOptions) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.info.autoReset = false;
+  // If a shader fails on this device, say so on screen (phones show no console), once.
+  let shaderTold = false;
+  renderer.debug.onShaderError = (gl, program, vs, fs) => {
+    const log = (gl.getProgramInfoLog(program) || gl.getShaderInfoLog(fs) || gl.getShaderInfoLog(vs) || 'unknown').trim().slice(0, 160);
+    console.error('Shader failed:', log);
+    if (!shaderTold) { shaderTold = true; document.body.insertAdjacentHTML('beforeend', `<div class="gfx-error">Graphics problem on this device: ${log.replace(/</g, '&lt;')}. Please send a screenshot of this to the developer.</div>`); }
+  };
   document.body.prepend(renderer.domElement);
 
   const scene = new THREE.Scene();
@@ -178,7 +185,7 @@ export async function startGame(opts: GameOptions) {
   ui.loading('Growing the forest', 0.5); await nextFrame();
   const scatter = scatterWorld(terrain, world.seed, up0, [
     { pos: domePoint, radius: 8 }, { pos: lotusPoint, radius: 4 }, { pos: spawnPoint, radius: 4.5 },
-  ], phone ? 0.4 : 1);
+  ], phone ? 0.65 : 1);
   scene.add(scatter.group);
   colliders.push(...scatter.colliders);
   scene.add(decorateBase(terrain, { up: up0, forward, right }, { dome: domePoint }));

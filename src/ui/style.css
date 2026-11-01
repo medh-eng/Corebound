@@ -255,7 +255,7 @@ details summary { cursor: pointer; color: var(--ink-dim); font-size: 13px; margi
 #touch[data-mode="orbit"] .t-tools .tb:not([data-code="KeyM"]) { display: none; }
 #rotate { display: none; }
 @media (orientation: portrait) {
-  body.touch #rotate { display: grid; place-items: center; position: fixed; inset: 0; z-index: 40; background: #0b0a1c; color: var(--ink); font: 16px system-ui, sans-serif; letter-spacing: 0.08em; text-align: center; padding: 24px; }
+  body.touch:not(.upright-ok) #rotate { display: grid; place-items: center; position: fixed; inset: 0; z-index: 40; background: #0b0a1c; color: var(--ink); font: 16px system-ui, sans-serif; letter-spacing: 0.08em; text-align: center; padding: 24px; }
 }
 
 /* The HUD and panels a little smaller on a phone so the world shows between them. */
@@ -272,3 +272,5 @@ body.touch #prompt { top: 64%; }
 body.touch #res { display: block; }
 body.touch #goals { top: 16px; bottom: auto; width: auto; min-width: 0; max-width: calc(100vw / var(--ui-scale) - 560px); }
 @media (max-width: 700px) { body.touch #goals { max-width: none; top: auto; bottom: 64px; } }
+#rotate p { margin: 0 0 16px; } #rotate .small { margin-top: 26px; font-size: 13px; color: var(--ink-dim); }
+.gfx-error { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 50; padding: 10px 14px; border-radius: 10px; background: rgba(120, 30, 40, 0.92); color: #fff; font: 13px system-ui, sans-serif; }

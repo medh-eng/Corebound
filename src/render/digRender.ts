@@ -4,7 +4,7 @@ import { VoxelWorld } from '../core/voxels';
 import { Mat } from '../core/geology';
 import type { Terrain } from '../core/terrain';
 import type { WorldDef } from '../data/worlds';
-import { shared, stylised, MAX_BOXES } from '../art/materials';
+import { shared, stylised, MAX_BOXES, syncBoxes } from '../art/materials';
 import { surfaceColor, surfacePalette } from './planet';
 
 const MAT_COLORS: Record<number, [string, string?]> = {
@@ -94,6 +94,7 @@ export class DigRenderer {
       shared.uBoxMax.value[i].set(ch.ox + s - inset, ch.oy + s - inset, ch.oz + s - inset);
     });
     shared.uBoxCount.value = keys.length;
+    syncBoxes();
   }
 
   get triangles() {
