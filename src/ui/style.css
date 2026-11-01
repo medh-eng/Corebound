@@ -6,6 +6,7 @@
   --copper: #d08a55;
   --teal: #5cffd6;
   --amber: #ffb347;
+  --text-scale: 1;
   font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0a1c; color: var(--ink); }
@@ -145,6 +146,11 @@ details summary { cursor: pointer; color: var(--ink-dim); font-size: 13px; margi
 @media (max-width: 700px) { #res { display: none; } }
 
 #pause select { flex: 1; background: rgba(20,16,40,.7); color: #f3e9dc; border: 1px solid rgba(255,190,120,.35); border-radius: 8px; padding: 4px 8px; font: inherit; }
+#pause select:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+@media (max-width: 560px) {
+  #pause .slider { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  #pause .slider input, #pause .slider select { box-sizing: border-box; width: 100%; min-width: 0; }
+}
 #tags { position: fixed; inset: 0; pointer-events: none; }
 #tags .tag { position: absolute; left: 0; top: 0; padding: 4px 10px; border-radius: 999px; background: rgba(30,22,48,.78); border: 1px solid rgba(255,179,71,.6); color: #ffd9a0; font-size: 13px; white-space: nowrap; }
 
@@ -261,10 +267,20 @@ details summary { cursor: pointer; color: var(--ink-dim); font-size: 13px; margi
 /* The HUD and panels a little smaller on a phone so the world shows between them. */
 body.touch { --ui-scale: 0.72; }
 @media (min-height: 560px) { body.touch { --ui-scale: 0.9; } }
-body.touch #vitals, body.touch #goals, body.touch #res, body.touch #gear, body.touch #prompt, body.touch #sarathi, body.touch #pickups,
-body.touch #planet, body.touch #toast { zoom: var(--ui-scale); }
-body.touch #pack .card, body.touch #build .card, body.touch #research .card, body.touch #codex .card, body.touch #pause .card,
-body.touch #log .card, body.touch #credits .card { zoom: var(--ui-scale); max-height: calc(92vh / var(--ui-scale)); overflow-y: auto; overscroll-behavior: contain; }
+/* Text size compounds with the phone layout scale, but never touches the canvas or touch controls. */
+#vitals, #goals, #res, #gear, #help, #stats, #prompt, #sarathi, #pickups, #planet, #toast {
+  zoom: calc(var(--ui-scale, 1) * var(--text-scale, 1));
+}
+#pack .card, #build .card, #research .card, #codex .card, #pause .card, #log .card, #credits .card {
+  zoom: calc(var(--ui-scale, 1) * var(--text-scale, 1));
+  box-sizing: border-box;
+  min-width: 0;
+  max-height: calc(92vh / (var(--ui-scale, 1) * var(--text-scale, 1)));
+  max-width: calc((100vw - 24px) / (var(--ui-scale, 1) * var(--text-scale, 1)));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+#pause .card { width: 528px; }
 body.touch #help { display: block; top: 110px; bottom: auto; left: max(8px, env(safe-area-inset-left)); width: calc(40vw - max(8px, env(safe-area-inset-left))); max-width: 40vw; box-sizing: border-box; padding: 5px 8px; }
 .phone-help { text-align: left; line-height: 1.4; }
 .phone-help p { margin: 0; }
@@ -272,10 +288,30 @@ body.touch #help { display: block; top: 110px; bottom: auto; left: max(8px, env(
 body.touch #help .phone-help { font-size: 10px; line-height: 1.2; }
 body.touch #help .phone-help p + p { margin-top: 1px; }
 body.touch #stats { top: 118px; bottom: auto; right: 12px; zoom: var(--ui-scale); }
-body.touch #sarathi { bottom: auto; top: 118px; }
+body.touch #sarathi { top: auto; bottom: 56px; max-width: 50vw; }
 body.touch #prompt { top: 64%; }
 body.touch #res { display: block; }
 body.touch #goals { top: 16px; bottom: auto; width: auto; min-width: 0; max-width: calc(100vw / var(--ui-scale) - 560px); }
 @media (max-width: 700px) { body.touch #goals { max-width: none; top: auto; bottom: 64px; } }
 #rotate p { margin: 0 0 16px; } #rotate .small { margin-top: 26px; font-size: 13px; color: var(--ink-dim); }
 .gfx-error { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 50; padding: 10px 14px; border-radius: 10px; background: rgba(120, 30, 40, 0.92); color: #fff; font: 13px system-ui, sans-serif; }
+
+/* Let enlarged header text wrap in the space left between the fixed-width status panels. */
+@media (min-width: 701px) {
+  #hud {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr) max-content max-content;
+    grid-template-rows: max-content minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+  #vitals, #goals, #res, #gear { position: static; grid-row: 1; }
+  #vitals { grid-column: 1; }
+  #goals { grid-column: 2; min-width: 0; width: auto; transform: none; }
+  #res { grid-column: 3; }
+  #gear { grid-column: 4; }
+  body.touch #hud { padding: 12px; gap: 8px; }
+  body.touch #goals { max-width: none; }
+}
