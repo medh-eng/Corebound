@@ -626,12 +626,25 @@ export async function startGame(opts: GameOptions) {
     if ((e.code === 'KeyJ' || e.code === 'Escape') && ui.codexOpen) { e.preventDefault(); closeCodex(); setTimeout(() => input.pressed.delete(e.code)); }
   });
 
-  addEventListener('resize', () => {
-    camera.aspect = innerWidth / innerHeight;
+  // Keep the picture the size of the screen. Phones announce a turn or full screen before the new
+  // size is ready (the Commander saw the picture stay half-width after choosing landscape), so the
+  // size is checked every frame as well as on every resize-type event.
+  let viewW = 0, viewH = 0;
+  const fitView = () => {
+    const w = Math.max(1, Math.round(window.visualViewport?.width ?? innerWidth) || innerWidth);
+    const h = Math.max(1, Math.round(window.visualViewport?.height ?? innerHeight) || innerHeight);
+    const W = Math.max(w, document.documentElement.clientWidth), H = Math.max(h, document.documentElement.clientHeight);
+    if (W === viewW && H === viewH) return;
+    viewW = W; viewH = H;
+    camera.aspect = W / H;
     camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
-    post.resize(innerWidth, innerHeight);
-  });
+    renderer.setSize(W, H);
+    post.resize(W, H);
+  };
+  for (const ev of ['resize', 'orientationchange', 'fullscreenchange']) addEventListener(ev, fitView);
+  document.addEventListener('fullscreenchange', fitView);
+  window.visualViewport?.addEventListener('resize', fitView);
+  screen.orientation?.addEventListener('change', fitView);
 
   const tmpUp = new THREE.Vector3();
   const tmpCol = new THREE.Color();
@@ -1322,6 +1335,7 @@ export async function startGame(opts: GameOptions) {
   else if (!opts.skipTitle) ui.showTitle(!!readSave(), () => begin(false), () => begin(true));
 
   const loop = () => {
+    fitView();
     const now = performance.now();
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;

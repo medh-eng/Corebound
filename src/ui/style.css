@@ -266,7 +266,7 @@ body.touch #planet, body.touch #toast { zoom: var(--ui-scale); }
 body.touch #pack .card, body.touch #build .card, body.touch #research .card, body.touch #codex .card, body.touch #pause .card,
 body.touch #log .card, body.touch #credits .card { zoom: var(--ui-scale); max-height: calc(92vh / var(--ui-scale)); overflow-y: auto; overscroll-behavior: contain; }
 body.touch #help { display: none; }
-body.touch #stats { top: auto; bottom: 120px; right: 12px; zoom: var(--ui-scale); }
+body.touch #stats { top: 118px; bottom: auto; right: 12px; zoom: var(--ui-scale); }
 body.touch #sarathi { bottom: auto; top: 118px; }
 body.touch #prompt { top: 64%; }
 body.touch #res { display: block; }
