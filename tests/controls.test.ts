@@ -11,7 +11,7 @@ describe('touch wording', () => {
     expect(forTouch('Mine 3 ice — hold the left mouse button on the blue crystals', true)).toBe('Mine 3 ice — hold Mine on the blue crystals');
     expect(forTouch('Load it with ice — walk up to it and press E', true)).toBe('Load it with ice — walk up to it and tap Use');
     expect(forTouch('Press Tab to open your backpack', true)).toBe('Tap Bag to open your backpack');
-    expect(forTouch('Smelter · <b>E</b> load ore · <b>X</b> pick up', true)).toBe('Smelter · <b>Use</b> load ore · <b>Pick up</b> pick up');
+    expect(forTouch('Smelter · <b>E</b> load ore · <b>X</b> pick up', true)).toBe('Smelter · Tap <b>Use</b> to load ore · <b>Pick up</b>');
   });
   it('no goal or tip still mentions a key or the mouse on touch', () => {
     const keyish = /\b(press|mouse|Tab|click)\b|\((E|Tab)\)/i;
