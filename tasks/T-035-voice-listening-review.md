@@ -1,7 +1,7 @@
 # T-035: Listen to SARATHI's 57 recordings and list any to redo
 
 - **Assigned to:** Sarvam AI (with the Commander playing the files)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-035-voice-review.md`
 
