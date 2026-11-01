@@ -10,6 +10,7 @@ import { RESEARCH_LINES, MACHINE_LINES, EVENT_LINES } from './data/lines';
 import { CHAPTER1_GOALS, SARATHI_EVENTS } from './data/story';
 import { machineAction, machineOutput } from './data/controls';
 import { SarathiDrone } from './render/sarathi';
+import { Creatures } from './render/creatures';
 import { TouchControls } from './ui/touch';
 import { HoloPortrait } from './render/hologram';
 import { Terrain } from './core/terrain';
@@ -196,6 +197,11 @@ export async function startGame(opts: GameOptions) {
   scene.add(laser.group);
   const fauna = new Fauna((d) => terrain.groundRadius(P(d)));
   scene.add(fauna.group);
+  // Grazers, burrowers and birds (the Commander's models); fewer on phones.
+  const creatures = new Creatures((d) => terrain.groundRadius(P(d)), (d) => terrain.groundRadius(P(d)) > R + world.seaLevel + 0.35,
+    phone ? { grazers: 3, burrowers: 3, birds: 3 } : { grazers: 5, burrowers: 4, birds: 5 }, world.seed);
+  scene.add(creatures.group);
+  await creatures.load(spawnPoint);
   const blooms = new BloomField((d) => terrain.groundRadius(P(d)));
   scene.add(blooms.group);
 
@@ -577,6 +583,7 @@ export async function startGame(opts: GameOptions) {
   let last = performance.now();
   let acc = 0;
   let digTimer = 0, oreTimer = 0, goalTimer = 0, saveTimer = 20;
+  let cullTimer = 0;
   let wasNight = false, lowWarned = false, resTimer = 0, lampOn = false, researchTimer = 0, itemCodexTimer = 1;
 
   const begin = (resume: boolean) => {
@@ -797,6 +804,7 @@ export async function startGame(opts: GameOptions) {
     const bl = blooms.raycast(o, camDir, 30); if (bl) hits.push([bl.t, 'bloom']);
     const on = ore.raycast(o, camDir, 30); if (on) hits.push([on.t, KIND_CODEX[on.node.kind]]);
     const mt = fauna.nearRay(o, camDir, 25); if (mt !== null) hits.push([mt, 'glow_moth']);
+    const cr = creatures.nearRay(o, camDir, 30); if (cr) hits.push(cr);
     for (const [kind, id, r] of [['banyan', 'banyan', 4.5], ['mushroomTree', 'mushroom_tree', 2.5]] as const) {
       for (const p of scatter.landmarks[kind] ?? []) {
         const c = p.clone().addScaledVector(p.clone().normalize(), kind === 'banyan' ? 5 : 3);
@@ -1109,7 +1117,12 @@ export async function startGame(opts: GameOptions) {
     const haze = THREE.MathUtils.smoothstep(base.harmony.air, 12, 80);
     sky.setHaze(haze);
     (planet.water.material as THREE.MeshStandardMaterial).color.set(world.palette.water).lerp(murk, THREE.MathUtils.smoothstep(base.harmony.water, 10, 70) * 0.8);
-    fauna.update(shared.uTime.value, pos, band === 'thriving' ? 1 : THREE.MathUtils.clamp((hv - 25) / 55, 0, 1) * 0.7);
+    const abundance = band === 'thriving' ? 1 : THREE.MathUtils.clamp((hv - 25) / 55, 0, 1) * 0.7;
+    fauna.update(shared.uTime.value, pos, abundance);
+    creatures.update(dt, shared.uTime.value, pos, Math.max(abundance, 0.5), night);
+    // Far grass, ferns and pebbles are not drawn (they are tiny at that distance): 45 m on phones.
+    cullTimer -= dt;
+    if (cullTimer <= 0) { cullTimer = 0.25; scatter.cullSmall(rig.mode === 'orbit' ? camera.position : pos, rig.mode === 'orbit' ? 1e9 : phone ? 45 : 95); }
     if (playing && band === 'thriving') {
       bloomTimer -= dt;
       if (bloomTimer <= 0 && blooms.blooms.length < HARMONY.bloomMax) {
@@ -1270,6 +1283,19 @@ export async function startGame(opts: GameOptions) {
     /** Opens a log and waits until Huxley's hologram has drawn (for screenshots). */
     showLogReady: async (id: string) => { openLog(id); await huxley.start(document.getElementById('log-holo') as HTMLCanvasElement); huxley.renderOnce(2.2); },
     say: (line: string, seconds?: number) => ui.sarathi(line, seconds),
+    /** Puts the first grazer/burrower (or the birds) `dist` metres in front of the player. */
+    bringCreature: (kind: 'grazer' | 'burrower' | 'bird', dist = 6) => creatures.bringTo(kind, V(me.pos), V(me.heading), dist),
+    /** Stands `dist` metres from the first grazer/burrower/bird and looks at it. */
+    nearCreature: (kind: 'grazer' | 'burrower' | 'bird', dist = 7) => {
+      if (kind === 'burrower') creatures.surfaceAll();
+      const c = creatures.spot(kind); if (!c) return false;
+      const u = c.clone().normalize();
+      const side = new THREE.Vector3(0, 1, 0).cross(u).normalize();
+      const d = u.clone().applyAxisAngle(side, dist / R).normalize();
+      me.pos = P(d.clone().multiplyScalar(terrain.groundRadius(P(d)) + 0.1));
+      const h = c.clone().sub(V(me.pos)); h.addScaledVector(d, -h.dot(d)).normalize(); me.heading = P(h);
+      return true;
+    },
     openCodex: () => { codexKnown.push(...CODEX.slice(0, 6).map((c) => c.id).filter((id) => !codexKnown.includes(id))); openCodex(); },
     pollute: (air: number, water: number, soil: number) => {
       base.harmony.air = air; base.harmony.water = water; base.harmony.soil = soil;

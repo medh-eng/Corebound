@@ -14,6 +14,7 @@ export interface ScatterResult {
   instances: number;
   triangles: number;
   landmarks: Record<string, THREE.Vector3[]>;
+  cullSmall: (at: THREE.Vector3, maxDist: number) => void;
 }
 
 type Rule = (s: ReturnType<Terrain['sample']>, slope: number, dir: THREE.Vector3) => number; // acceptance 0..1
@@ -37,14 +38,19 @@ interface Kind {
 
 const tmpM = new THREE.Matrix4();
 
-function chunkKey(d: THREE.Vector3): number {
+/** Which patch of the planet a direction falls in: each cube face split into n × n patches. */
+function chunkKey(d: THREE.Vector3, n = 2): number {
   const ax = Math.abs(d.x), ay = Math.abs(d.y), az = Math.abs(d.z);
   let face: number, u: number, v: number;
   if (ax >= ay && ax >= az) { face = d.x > 0 ? 0 : 1; u = d.y / ax; v = d.z / ax; }
   else if (ay >= az) { face = d.y > 0 ? 2 : 3; u = d.x / ay; v = d.z / ay; }
   else { face = d.z > 0 ? 4 : 5; u = d.x / az; v = d.y / az; }
-  return face * 4 + (u > 0 ? 1 : 0) * 2 + (v > 0 ? 1 : 0);
+  const iu = Math.min(n - 1, Math.floor((u + 1) / 2 * n)), iv = Math.min(n - 1, Math.floor((v + 1) / 2 * n));
+  return (face * n + iu) * n + iv;
 }
+
+/** Small plants and stones are grouped in finer patches (about 30 m) so far ones can be hidden. */
+const SMALL = new Set(['grass', 'fern', 'smallMushroom', 'smallRock', 'lotus']);
 
 export function surfaceNormal(terrain: Terrain, d: THREE.Vector3): THREE.Vector3 {
   const R = terrain.radius, e = 0.004;
@@ -150,6 +156,7 @@ export function scatterWorld(terrain: Terrain, seed: number, baseDir: THREE.Vect
   ];
 
   let instances = 0, triangles = 0;
+  const small: THREE.InstancedMesh[] = [];
   const landmarks: Record<string, THREE.Vector3[]> = {};
   const angOf = (d: THREE.Vector3) => d.angleTo(baseDir) * (180 / Math.PI);
 
@@ -177,7 +184,7 @@ export function scatterWorld(terrain: Terrain, seed: number, baseDir: THREE.Vect
       if (keepClear.some((c) => c.pos.distanceTo(p) < c.radius)) continue;
       const m = surfaceMatrix(terrain, d, r() * Math.PI * 2, scale, k.sink, k.tilt ?? 0);
       const v = Math.floor(r() * k.geoms.length);
-      const key = chunkKey(d);
+      const key = chunkKey(d, SMALL.has(k.name) ? 8 : 2);
       if (!perChunk.has(key)) perChunk.set(key, k.geoms.map(() => []));
       perChunk.get(key)![v].push(m);
       if (k.collider) colliders.push({ pos: { x: p.x, y: p.y, z: p.z }, radius: k.collider * scale });
@@ -194,6 +201,7 @@ export function scatterWorld(terrain: Terrain, seed: number, baseDir: THREE.Vect
         im.castShadow = !!k.castShadow;
         im.receiveShadow = true;
         im.name = k.name;
+        if (SMALL.has(k.name)) small.push(im);
         group.add(im);
         instances += mats.length;
         triangles += (k.geoms[v].getAttribute('position').count / 3) * mats.length;
@@ -201,7 +209,14 @@ export function scatterWorld(terrain: Terrain, seed: number, baseDir: THREE.Vect
     }
   }
   void tmpM;
-  return { group, colliders, instances, triangles, landmarks };
+  /** Hides small-plant patches farther than `maxDist` metres from `at` (call a few times a second). */
+  const cullSmall = (at: THREE.Vector3, maxDist: number) => {
+    for (const im of small) {
+      const b = im.boundingSphere!;
+      im.visible = b.center.distanceTo(at) - b.radius < maxDist;
+    }
+  };
+  return { group, colliders, instances, triangles, landmarks, cullSmall };
 }
 
 /** A few hand-placed things around the starting base, for the opening view. */

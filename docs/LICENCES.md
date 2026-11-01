@@ -27,6 +27,7 @@ Made by the Commander with AI tools (Gemini for images; image-to-3D tools for mo
 | --- | --- | --- |
 | `huxley.glb` (2026-10-29) | Triple 3D (triple3d.ai), free | Mixamo (Breathing Idle, Talking, Talking 2, Thinking, Pointing) |
 | `sarathi.glb` (uploaded as `sarthi.glb`, 2026-10-29) | Triple 3D (triple3d.ai), free | none (animated in code) |
+| `escape_module`, `grazer`, `burrower`, `bird`, `jellyfish`, `huxley_projector`, `launch_pad`, `memory_log`, `quantum_fragment`, `rover`, `translator` (2026-10-31); `cryo_pod`, `sabatier_reactor` colour re-exports | Triple 3D (the Commander's 3D tool; confirm if any came from elsewhere) | none (animated in code) |
 
 **Triple 3D terms** (read 2026-10-29; effective date 2026-06-25, https://triple3d.ai/terms): generated models may be used commercially; no attribution is required; Triple 3D does not claim ownership of private outputs. It gives no guarantee that a model is exclusive (others may get similar results) or free of third-party rights, and anything made **public** in its gallery may be shown and shared by Triple 3D. So: keep generations private, and re-read the terms before release, because the service is free now and says paid features may come later. Before release: list the tool for each 3D model and check each tool's terms for commercial use (see PROMPTS.md §11), and write the Steam AI-content disclosure.
 

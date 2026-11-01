@@ -84,30 +84,71 @@
     "sabatier_reactor": {
       "targetTriangles": 15000,
       "height": 2.1,
-      "textureSize": 1024,
-      "metallic": 0.3,
-      "tint": [
-        0.72,
-        0.45,
-        0.3,
-        1
-      ]
+      "textureSize": 1024
     },
     "cryo_pod": {
       "targetTriangles": 20000,
       "height": 1.4,
-      "textureSize": 1024,
-      "metallic": 0.3,
-      "tint": [
-        0.82,
-        0.8,
-        0.76,
-        1
-      ]
+      "textureSize": 1024
     },
     "vehicle_bay": {
       "targetTriangles": 24000,
       "height": 4.5,
+      "textureSize": 1024
+    },
+    "escape_module": {
+      "targetTriangles": 18000,
+      "height": 2.6,
+      "textureSize": 1024
+    },
+    "grazer": {
+      "targetTriangles": 8000,
+      "height": 1.7,
+      "textureSize": 1024
+    },
+    "burrower": {
+      "targetTriangles": 4000,
+      "height": 0.45,
+      "textureSize": 1024
+    },
+    "bird": {
+      "targetTriangles": 4000,
+      "height": 0.75,
+      "textureSize": 1024
+    },
+    "jellyfish": {
+      "targetTriangles": 4000,
+      "height": 0.9,
+      "textureSize": 1024
+    },
+    "huxley_projector": {
+      "targetTriangles": 5000,
+      "height": 0.45,
+      "textureSize": 1024
+    },
+    "launch_pad": {
+      "targetTriangles": 15000,
+      "height": 4.8,
+      "textureSize": 1024
+    },
+    "memory_log": {
+      "targetTriangles": 4000,
+      "height": 0.25,
+      "textureSize": 1024
+    },
+    "quantum_fragment": {
+      "targetTriangles": 5000,
+      "height": 0.7,
+      "textureSize": 1024
+    },
+    "rover": {
+      "targetTriangles": 20000,
+      "height": 2.6,
+      "textureSize": 1024
+    },
+    "translator": {
+      "targetTriangles": 4000,
+      "height": 0.3,
       "textureSize": 1024
     }
   },

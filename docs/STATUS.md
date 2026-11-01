@@ -2,6 +2,33 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
+## 2026-11-01 (evening)
+
+**Phone: the half-screen picture after turning to landscape is fixed.** Android announced the turn before the new screen size was ready, and the game resized only on that announcement, so the picture kept its upright width. The game now checks its size every frame. New test `scripts/playtest-rotate.mjs` hides every size announcement from the game and still expects a full-screen picture upright, sideways and back again (it fails without the fix).
+
+**Creatures are alive on Jivagraha** (the Commander's models, M3): 5 gentle grazers (3 on phones) wander, graze with nodding heads, step away when you come within 5 m and rest at night; 4 burrowers (3) pop out of the ground nearby, look around and duck back in, at once if you come close; 5 birds (3) circle over the trees by day and roost at night. Numbers follow Harmony. Hold Scan on a grazer or burrower for its Codex entry.
+
+**11 new models processed** (31 Oct): escape module, grazer, burrower, bird, jellyfish, Huxley projector, launch pad, memory log, quantum fragment, rover, translator, plus the colour re-exports of the cryo pod and Sabatier reactor (the code tint is removed). The jellyfish is all black: needs a colour re-export later.
+
+**Faster on phones:** small plants are grouped in finer patches and far ones (over 45 m) are not drawn. Phone preset: 513,000 → 356,000 triangles a frame, 176 → 146 draw batches. The frame-rate box moved to the top right, clear of the buttons; the phone help card sits below the vitals with larger text.
+
+**Merged (6 pull requests):** T-026 text size (Director kept SARATHI's line and prompts in their usual places; the worker had moved them, a design change), T-028 phone help and clearer machine prompts (no more "8 8 hydrogen ready"), T-034 music dips under SARATHI's voice, T-032 model review and Mooladri advice, T-033 Hindi and Marathi UI text, T-035 voice review (one line to re-record).
+
+**Checked:** 210 tests, build, shader slots (79, under the 224 phone limit), and the rotate, mouse, factory and phone playtests.
+
+**New tasks:** T-036 names and model review (Sarvam), T-037 creature lines and a bird Codex entry (ChatGPT chat), T-038 Graphics setting (ChatGPT Codex). T-030 and T-031 (ChatGPT chat) still waiting since 30 Oct.
+
+**Waiting for the Commander:** phone retest; re-record `goal_breathe.mp3`; Mooladri trunk concepts uploaded to make the body final; starter ship model.
+
+## 2026-11-01
+
+**Phone test by the Commander (3 Android phones): fixed.**
+- **Glitch on two phones (ground missing, tan by day and dark blue with stars at night, mushrooms floating):** the ground and sea shaders kept a list of up to 128 dug holes in "uniform" slots: 318 slots in all, while many Android graphics chips allow only 224–256. Those shaders failed to load, so the planet's surface was not drawn and you saw the sky through it; only dug areas, plants and machines showed. The list now lives in a small texture: the busiest shader uses 79 slots. New check: `node scripts/check-uniforms.mjs`.
+- **Phone that "doesn't start":** it showed "Turn your phone sideways" while Auto-rotate was off, so turning did nothing. That screen now has **Tap to play sideways** (goes full screen in landscape even with Auto-rotate off) and **Play upright anyway**.
+- If a shader ever fails again, a red message appears on screen with the reason, to screenshot.
+- More grass on phones (65% instead of 40%).
+- Checked: 190 tests, phone, mouse and factory playtests, dug ground on the phone preset.
+
 ## 2026-10-31
 - **Merged T-029 (PR #27):** touch movement now recovers from every interrupted gesture (finger lifted outside, cancelled touch, lost capture, panels, app in background, rotation, a new thumb taking over). Director change: the joystick is no longer reset on page resize, because Chrome's address bar resizes the page and that could itself stop a walk. Phone playtest: 13 of 13 checks pass, including a real 60-second walk.
 - **Merged T-005 voice (PR #21):** SARATHI speaks her 57 recorded lines (Bulbul, ishita) with a voice volume slider. Director fix: the code looked for `sarathi_goal_ice.mp3` but the files are `goal_ice.mp3`, so nothing would have played; a new test now checks every line has its file.
@@ -14,15 +41,6 @@
 - **Merged:** T-027 privacy notice and phone help (PR #26).
 - **Workers given more of the next two days:** T-028 and T-029 (Codex: phone help, HUD wording and the movement lock, issues #23–#25), T-026 changes requested (rebase plus screenshots), T-030 and T-031 (ChatGPT chat: M4 Codex entries, goals and hints), T-032 and T-033 (Sarvam: model review and Mooladri advice, Hindi and Marathi UI text).
 - **Waiting:** PR #21 (voice) needs the 57 recordings uploaded to `public/assets/audio/voice/` before review. 167 tests pass; build passes.
-
-## 2026-11-01
-
-**Phone test by the Commander (3 Android phones): fixed.**
-- **Glitch on two phones (ground missing, tan by day and dark blue with stars at night, mushrooms floating):** the ground and sea shaders kept a list of up to 128 dug holes in "uniform" slots: 318 slots in all, while many Android graphics chips allow only 224–256. Those shaders failed to load, so the planet's surface was not drawn and you saw the sky through it; only dug areas, plants and machines showed. The list now lives in a small texture: the busiest shader uses 79 slots. New check: `node scripts/check-uniforms.mjs`.
-- **Phone that "doesn't start":** it showed "Turn your phone sideways" while Auto-rotate was off, so turning did nothing. That screen now has **Tap to play sideways** (goes full screen in landscape even with Auto-rotate off) and **Play upright anyway**.
-- If a shader ever fails again, a red message appears on screen with the reason, to screenshot.
-- More grass on phones (65% instead of 40%).
-- Checked: 190 tests, phone, mouse and factory playtests, dug ground on the phone preset.
 
 ## 2026-10-29 (afternoon)
 

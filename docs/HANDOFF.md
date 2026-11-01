@@ -1,6 +1,7 @@
 # Corebound handoff (28 October 2026, updated 29 October)
 
 > **29 October:** Huxley (rigged, five clips) and SARATHI models are in the game: SARATHI floats beside the Custodian; Huxley appears as a hologram in his recordings. Mooladri is faceless (the Commander's new concepts).
+> **1 November:** phone landscape fixed (size checked every frame; `scripts/playtest-rotate.mjs`); dug-hole list moved to a texture (Android shader limit; `scripts/check-uniforms.mjs`); grazers, burrowers and birds live in the world (`src/render/creatures.ts`); 11 new models processed; T-026, T-028, T-032 to T-035 merged. Open: T-030, T-031, T-036, T-037, T-038.
 > **29 October, afternoon:** the game plays on **Android** (touch controls, Phone preset, installable; phone track in `docs/ROADMAP.md`). T-021 to T-025 merged. Open: T-026 (Codex), T-027 (ChatGPT chat). Details in `docs/STATUS.md`.
 
 This file covers four things:
@@ -221,6 +222,7 @@ Practical notes from the last chat:
   The headless browser is slow: keep commands under 10 minutes and use few frames.
 - Playtests: scripts/playtest-m2.mjs, scripts/playtest-mouse.mjs and scripts/playtest-touch.mjs (phone screen).
 - Phones: ?touch=1 forces touch controls, ?q=phone the phone preset, ?fps=1 shows the frame rate.
+- Creature test hooks: __game.bringCreature('grazer'|'burrower'|'bird', metres) puts one in front of you.
 - Rigged characters: Mixamo FBX clips go in art-inbox/models/<character>/, then `npm run rig -- <character>`
   with the dev server running (clip lists in src/tools/rig.ts). Preview a log: /?log=huxley_01.
 - After pushing, run `git fetch origin '+refs/heads/main:refs/remotes/origin/main'`.
