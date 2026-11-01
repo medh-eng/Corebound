@@ -1,7 +1,7 @@
 # T-038: A Graphics setting (Phone / Low / High)
 
 - **Assigned to:** ChatGPT (Codex)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P2 (phone track P2)
 - **Deliver to:** pull request from branch `chatgpt/T-038-graphics-setting`
 

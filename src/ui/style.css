@@ -140,6 +140,9 @@ html:has(body.touch) { overscroll-behavior: none; }
 .btn.small { padding: 10px 20px; font-size: 13px; }
 .slider { display: grid; grid-template-columns: 140px 1fr; align-items: center; gap: 12px; text-align: left; font-size: 14px; margin: 6px 0; }
 .slider input { accent-color: #d08a55; }
+.graphics-choice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.graphics-choice .note { font-size: 12px; }
+#pause .graphics-choice select { min-width: 80px; }
 details { margin-top: 14px; text-align: left; }
 details summary { cursor: pointer; color: var(--ink-dim); font-size: 13px; margin-bottom: 10px; }
 #saved-note { min-height: 16px; margin-top: 8px; font-size: 12px; color: var(--teal); }

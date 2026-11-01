@@ -18,6 +18,22 @@ import type { StoryLog } from '../data/logs';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
 
+type GraphicsQuality = 'phone' | 'low' | 'high';
+
+/** Testing overrides take precedence over a saved preference and the device default. */
+export function chooseQuality(url: string | null, saved: string | null, touch: boolean): GraphicsQuality {
+  for (const value of [url, saved]) {
+    if (value === 'phone' || value === 'low' || value === 'high') return value;
+  }
+  return touch ? 'phone' : 'high';
+}
+
+export function readQuality(url: string | null, touch: boolean): GraphicsQuality {
+  let saved: string | null = null;
+  try { saved = window.localStorage.getItem('corebound.quality'); } catch { /* Use the device default when storage is unavailable. */ }
+  return chooseQuality(url, saved, touch);
+}
+
 const KEYS: [string, string][] = [
   ['W A S D', 'Walk'],
   ['Mouse', 'Look around'],
@@ -88,6 +104,11 @@ export class UI {
         <label class="slider"><span>Mouse sensitivity</span><input type="range" id="sens" min="0.0008" max="0.005" step="0.0002"></label>
         <label class="slider"><span>Shadows</span><select id="shadows"><option value="2">High</option><option value="1">Low</option><option value="0">Off</option></select></label>
         <label class="slider"><span>Text size</span><select id="text-size"><option value="1">Normal</option><option value="1.15">Large</option><option value="1.3">Larger</option></select></label>
+        <div class="slider graphics-setting"><label for="graphics">Graphics</label><div class="graphics-choice">
+          <select id="graphics" aria-describedby="graphics-note"><option value="phone">Phone</option><option value="low">Low</option><option value="high">High</option></select>
+          <span id="graphics-note" class="note hidden" role="status">Applies after restart</span>
+          <button class="btn small hidden" id="graphics-restart">Restart now</button>
+        </div></div>
         <details><summary>Controls</summary><div class="controls"></div></details>
       </div></div>
       <div id="credits" class="hidden" role="dialog" aria-modal="true" aria-label="${CREDITS.button}"><div class="card">
@@ -173,6 +194,29 @@ export class UI {
       try {
         window.localStorage.setItem('corebound.textSize', String(scale));
       } catch { /* Keep the setting for this session even when storage fails. */ }
+    };
+    const graphics = $('#graphics') as HTMLSelectElement;
+    const initialQuality = readQuality(new URLSearchParams(location.search).get('q'), document.body.classList.contains('touch'));
+    graphics.value = initialQuality;
+    let qualityStored = false;
+    graphics.onchange = () => {
+      qualityStored = false;
+      try {
+        window.localStorage.setItem('corebound.quality', graphics.value);
+        qualityStored = true;
+      } catch { /* Restart can still apply the choice through the URL. */ }
+      const unchanged = graphics.value === initialQuality;
+      $('#graphics-note').classList.toggle('hidden', unchanged);
+      $('#graphics-restart').classList.toggle('hidden', unchanged);
+    };
+    $('#graphics-restart').onclick = () => {
+      this.menu.save();
+      const url = new URL(location.href);
+      // A testing override must not undo the player's new choice on restart.
+      if (qualityStored) url.searchParams.delete('q');
+      else url.searchParams.set('q', graphics.value);
+      history.replaceState(null, '', url);
+      location.reload();
     };
     const tip = $('#loading .tip');
     let remaining: string[] = [];

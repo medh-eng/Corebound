@@ -1,6 +1,7 @@
 import './ui/style.css';
 import { startGame } from './game';
 import { wantsTouch } from './ui/touch';
+import { readQuality } from './ui/ui';
 
 // URL options (for testing): ?log=huxley_01 (preview a memory log) ?skip=1 ?t=0.5 ?view=orbit ?q=low ?shot=1 ?yaw=20 ?pitch=0.3 ?dist=8
 const q = new URLSearchParams(location.search);
@@ -10,7 +11,7 @@ const num = (k: string) => (q.has(k) ? Number(q.get(k)) : undefined);
 const touch = wantsTouch(q.get('touch'));
 if (touch) document.body.classList.add('touch');
 startGame({
-  quality: q.get('q') === 'low' ? 'low' : q.get('q') === 'high' ? 'high' : q.get('q') === 'phone' || touch ? 'phone' : 'high',
+  quality: readQuality(q.get('q'), touch),
   touch,
   skipTitle: q.get('skip') === '1' || q.get('shot') === '1' && q.get('title') !== '1',
   timeOffset: num('t') ?? 0,
