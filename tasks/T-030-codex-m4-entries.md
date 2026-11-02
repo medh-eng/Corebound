@@ -1,7 +1,7 @@
 # T-030: Codex entries for Chapter 1 (M4) objects
 
 - **Assigned to:** ChatGPT (chat)
-- **Status:** review
+- **Status:** done (merged 2026-11-02)
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-030-codex-m4-entries.md`
 

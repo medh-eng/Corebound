@@ -30,15 +30,17 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | [T-027](T-027-privacy-and-phone-help.md) | Privacy notice and "playing on a phone" help | ChatGPT (chat) | P2 | done ✓ (PR #26; phone help goes into the game in T-028) |
 | [T-028](T-028-phone-help-hud-wording.md) | Phone help card and HUD wording fixes (#23, #25) | ChatGPT (Codex) | P1 | done ✓ (PR #28, 1 Nov; Director moved the card below the vitals and enlarged its text) |
 | [T-029](T-029-android-movement-lock.md) | Android movement sometimes stops (#24) | ChatGPT (Codex) | P1 | done ✓ (PR #27, 31 Oct; Director kept walking through page resizes) |
-| [T-030](T-030-codex-m4-entries.md) | Codex entries for Chapter 1 objects | ChatGPT (chat) | P2 | todo (new) |
-| [T-031](T-031-chapter1-goals-hints.md) | Chapter 1 goals and SARATHI stuck hints | ChatGPT (chat) | P2 | todo (new) |
+| [T-030](T-030-codex-m4-entries.md) | Codex entries for Chapter 1 objects | ChatGPT (chat) | P2 | done ✓ (PR #33, 2 Nov; `CHAPTER1_CODEX` in `codex.ts`, joins the Codex in M4; Director rewrote Mooladri and the valley so they don't give away the puzzle) |
+| [T-031](T-031-chapter1-goals-hints.md) | Chapter 1 goals and SARATHI stuck hints | ChatGPT (chat) | P2 | done ✓ (PR #34, 2 Nov; 16 goals and stuck hints in `src/data/chapter1.ts`, used in M4) |
 | [T-032](T-032-review-new-models-mooladri.md) | Review of three new models; advice on Mooladri's body | Sarvam AI | P2 | done ✓ (PR #29; trunk body approved; colour re-export of cryo pod and Sabatier taken) |
 | [T-033](T-033-hindi-marathi-ui.md) | Hindi and Marathi for controls, tips, phone help, privacy | Sarvam AI | P3 | done ✓ (PR #31; kept for the language setting at M10) |
 | [T-034](T-034-voice-ducking-subtitles.md) | Music dips while SARATHI speaks; her text stays as long as the voice | ChatGPT (Codex) | P2 | done ✓ (PR #30) |
 | [T-035](T-035-voice-listening-review.md) | Listen to the 57 recordings; list any to redo | Sarvam AI + Commander | P2 | done ✓ (PR #32; redo `goal_breathe.mp3` as "Electrolisis") |
-| [T-036](T-036-names-and-review-new-models.md) | Names for the grazer, burrower and bird; review of the 11 new models | Sarvam AI | P2 | todo (new) |
-| [T-037](T-037-creature-lines.md) | SARATHI lines and a bird Codex entry for the creatures | ChatGPT (chat) | P2 | todo (new) |
+| [T-036](T-036-names-and-review-new-models.md) | Names for the grazer, burrower and bird; review of the 11 new models | Sarvam AI | P2 | done ✓ (PR #36, 2 Nov; Mridugami, Bilavasa, Divachari in the Codex; projector, launch pad and fragment need trim fixes) |
+| [T-037](T-037-creature-lines.md) | SARATHI lines and a bird Codex entry for the creatures | ChatGPT (chat) | P2 | done ✓ (PR #35, 2 Nov; SARATHI's six creature remarks in the game; bird Codex entry, birds now scannable) |
 | [T-038](T-038-graphics-setting.md) | A Graphics setting (Phone / Low / High) | ChatGPT (Codex) | P2 | todo (new) |
+| [T-039](T-039-m4-machine-lines.md) | SARATHI lines for the M4 machines, research and vehicles | ChatGPT (chat) | P2 | todo (new) |
+| [T-040](T-040-voice-script-ch1.md) | Voice script for Chapter 1: respellings for SARATHI's new lines | Sarvam AI | P2 | todo (new) |
 | [T-018](T-018-codex-text.md) | Codex entries for Jivagraha and Harmony | ChatGPT (chat) | P2 | done ✓ (PR #11; in the game) |
 
 ## Commander
@@ -68,5 +70,7 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | D-003 | Rig tool: per-character animation folders | done ✓ (2026-10-29: `npm run rig -- huxley`; clips in `art-inbox/models/<character>/`) |
 | D-007 | Huxley hologram and SARATHI drone in the game | done ✓ (2026-10-29) |
 | D-008 | Android: touch controls, Phone preset, installable app (phone track P1) | done ✓ first version (2026-10-29); tuning after the Commander's phone test |
+| D-009 | Creature remarks wired; birds scannable (T-037) | done ✓ (2026-11-02) |
+| D-010 | M4 build plan (`docs/M4-PLAN.md`) | written ✓ (2026-11-02); waits for the Commander's go |
 | D-005 | Store art for the store pages and loading screen | M4 |
 | D-006 | M3 Harmony and life | first version done ✓; scanner/Codex waits for T-016/T-017/T-018 |

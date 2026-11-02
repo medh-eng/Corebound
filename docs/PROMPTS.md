@@ -17,6 +17,7 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 
 | Date | What | Result |
 | --- | --- | --- |
+| 2 Nov | **Four agent deliveries** (T-030, T-031, T-036, T-037) | ✓ Merged. The creatures have names (**Mridugami**, **Bilavasa**, **Divachari**) and SARATHI remarks on them; Chapter 1 goals, hints and Codex entries are ready for M4 |
 | 1 Nov | **Phone landscape fix**: the picture stayed half-width after turning | ✓ Fixed; the game now checks its size every frame |
 | 1 Nov | **11 new models** (31 Oct): escape module, grazer, burrower, bird, jellyfish, projector, launch pad, memory log, quantum fragment, rover, translator; cryo pod and Sabatier with colour | ✓ All processed. **Grazers, burrowers and birds now live in the game.** The rest wait for M4. The jellyfish is all black (row 3) |
 | 1 Nov | Six agent deliveries (T-026, T-028, T-032, T-033, T-034, T-035) | ✓ Merged: text size, phone help, clearer machine prompts, music dips under SARATHI's voice |
@@ -27,9 +28,9 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 
 | Agent | Paste | Status |
 | --- | --- | --- |
-| ChatGPT Codex | `Do tasks/T-038-graphics-setting.md in medh-eng/Corebound. Follow AGENTS.md.` | ⏳ new |
-| ChatGPT chat | Writer intro (HANDOFF §3c), then the text of `tasks/T-030-codex-m4-entries.md`; then `tasks/T-031-chapter1-goals-hints.md`; then `tasks/T-037-creature-lines.md` | ⏳ T-030 and T-031 still waiting since 30 Oct |
-| Sarvam AI | Adviser intro (HANDOFF §3d), then `tasks/T-036-names-and-review-new-models.md` (it can open the pictures in `docs/review/2026-11-01/`) | ⏳ new |
+| ChatGPT Codex | `Do tasks/T-038-graphics-setting.md in medh-eng/Corebound. Follow AGENTS.md.` | ⏳ still waiting |
+| ChatGPT chat | Writer intro (HANDOFF §3c), then the text of `tasks/T-039-m4-machine-lines.md` | ⏳ new |
+| Sarvam AI | Adviser intro (HANDOFF §3d), then `tasks/T-040-voice-script-ch1.md` | ⏳ new |
 
 Upload writing answers to `team-inbox/writing/` with the file name the task gives. Codex opens its own pull request.
 
@@ -37,17 +38,18 @@ Upload writing answers to `team-inbox/writing/` with the file name the task give
 
 | # | What | Where it goes | Prompt |
 | --- | --- | --- | --- |
-| 1 | **Play on your phone again** (Ctrl+F5 or reopen the tab): turn sideways and back; it should fill the screen every time. Look for the grazers, burrowers and birds near your base. Tell the Director the frame rate (add `?fps=1`) | — | — |
-| 2 | **Re-record one voice line**: `goal_breathe.mp3` in Bulbul with the first word spelled **Electrolisis**: `Electrolisis complete. You are breathing. I consider that a good start.` (voice ishita, en-IN, pace 1.08) | `public/assets/audio/voice/goal_breathe.mp3` | T-035 |
-| 3 | **Jellyfish again with colour** (it came out all black). Not urgent: it belongs to the ice moon | `art-inbox/models/jellyfish.glb` | §5.1 |
-| 4 | **Mooladri's body:** Sarvam reviewed your two trunk concepts and approved the trunk. Upload them as `concept/guardian_root_trunk.png` and `concept/guardian_root_trunk_scene.png` to make it final. Before modelling, Sarvam asks for 5 changes: few thick strands that reach the ground (not a curtain), unequal blunt arms, no shoulder stubs, no single bright glow at the top, pale green glow when calm | `art-inbox/concept/` | `team-inbox/writing/T-032-review-models-mooladri.md` §7 |
-| 5 | **Starter ship** model (the demo's last scene) | `art-inbox/models/ship_starter.glb` | §7 |
-| 6 | *When convenient:* fix the trim Sarvam flagged on `vehicle_bay` (plain round arch, no crest, no petal row) and `sabatier_reactor` (rectangular windows, flat lids, no ball on top, straight base), and the cryo pod's hatch frame (plain round). Shape only; the colours are good | `art-inbox/models/` | `team-inbox/writing/T-032-review-models-mooladri.md` §3, §4, §8 |
-| 7 | **Machine sound loops**: `auto_drill_loop`, `conveyor_loop`, `research_loop`, `coal_burner_loop`, `electrolyzer_loop`, `battery_hum`, `solar_lotus_open` | `art-inbox/audio/sfx/` | §13.4 |
-| 8 | **Ambience**: `amb_jiva_day`, `amb_jiva_night`, `amb_cave` | `art-inbox/audio/sfx/` | §13.7 |
-| 9 | **Music still missing**: `memory_log`, `spaceflight` | `art-inbox/audio/music/` | §12 |
-| 10 | `o2_canister` model | `art-inbox/models/` | §8 |
-| 11 | **Teaser clips** for the demo trailer | `art-inbox/video/` | §10 |
+| 1 | **Say "go" for M4** after playing M2 and M3. The plan is in `docs/M4-PLAN.md`: six slices, each playable when it lands. Also say yes or no to the three creature names (other options are in `team-inbox/writing/T-036-names-and-models.md`) | — | — |
+| 2 | **Play on your phone again** (Ctrl+F5 or reopen the tab): turn sideways and back; walk near the grazers, burrowers and birds (SARATHI now comments). Tell the Director the frame rate (add `?fps=1`) and whether movement ever locks (issue #24) | — | — |
+| 3 | **Mooladri's body:** upload your two trunk concepts as `concept/guardian_root_trunk.png` and `concept/guardian_root_trunk_scene.png`, with Sarvam's 5 changes: few thick strands that reach the ground, unequal blunt arms, no shoulder stubs, no single bright glow at the top, pale green glow when calm. M4 slice 3 needs it | `art-inbox/concept/` | `team-inbox/writing/T-032-review-models-mooladri.md` §7 |
+| 4 | **Starter ship** model (the demo's last scene; M4 slice 5 needs it) | `art-inbox/models/ship_starter.glb` | §7 |
+| 5 | **Re-record one voice line**: `goal_breathe.mp3` in Bulbul with the first word spelled **Electrolisis**: `Electrolisis complete. You are breathing. I consider that a good start.` (voice ishita, en-IN, pace 1.08) | `public/assets/audio/voice/goal_breathe.mp3` | T-035 |
+| 6 | **Trim fixes, shape only** (colours are good). Paste each fix into your 3D tool and re-export with the same file name: **projector** `two straight posts with flat cut tops, no inward curve, unequal heights, keep the green dome and copper base`; **launch pad** `plain chamfered rim instead of the petal ring; flat-capped towers with a plain lightning rod; open cross-braced gantries, no lintel`; **quantum fragment** `three straight struts meeting a flat top plate; flat machined base plate with bolts; no point at the top`; **memory log** `the round boss becomes a small status light; a clip or recessed foot instead of the stand; squarer corners`; **Sabatier** `rectangular louvred windows; flat bolted lids; a gauge instead of the ball on top; straight base on a flat pad; the gold disc becomes a gauge`; **cryo pod** hatch frame plain round, flat base with two skids; **vehicle bay** plain round arch, no crest, no petal row | `art-inbox/models/` | `team-inbox/writing/T-036-names-and-models.md` §2, §4 |
+| 7 | **Jellyfish again with colour**: glowing pale blue-white, see-through bell. Not urgent: it belongs to the ice moon | `art-inbox/models/jellyfish.glb` | §5.1 |
+| 8 | **Machine sound loops**: `auto_drill_loop`, `conveyor_loop`, `research_loop`, `coal_burner_loop`, `electrolyzer_loop`, `battery_hum`, `solar_lotus_open` | `art-inbox/audio/sfx/` | §13.4 |
+| 9 | **Ambience**: `amb_jiva_day`, `amb_jiva_night`, `amb_cave` | `art-inbox/audio/sfx/` | §13.7 |
+| 10 | **Music still missing**: `memory_log`, `spaceflight` | `art-inbox/audio/music/` | §12 |
+| 11 | `o2_canister` model | `art-inbox/models/` | §8 |
+| 12 | **Teaser clips** for the demo trailer | `art-inbox/video/` | §10 |
 
 **Play on an Android phone:** open https://medh-eng.github.io/Corebound/ in Chrome on the phone, turn it sideways and tap New game (it goes full screen). Left thumb: touch anywhere on the left and slide to walk (push to the edge to run). Right thumb: drag to look; hold **Mine** and slide to aim the laser. The bottom row has Bag, Build, Belt, Codex, Planet, O₂, Pick up and Dance; ✕ closes a panel. To keep it like an app: Chrome menu ⋮ → **Add to Home screen** (or **Install app**). To see the frame rate, open https://medh-eng.github.io/Corebound/?fps=1 instead.
 

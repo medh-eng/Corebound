@@ -6,7 +6,7 @@ import { START_BASE } from './data/base';
 import { ITEMS, YIELD, MACHINES, SURVIVAL, RECIPES, type ItemId, type MachineId, type Recipe } from './data/items';
 import { researchById } from './data/research';
 import { CODEX, codexById } from './data/codex';
-import { RESEARCH_LINES, MACHINE_LINES, EVENT_LINES } from './data/lines';
+import { RESEARCH_LINES, MACHINE_LINES, EVENT_LINES, CREATURE_LINES } from './data/lines';
 import { CHAPTER1_GOALS, SARATHI_EVENTS } from './data/story';
 import { machineAction, machineOutput } from './data/controls';
 import { SarathiDrone } from './render/sarathi';
@@ -308,6 +308,7 @@ export async function startGame(opts: GameOptions) {
   const mined: Partial<Record<ItemId, number>> = {};
   const crafted: Partial<Record<ItemId, number>> = {};
   const flags: Record<string, boolean> = {};
+  let creatureTalk = 30, lastNight = 0;   // seconds until SARATHI may remark on a creature; last frame's night amount
   const fraction = new Map<ItemId, number>();
   const codexKnown: string[] = [];
   const codexNew: string[] = [];
@@ -1120,6 +1121,17 @@ export async function startGame(opts: GameOptions) {
     const abundance = band === 'thriving' ? 1 : THREE.MathUtils.clamp((hv - 25) / 55, 0, 1) * 0.7;
     fauna.update(shared.uTime.value, pos, abundance);
     creatures.update(dt, shared.uTime.value, pos, Math.max(abundance, 0.5), night);
+    // SARATHI notices the shy creatures (T-037): each remark once; a shy line only after that creature's first remark,
+    // and never two creature remarks within 20 seconds.
+    creatureTalk -= dt;
+    if (creatureTalk <= 0 && playing) {
+      const order: [string, string, string?][] = [['seen_grazer', 'first_grazer'], ['seen_burrower', 'first_burrower'], ['seen_bird', 'first_bird'], ['grazer_shy', 'grazer_shy', 'first_grazer'], ['burrower_shy', 'burrower_shy', 'first_burrower']];
+      for (const [ev, line, after] of order) {
+        if (creatures.events.has(ev) && !flags[`said_${line}`] && (!after || flags[`said_${after}`])) { flags[`said_${line}`] = true; ui.sarathi(CREATURE_LINES[line], 8); creatureTalk = 20; break; }
+      }
+    }
+    if (night > 0.45 && lastNight <= 0.45 && night > lastNight && flags.said_first_bird && !flags.said_bird_roost && creatureTalk <= 0) { flags.said_bird_roost = true; ui.sarathi(CREATURE_LINES.bird_roost, 8); creatureTalk = 20; }
+    lastNight = night;
     // Far grass, ferns and pebbles are not drawn (they are tiny at that distance): 45 m on phones.
     cullTimer -= dt;
     if (cullTimer <= 0) { cullTimer = 0.25; scatter.cullSmall(rig.mode === 'orbit' ? camera.position : pos, rig.mode === 'orbit' ? 1e9 : phone ? 45 : 95); }
@@ -1283,6 +1295,11 @@ export async function startGame(opts: GameOptions) {
     /** Opens a log and waits until Huxley's hologram has drawn (for screenshots). */
     showLogReady: async (id: string) => { openLog(id); await huxley.start(document.getElementById('log-holo') as HTMLCanvasElement); huxley.renderOnce(2.2); },
     say: (line: string, seconds?: number) => ui.sarathi(line, seconds),
+    /** Lets SARATHI remark on a creature straight away (playtests; normally 20 s between remarks). */
+    creatureTalkNow: () => { creatureTalk = 0; },
+    /** Unlocks Codex entries by id (playtests and screenshots). */
+    unlockCodex: (...ids: string[]) => ids.forEach((id) => { if (!codexKnown.includes(id)) unlockCodex(id); }),
+    flags,
     /** Puts the first grazer/burrower (or the birds) `dist` metres in front of the player. */
     bringCreature: (kind: 'grazer' | 'burrower' | 'bird', dist = 6) => creatures.bringTo(kind, V(me.pos), V(me.heading), dist),
     /** Stands `dist` metres from the first grazer/burrower/bird and looks at it. */

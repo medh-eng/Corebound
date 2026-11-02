@@ -54,6 +54,8 @@ export class Creatures {
   private birds: Bird[] = [];
   private rnd: () => number;
   private ready = false;
+  /** What happened this frame, for SARATHI's remarks (T-037): seen_grazer, seen_burrower, seen_bird, grazer_shy, burrower_shy. */
+  readonly events = new Set<string>();
 
   /** `dry(dir)` is true where a creature may stand (land, not water). */
   constructor(private ground: Ground, private dry: (dir: THREE.Vector3) => boolean, private counts = { grazers: 5, burrowers: 4, birds: 5 }, seed = 7) {
@@ -119,11 +121,13 @@ export class Creatures {
     };
     for (const g of this.grazers) if (g.obj.visible) test(g.obj.position.clone().addScaledVector(g.dir, 0.9), 1.1, 'gentle_grazer');
     for (const b of this.burrowers) if (b.obj.visible && b.state !== 'dive') test(b.obj.position.clone().addScaledVector(b.dir, 0.2), 0.6, 'small_burrower');
+    for (const f of this.birds) if (f.obj.visible) test(f.obj.position, 0.9, 'small_bird');
     return best;
   }
 
   /** `abundance` 0..1 from Harmony; `night` 0..1. */
   update(dt: number, time: number, player: THREE.Vector3, abundance: number, night: number) {
+    this.events.clear();
     if (!this.ready) return;
     const pDir = player.clone().normalize();
     const R = player.length();
@@ -139,7 +143,8 @@ export class Creatures {
       // Too far behind you on this small world: wander back into view.
       if (dist > 70) { g.dir.copy(this.landNear(pDir, 18, 40)); return; }
       g.t -= dt;
-      if (dist < 5 && g.state !== 'flee') { g.state = 'flee'; g.t = 2.5; }
+      if (dist < 12) this.events.add('seen_grazer');
+      if (dist < 5 && g.state !== 'flee') { g.state = 'flee'; g.t = 2.5; this.events.add('grazer_shy'); }
       if (g.t <= 0) {
         if (night > 0.7) { g.state = 'graze'; g.t = 3; }
         else if (g.state === 'walk') { g.state = 'graze'; g.t = 3 + this.rnd() * 4; }
@@ -176,9 +181,10 @@ export class Creatures {
         if (b.dir.clone().multiplyScalar(this.ground(b.dir)).distanceTo(player) < 6 || night > 0.85 || this.rnd() > 0.5 + abundance * 0.5) { b.t = 3 + this.rnd() * 5; continue; }
         b.state = 'rise'; b.t = 0.8; b.yaw = this.rnd() * 6.28; b.obj.visible = true;
       } else if (b.state === 'rise' && b.t <= 0) { b.state = 'look'; b.t = 4 + this.rnd() * 5; }
-      else if (b.state === 'look' && (b.t <= 0 || dist < 4.5)) { b.state = 'dive'; b.t = dist < 4.5 ? 0.35 : 0.7; }
+      else if (b.state === 'look' && (b.t <= 0 || dist < 4.5)) { b.state = 'dive'; b.t = dist < 4.5 ? 0.35 : 0.7; if (dist < 4.5) this.events.add('burrower_shy'); }
       else if (b.state === 'dive' && b.t <= 0) { b.state = 'hidden'; b.t = 4 + this.rnd() * 8; b.obj.visible = false; }
       if (!b.obj.visible) continue;
+      if (b.state === 'look' && dist < 12) this.events.add('seen_burrower');
       const k = b.state === 'rise' ? 1 - b.t / 0.8 : b.state === 'dive' ? b.t / (dist < 4.5 ? 0.35 : 0.7) : 1;
       const depth = (1 - THREE.MathUtils.smoothstep(k, 0, 1)) * 0.5;
       if (b.state === 'look') b.yaw += Math.sin(time * 1.3) * dt * 0.8;
@@ -201,6 +207,7 @@ export class Creatures {
       const pos = dir.clone().multiplyScalar(this.ground(dir) + f.alt + Math.sin(time * 0.7 + f.phase) * 0.8);
       const vel = e1.clone().multiplyScalar(-Math.sin(f.ang)).addScaledVector(e2, Math.cos(f.ang)).multiplyScalar(Math.sign(f.speed));
       place(f.obj, pos, dir, vel);
+      if (pos.distanceTo(player) < 25) this.events.add('seen_bird');
       const inner = f.obj.userData.inner as THREE.Object3D;
       inner.rotation.z = -Math.sign(f.speed) * 0.35;                       // bank into the turn
       const flap = Math.sin(time * 9 + f.phase);

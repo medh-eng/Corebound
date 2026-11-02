@@ -1,7 +1,7 @@
 # T-036: Names for Jivagraha's three creatures, and a review of the 11 new models
 
 - **Assigned to:** Sarvam AI
-- **Status:** review
+- **Status:** done (merged 2026-11-02)
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-036-names-and-models.md` (pull request from `sarvam/T-036-names-models`)
 

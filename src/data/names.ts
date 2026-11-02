@@ -34,7 +34,14 @@ export const CREATURE_NAMES: Record<string, Name> = {
   ribbon_glider: { name: 'Tarangini', deva: 'तरंगिणी', say: 'tuh-RUN-gi-nee', meaning: 'the flowing one' },
   acid_beetle: { name: 'Kathorakita', deva: 'कठोरकीट', say: 'kuh-THOR-uh-KEET', meaning: 'hard-shelled beetle' },
   cloud_ray: { name: 'Neelachhaya', deva: 'नीलछाया', say: 'NEEL-uh-CHHAA-yaa', meaning: 'blue shadow' },
+  // Jivagraha's three wandering creatures (Sarvam AI, T-036, 2 Nov; Sarvam's recommended name from each table).
+  grazer: { name: 'Mridugami', deva: 'मृदुगामी', say: 'MRID-oo-GAA-mee', meaning: 'gentle-goer', voice: 'Mri du gaa mi' },
+  burrower: { name: 'Bilavasa', deva: 'बिलवास', say: 'BIL-uh-VAAS', meaning: 'burrow-dweller', voice: 'Bi la vaa saa' },
+  bird: { name: 'Divachari', deva: 'दिवाचरी', say: 'DIV-aa-CHUH-ree', meaning: 'day-wanderer', voice: 'Di vaa cha ri' },
 };
+
+/** Which Codex entry each Jivagraha creature name belongs on. */
+export const CREATURE_CODEX: Record<string, string> = { grazer: 'gentle_grazer', burrower: 'small_burrower', bird: 'small_bird' };
 
 /** The Szynthars' own name for the grove-and-grass belt of Marubhumi where their packs were born
  *  (Medhanshu's word, kept as he wrote it). */

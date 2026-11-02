@@ -1,7 +1,7 @@
 # T-031: Chapter 1 goals and SARATHI hints (first 30 minutes)
 
 - **Assigned to:** ChatGPT (chat)
-- **Status:** review
+- **Status:** done (merged 2026-11-02)
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-031-chapter1-goals-hints.md`
 

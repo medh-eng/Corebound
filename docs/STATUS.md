@@ -2,6 +2,22 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
+## 2026-11-02
+
+**Four worker deliveries reviewed and merged** (all text; all four PRs met their "Done when" lists):
+- **T-036 (Sarvam):** Jivagraha's creatures have names: **Mridugami** the grazer ("gentle-goer"), **Bilavasa** the burrower ("burrow-dweller"), **Divachari** the bird ("day-wanderer"). They show in the Codex with Devanagari, and their voice respellings are stored. Sarvam also reviewed the 11 new models: 8 fine, 3 need trim fixes (Huxley's projector arms meet in an arch over him; the launch pad has a petal ring, needle finials and a doorway lintel; the fragment's cage reads as a relic case). The jellyfish's shape is fine: re-export with colour. The Sabatier reactor's shape fixes are still not done.
+- **T-037 (ChatGPT chat):** SARATHI now remarks on the creatures in the game: once when you first see each one up close, once the first time a grazer steps away or a burrower ducks back because you came near, and at the first dusk after you have seen a bird. Never two creature remarks within 20 seconds. The bird has a Codex entry (the Director added its leaf-shaped wings) and can now be scanned.
+- **T-030 (ChatGPT chat):** Codex entries for ten Chapter 1 objects, kept ready in `CHAPTER1_CODEX` until those objects are in the world. The Director rewrote Mooladri's and the root valley's entries: the delivered ones listed the three calming steps, which would give the puzzle away the moment you scanned Mooladri.
+- **T-031 (ChatGPT chat):** 16 Chapter 1 goals in play order, with a SARATHI "stuck" hint for each and phone wording, in `src/data/chapter1.ts` for M4.
+
+**Checked:** 217 tests (7 new: names on Codex entries, line lengths, goal order matching Mooladri's scenes, no keyboard keys in phone wording), type check, build. New playtest `scripts/playtest-creatures.mjs`: a grazer is brought close and SARATHI says her first remark, then the shy one, once each. Screenshots of the Codex fauna tab with the three names.
+
+**Next plan:** `docs/M4-PLAN.md` sets out the Chapter 1 demo in six playable slices (waking up; Huxley and the logs; Mooladri; rover and the Fragment chamber; launch pad and lift-off; finish and publish). It starts when the Commander says go.
+
+**New tasks:** T-039 (ChatGPT chat: SARATHI lines for the M4 machines and vehicles), T-040 (Sarvam: voice script for Chapter 1 so the Commander can record it). Still open: T-038 Graphics setting (ChatGPT Codex). No new uploads in `art-inbox/` since 31 October.
+
+**Waiting for the Commander:** say **go** for M4; phone retest (then issue #24 can close); re-record `goal_breathe.mp3`; Mooladri trunk concepts; starter ship model.
+
 ## 2026-11-01 (evening)
 
 **Phone: the half-screen picture after turning to landscape is fixed.** Android announced the turn before the new screen size was ready, and the game resized only on that announcement, so the picture kept its upright width. The game now checks its size every frame. New test `scripts/playtest-rotate.mjs` hides every size announcement from the game and still expects a full-screen picture upright, sideways and back again (it fails without the fix).

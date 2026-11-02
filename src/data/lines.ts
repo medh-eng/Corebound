@@ -33,3 +33,15 @@ export const EVENT_LINES: Record<string, string> = {
   drill_full: "The drill has filled its output space. Empty it or connect a belt so it can get back to work.",
   no_power: "This machine is outside your power network. Move it closer, or extend a connected line of pylons to reach it.",
 };
+
+/** Jivagraha's shy creatures (ChatGPT, T-037; reviewed 2026-11-02). Each is said once:
+ *  first_* the first time you see one up close, *_shy the first time one steps or ducks away from you,
+ *  bird_roost at the first dusk after you have seen a bird. */
+export const CREATURE_LINES: Record<string, string> = {
+  first_grazer: "Give that grazer space to feed and watch it from here. We can be interesting from a distance.",
+  first_burrower: "Stand back from that small opening and watch the burrower look around. Our welcome appears to be provisional.",
+  first_bird: "Look above the forest for a small bird circling in daylight. A useful reminder to look up occasionally.",
+  grazer_shy: "Pause and leave the grazer room to wander; it steps away when we come too close.",
+  burrower_shy: "Step back from the burrower's opening and wait quietly. It has concluded this meeting.",
+  bird_roost: "Give the bird's roost some space as dusk falls. Its working day appears to be over.",
+};
