@@ -1,4 +1,4 @@
-# Corebound handoff (28 October 2026, updated 29 October)
+# Corebound handoff (28 October 2026, updated 2 November)
 
 > **2 November:** T-030, T-031, T-036, T-037 merged: creatures named (Mridugami, Bilavasa, Divachari) and SARATHI remarks on them; Chapter 1 goals, hints and Codex entries ready (`src/data/chapter1.ts`, `CHAPTER1_CODEX`). M4 plan in six slices: `docs/M4-PLAN.md` (waits for the Commander's go). Open: T-038, T-039, T-040. 217 tests.
 > **29 October:** Huxley (rigged, five clips) and SARATHI models are in the game: SARATHI floats beside the Custodian; Huxley appears as a hologram in his recordings. Mooladri is faceless (the Commander's new concepts).
@@ -206,11 +206,11 @@ Then do your Director duties:
    quality checks yourself.
 5. Tell me what changed and what needs my decision.
 
-Where we are: M0–M3 have first versions built (159 tests pass); Huxley and SARATHI models are in.
-Android works in the browser (touch controls; scripts/playtest-touch.mjs). Open tasks: T-026 (ChatGPT
-Codex, text size), T-027 (ChatGPT chat, privacy notice and phone help), T-005 (my voice test).
-Mooladri is faceless (decided); its body shape is my decision. Next milestone is M4, the Chapter 1 demo.
-Start it only after I say go.
+Where we are (2 Nov): M0–M3 have first versions built (217 tests pass); Huxley, SARATHI and the creatures
+(Mridugami, Bilavasa, Divachari) are in. Chapter 1 text is ready (scenes.ts, chapter1.ts, CHAPTER1_CODEX).
+The M4 plan is docs/M4-PLAN.md (six slices). Open tasks: T-038 (ChatGPT Codex, Graphics setting),
+T-039 (ChatGPT chat, M4 machine lines), T-040 (Sarvam, Chapter 1 voice script).
+Mooladri is faceless with a trunk body (approved); its final concept is mine to upload. Start M4 only after I say go.
 
 Rules: no violence; the GDD is the source of truth (log every design decision there); never merge
 design changes without my yes; data in src/data/; plain-English commit messages; every milestone
@@ -223,7 +223,8 @@ Practical notes from the last chat:
   The headless browser is slow: keep commands under 10 minutes and use few frames.
 - Playtests: scripts/playtest-m2.mjs, scripts/playtest-mouse.mjs and scripts/playtest-touch.mjs (phone screen).
 - Phones: ?touch=1 forces touch controls, ?q=phone the phone preset, ?fps=1 shows the frame rate.
-- Creature test hooks: __game.bringCreature('grazer'|'burrower'|'bird', metres) puts one in front of you.
+- Creature test hooks: __game.bringCreature('grazer'|'burrower'|'bird', metres) puts one in front of you;
+  __game.creatureTalkNow() lets SARATHI remark at once; __game.unlockCodex(...ids). Playtest: scripts/playtest-creatures.mjs.
 - Rigged characters: Mixamo FBX clips go in art-inbox/models/<character>/, then `npm run rig -- <character>`
   with the dev server running (clip lists in src/tools/rig.ts). Preview a log: /?log=huxley_01.
 - After pushing, run `git fetch origin '+refs/heads/main:refs/remotes/origin/main'`.
