@@ -2,7 +2,10 @@
 import { CHAPTER1_LOGS } from './data/logs';
 import * as THREE from 'three';
 import { JIVAGRAHA } from './data/worlds';
-import { START_BASE } from './data/base';
+import { START_BASE, CRASH_SITE, OPENING } from './data/base';
+import { INTRO_LINES } from './data/scenes';
+import { CHAPTER1_MILESTONES, STEP_MILESTONE, STUCK_HINTS, PHONE_STUCK_HINTS, STUCK } from './data/chapter1';
+import { buildCrashSite } from './render/crashsite';
 import { ITEMS, YIELD, MACHINES, SURVIVAL, RECIPES, type ItemId, type MachineId, type Recipe } from './data/items';
 import { researchById } from './data/research';
 import { CODEX, codexById } from './data/codex';
@@ -65,6 +68,7 @@ export interface GameOptions {
   alt?: number;         // testing: start this many metres in the air
   log?: string;         // preview: open this memory log a few seconds after the game starts
   fps?: boolean;        // show the frame rate from the start (F3 on a keyboard)
+  wake?: boolean;       // testing: play the wake-up even when the title is skipped (?wake=1)
 }
 
 const SAVE_KEY = 'corebound.save.v1';
@@ -78,6 +82,7 @@ interface SaveData {
   digs: Dig[];
   ore: number[];
   goal: number;
+  goalId?: string;      // since M4: the goal by name, so new goals can be added in between
   mined: Partial<Record<ItemId, number>>;
   crafted: Partial<Record<ItemId, number>>;
   flags: Record<string, boolean>;
@@ -183,15 +188,26 @@ export async function startGame(opts: GameOptions) {
     colliders.push({ pos: P(lotusPoint), radius: 0.5 });
   }
 
+  // ── The crash site behind you: escape module and cryo-pod (M4) ──
+  const moduleDir = along(CRASH_SITE.escapeModule.forward, CRASH_SITE.escapeModule.right);
+  const podDir = along(CRASH_SITE.cryoPod.forward, CRASH_SITE.cryoPod.right);
+  const modulePoint = moduleDir.clone().multiplyScalar(terrain.groundRadius(P(moduleDir)));
+  const podPoint = podDir.clone().multiplyScalar(terrain.groundRadius(P(podDir)));
+  const crash = await buildCrashSite(terrain, moduleDir, CRASH_SITE.escapeModule, podDir, CRASH_SITE.cryoPod, spawnPoint);
+  crash.setSteam(0.15);
+  scene.add(crash.group);
+  colliders.push({ pos: P(modulePoint), radius: CRASH_SITE.escapeModule.radius }, { pos: P(podPoint), radius: CRASH_SITE.cryoPod.radius });
+
   // ── Plants, rocks, crystals, ore ──────────────────────
   ui.loading('Growing the forest', 0.5); await nextFrame();
   const scatter = scatterWorld(terrain, world.seed, up0, [
     { pos: domePoint, radius: 8 }, { pos: lotusPoint, radius: 4 }, { pos: spawnPoint, radius: 4.5 },
+    { pos: modulePoint, radius: 6 }, { pos: podPoint, radius: 3 },
   ], phone ? 0.65 : 1);
   scene.add(scatter.group);
   colliders.push(...scatter.colliders);
   scene.add(decorateBase(terrain, { up: up0, forward, right }, { dome: domePoint }));
-  const ore = new OreField(terrain, world.seed, { up: up0, forward, right }, [{ pos: domePoint, radius: 5 }, { pos: lotusPoint, radius: 2.5 }, { pos: spawnPoint, radius: 2 }]);
+  const ore = new OreField(terrain, world.seed, { up: up0, forward, right }, [{ pos: domePoint, radius: 5 }, { pos: lotusPoint, radius: 2.5 }, { pos: spawnPoint, radius: 2 }, { pos: modulePoint, radius: 5 }, { pos: podPoint, radius: 2.5 }]);
   scene.add(ore.group);
   const laser = new LaserView();
   scene.add(laser.group);
@@ -391,7 +407,7 @@ export async function startGame(opts: GameOptions) {
     if (opts.shot) return;
     const data: SaveData = {
       v: 1, days, me: { pos: { ...me.pos }, heading: { ...me.heading } }, pack: pack.toJSON(), base,
-      digs: voxels.digs, ore: ore.amounts(), goal: goalIndex, mined, crafted, flags, codex: codexKnown,
+      digs: voxels.digs, ore: ore.amounts(), goal: goalIndex, goalId: CHAPTER1_GOALS[goalIndex].id, mined, crafted, flags, codex: codexKnown,
     };
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch { /* storage full or blocked */ }
   };
@@ -405,7 +421,9 @@ export async function startGame(opts: GameOptions) {
     dug.rebuild(voxels.chunks.keys());
     for (const g of d.digs) clearFlora(V(g), g.r);
     ore.restore(d.ore);
-    goalIndex = d.goal;
+    // Older saves count goals from before the wake-up goal existed (M4), so they are one behind.
+    const byId = d.goalId ? CHAPTER1_GOALS.findIndex((g) => g.id === d.goalId) : -1;
+    goalIndex = byId >= 0 ? byId : Math.min(d.goal + 1, CHAPTER1_GOALS.length - 1);
     Object.assign(mined, d.mined); Object.assign(crafted, d.crafted); Object.assign(flags, d.flags);
     codexKnown.splice(0, codexKnown.length, ...(d.codex ?? []));
     for (const m of base.machines) addMachineView(m, m.yaw ?? 0);
@@ -417,6 +435,7 @@ export async function startGame(opts: GameOptions) {
   const goalDone = (id: string): boolean => {
     const has = (mid: MachineId) => base.machines.some((m) => m.id === mid && V(m.pos).distanceTo(domePoint) < SURVIVAL.gridRadius);
     switch (id) {
+      case 'wake': return !!flags.reachedShelter;
       case 'ice': return (mined.ice ?? 0) >= 3;
       case 'iron': return (mined.iron_ore ?? 0) >= 6;
       case 'silica': return (mined.silica ?? 0) >= 4;
@@ -442,7 +461,10 @@ export async function startGame(opts: GameOptions) {
   const goalsView = (): Goal[] => {
     const cur = CHAPTER1_GOALS[Math.min(goalIndex, CHAPTER1_GOALS.length - 1)];
     const next = CHAPTER1_GOALS[goalIndex + 1];
-    const list: Goal[] = [{ key: 'Now', text: cur.text }];
+    const ms = CHAPTER1_MILESTONES.find((m) => m.id === STEP_MILESTONE[cur.id]);
+    const list: Goal[] = [];
+    if (ms) list.push({ key: 'Chapter 1', text: ms.title, chapter: true });
+    list.push({ key: 'Now', text: cur.text });
     if (next) list.push({ key: 'Next', text: next.text });
     list.push({ key: '???', text: 'Something vast moves beneath the glowing forest…', mystery: true });
     return list;
@@ -587,6 +609,55 @@ export async function startGame(opts: GameOptions) {
   let cullTimer = 0;
   let wasNight = false, lowWarned = false, resTimer = 0, lampOn = false, researchTimer = 0, itemCodexTimer = 1;
 
+  // ── The wake-up (M4 slice 1) ──────────────────────────
+  // A new game opens on the crash site: the cryo-pod hisses open, SARATHI talks you awake, and the
+  // view swings round to the sunrise and the shelter. -1 = not running.
+  let opening = -1;
+  const openingShot = () => {
+    const camPos = spawnPoint.clone().addScaledVector(forward, 3.6).addScaledVector(right, -4.2).addScaledVector(up0, 1.8);
+    const look = crash.focus.clone().lerp(spawnPoint.clone().addScaledVector(up0, 1.2), 0.45);
+    rig.shot(camPos, look, up0);
+  };
+  const startOpening = () => {
+    opening = 0;
+    flags.reachedShelter = false;
+    document.body.classList.add('cinematic');
+    crash.setSteam(1);
+    openingShot();
+  };
+  const openingLocked = () => opening >= 0 && opening < OPENING.control;
+  const tickOpening = (dt: number) => {
+    if (opening < 0) return;
+    const before = opening;
+    opening += dt;
+    for (const b of OPENING.beats) if (before < b.t && opening >= b.t) ui.sarathi(INTRO_LINES[b.line], OPENING.lineSeconds);
+    if (opening >= OPENING.camera && rig.onShot) { rig.shot(null, undefined, undefined, 2.4); document.body.classList.remove('cinematic'); }
+    crash.setSteam(THREE.MathUtils.clamp(1 - (opening - 8) / 20, 0.15, 1));
+    const lastBeat = OPENING.beats[OPENING.beats.length - 1].t;
+    if (opening > lastBeat + OPENING.lineSeconds) opening = -1;
+  };
+
+  // ── Stuck hints (T-031): SARATHI helps when nothing has moved on for a while ──
+  let stuckClock = 0, stuckSig = '', stuckCheck = 0, stuckSaid = 0;
+  const progressSig = () => [goalIndex, Object.values(mined).reduce((a, n) => a + (n ?? 0), 0), Object.values(crafted).reduce((a, n) => a + (n ?? 0), 0),
+    base.machines.length, base.belts.length, base.research.done.length, base.research.progress > 0 ? 1 : 0, flags.reachedShelter ? 1 : 0].join('|');
+  const stuckHint = (): string => {
+    const step = CHAPTER1_GOALS[goalIndex];
+    const ms = STEP_MILESTONE[step.id];
+    return (ms && ((touch && PHONE_STUCK_HINTS[ms]) || STUCK_HINTS[ms])) || step.sarathi;
+  };
+  const tickStuck = (dt: number, quiet: boolean) => {
+    stuckCheck -= dt;
+    if (stuckCheck > 0) return;
+    stuckCheck = 1;
+    const sig = progressSig();
+    if (sig !== stuckSig) { stuckSig = sig; stuckClock = 0; stuckSaid = 0; return; }
+    if (quiet) return;                           // panels open, pause, the wake-up: the clock waits
+    stuckClock += 1;
+    const due = stuckSaid === 0 ? STUCK.firstAfter : STUCK.firstAfter + stuckSaid * STUCK.repeatAfter;
+    if (stuckClock >= due && goalIndex < CHAPTER1_GOALS.length - 1) { stuckSaid++; ui.sarathi(stuckHint(), 9); }
+  };
+
   const begin = (resume: boolean) => {
     if (touch) TouchControls.enterFullscreen();
     sound.start();
@@ -601,7 +672,8 @@ export async function startGame(opts: GameOptions) {
     ui.goals(goalsView());
     if (!opts.shot) input.lock();
     setTimeout(() => ui.toast('Jivagraha'), 3800);
-    setTimeout(() => ui.sarathi(CHAPTER1_GOALS[goalIndex].sarathi, 10), d ? 1000 : 5200);
+    if (d) setTimeout(() => ui.sarathi(CHAPTER1_GOALS[goalIndex].sarathi, 10), 1000);
+    else startOpening();
     if (opts.log) setTimeout(() => openLog(opts.log!), 6500);
   };
 
@@ -611,6 +683,7 @@ export async function startGame(opts: GameOptions) {
     playing = true;
     ui.showHud();
     ui.goals(goalsView());
+    if (opts.wake) startOpening();
   } else {
     rig.mode = 'orbit';
     rig.orbitPitch = 0.62;
@@ -853,7 +926,7 @@ export async function startGame(opts: GameOptions) {
     if (input.hit('KeyH')) ui.toggleHelp();
     if (input.wheel && !building) rig.dist = THREE.MathUtils.clamp(rig.dist + input.wheel * 0.8, 3.5, 14);
 
-    const active = playing && !ui.paused && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && !ui.codexOpen && !ui.logOpen && (input.locked || input.touch || opts.shot) && !rig.transitioning;
+    const active = playing && !ui.paused && !ui.packOpen && !ui.buildOpen && !ui.researchOpen && !ui.codexOpen && !ui.logOpen && (input.locked || input.touch || opts.shot) && !rig.transitioning && !openingLocked();
     if (active && input.hit('KeyM')) rig.setMode(rig.mode === 'follow' ? 'orbit' : 'follow', 1.4);
     const look = input.sensitivity;
     let yaw = 0;
@@ -891,6 +964,9 @@ export async function startGame(opts: GameOptions) {
     // Machines: use (E), pick up (X), canister (Q), dance (G), build menu (B), conveyor (C).
     const near = nearestMachine(pos, 2.8);
     const atShelter = pos.distanceTo(domePoint) < 4.4;
+    const atModule = pos.distanceTo(podPoint) < CRASH_SITE.airRadius || pos.distanceTo(modulePoint) < CRASH_SITE.escapeModule.radius + 1.2;
+    if (playing && !flags.reachedShelter && pos.distanceTo(domePoint) < OPENING.shelterReach) { flags.reachedShelter = true; advanceGoals(); }
+    if (playing && !ui.paused) { tickOpening(dt); tickStuck(dt, opening >= 0 || ui.packOpen || ui.buildOpen || ui.researchOpen || ui.codexOpen || ui.logOpen || rig.mode !== 'follow'); }
     let prompt: string | null = null;
     const wasBelt = beltMode;
     if (walk && !building && !beltMode) {
@@ -1163,7 +1239,7 @@ export async function startGame(opts: GameOptions) {
     if (playing && !ui.paused) {
       const o2Before = base.oxygen;
       const res = tickBase(base, {
-        dt, inShelter: atShelter, running: sprint && (fwd !== 0 || side !== 0), lasering, jetting: me.jetting,
+        dt, inShelter: atShelter, atModule, running: sprint && (fwd !== 0 || side !== 0), lasering, jetting: me.jetting,
         sunAt: (p) => daylight(sunElevation(days, P(V(p).normalize()))),
         nearShelter,
       });
@@ -1222,7 +1298,7 @@ export async function startGame(opts: GameOptions) {
       }
       if (ui.researchOpen && researchTimer <= 0) { renderResearch(); researchTimer = 0.4; }
       const baseNight = 1 - daylight(sunElevation(days, P(domeDir)));
-      if (baseNight > 0.8 && !wasNight) { wasNight = true; ui.sarathi(SARATHI_EVENTS.nightFalls); if (goalIndex >= 8) flags.sawNight = true; }
+      if (baseNight > 0.8 && !wasNight) { wasNight = true; ui.sarathi(SARATHI_EVENTS.nightFalls); if (goalIndex >= CHAPTER1_GOALS.findIndex((g) => g.id === 'night')) flags.sawNight = true; }
       if (baseNight < 0.3 && wasNight) { wasNight = false; ui.sarathi(SARATHI_EVENTS.sunrise); if (flags.sawNight) { flags.survivedNight = true; advanceGoals(); } }
       const gridText = `Power ${res.produceKW.toFixed(1)} kW${res.capacity ? ` · Battery ${base.stored.toFixed(0)}/${res.capacity} kWh` : ''}`;
       ui.vitals(base.oxygen, base.power, base.shelterO2 / SURVIVAL.shelterO2Capacity, localClock(days, P(up)), gridText);
@@ -1330,7 +1406,13 @@ export async function startGame(opts: GameOptions) {
       if (problem) return problem;
       belts.add(addBelt(base, f, t, len), pts); advanceGoals(); return 'ok';
     },
-    goalIndex: (i: number) => { goalIndex = i; ui.goals(goalsView()); },
+    goalIndex: (i: number | string) => { goalIndex = typeof i === 'number' ? i : Math.max(0, CHAPTER1_GOALS.findIndex((g) => g.id === i)); ui.goals(goalsView()); },
+    /** The wake-up: seconds since it began (-1 = not running); start it again for a playtest. */
+    opening: () => opening,
+    startOpening: () => startOpening(),
+    openingAt: (t: number) => { opening = t; },
+    stuckNow: () => { stuckClock = STUCK.firstAfter - 1; stuckCheck = 0; },
+    stuckHint: () => stuckHint(),
     /** Runs the factory for `seconds` of game time at once (tests run at a few frames per second). */
     simulate: (seconds: number) => {
       for (let t = 0; t < seconds; t += 0.25) {

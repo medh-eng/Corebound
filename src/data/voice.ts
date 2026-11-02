@@ -5,8 +5,12 @@
 import { RESEARCH_LINES, MACHINE_LINES, EVENT_LINES } from './lines';
 import { CHAPTER1_GOALS, SARATHI_EVENTS } from './story';
 
+/** Lines whose words changed (or are new) and wait for the Commander to record them (T-040):
+ *  until then SARATHI shows them as text only, so an old recording never plays with new words. */
+export const AWAITING_VOICE = new Set(['goal_wake.mp3', 'goal_ice.mp3']);
+
 const map: Record<string, string> = {};
-const add = (prefix: string, key: string, text: string) => { map[text.trim()] = `${prefix}_${key}.mp3`; };
+const add = (prefix: string, key: string, text: string) => { const f = `${prefix}_${key}.mp3`; if (!AWAITING_VOICE.has(f)) map[text.trim()] = f; };
 
 for (const [k, v] of Object.entries(RESEARCH_LINES)) add('research', k, v);
 for (const [k, v] of Object.entries(MACHINE_LINES)) add('machine', k, v);

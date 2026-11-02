@@ -38,6 +38,7 @@ export interface BaseState {
   oxygen: number;        // suit, 0..1
   power: number;         // suit, 0..1
   shelterO2: number;     // units in the shelter tank
+  moduleO2?: number;     // units of air left in the crashed escape module (M4; older saves have none)
   stored: number;        // kWh in the shelter network's batteries (kept for the HUD)
   machines: PlacedMachine[];
   belts: Belt[];
@@ -50,6 +51,7 @@ export interface BaseState {
 export interface Tick {
   dt: number;
   inShelter: boolean;
+  atModule?: boolean;                   // standing beside the crashed escape module
   running: boolean;
   lasering: boolean;
   jetting: boolean;
@@ -71,7 +73,7 @@ export interface TickResult {
 }
 
 export function newBase(): BaseState {
-  return { oxygen: SURVIVAL.startOxygen, power: 1, shelterO2: 0, stored: 0, machines: [], belts: [], blackouts: 0, nextUid: 1, research: { done: [], active: null, inv: {}, progress: 0 }, harmony: newHarmony() };
+  return { oxygen: SURVIVAL.startOxygen, power: 1, shelterO2: 0, moduleO2: SURVIVAL.moduleO2, stored: 0, machines: [], belts: [], blackouts: 0, nextUid: 1, research: { done: [], active: null, inv: {}, progress: 0 }, harmony: newHarmony() };
 }
 
 /** Brings older saves and hand-made states up to date: ids, buffers, belts, research. */
@@ -326,6 +328,11 @@ export function tickBase(b: BaseState, t: Tick): TickResult {
   if (t.inShelter && b.shelterO2 > 0 && b.oxygen < 1) {
     const takeO2 = Math.min(b.shelterO2, (1 - b.oxygen) * 100, 12 * dt);
     b.shelterO2 -= takeO2;
+    b.oxygen = Math.min(1, b.oxygen + takeO2 / 100);
+  } else if (!t.inShelter && t.atModule && (b.moduleO2 ?? 0) > 0 && b.oxygen < 1) {
+    // The escape module's last reserve: a slower refill, and it runs out for good.
+    const takeO2 = Math.min(b.moduleO2!, (1 - b.oxygen) * 100, 6 * dt);
+    b.moduleO2! -= takeO2;
     b.oxygen = Math.min(1, b.oxygen + takeO2 / 100);
   } else if (!t.inShelter) {
     b.oxygen -= (dt / SURVIVAL.oxygenSeconds) * (t.running ? SURVIVAL.sprintO2 : 1);

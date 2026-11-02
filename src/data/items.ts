@@ -133,6 +133,7 @@ export const SURVIVAL = {
   suitDrainPerSec: 0.004,    // walking
   laserDrainPerSec: 0.035,
   wakeOxygen: 0.35,
+  moduleO2: 30,              // units of air left in the crashed escape module (M4)
   shelterRadius: 3.0,
   shelterO2Capacity: 100,    // units; standing inside refills the suit from here
   electrolyzerIcePerUnit: 1, // one ice → 6 units of shelter oxygen

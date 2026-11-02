@@ -2,7 +2,7 @@ import './ui/style.css';
 import { startGame } from './game';
 import { wantsTouch } from './ui/touch';
 
-// URL options (for testing): ?log=huxley_01 (preview a memory log) ?skip=1 ?t=0.5 ?view=orbit ?q=low ?shot=1 ?yaw=20 ?pitch=0.3 ?dist=8
+// URL options (for testing): ?log=huxley_01 (preview a memory log) ?skip=1 ?t=0.5 ?view=orbit ?q=low ?shot=1 ?wake=1 (play the wake-up) ?yaw=20 ?pitch=0.3 ?dist=8
 const q = new URLSearchParams(location.search);
 const num = (k: string) => (q.has(k) ? Number(q.get(k)) : undefined);
 
@@ -23,6 +23,7 @@ startGame({
   alt: num('alt'),
   log: q.get('log') ?? undefined,
   fps: q.get('fps') === '1',
+  wake: q.get('wake') === '1',
 }).catch((e) => {
   console.error(e);
   document.body.insertAdjacentHTML('beforeend', `<pre style="position:fixed;inset:20px;color:#fff;white-space:pre-wrap">Corebound could not start: ${String(e?.message ?? e)}\nThis game needs a browser with WebGL 2.</pre>`);

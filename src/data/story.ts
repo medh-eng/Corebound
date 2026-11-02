@@ -2,7 +2,9 @@
 export interface StoryGoal { id: string; text: string; sarathi: string }
 
 export const CHAPTER1_GOALS: StoryGoal[] = [
-  { id: 'ice', text: 'Mine 3 ice — hold the left mouse button on the blue crystals', sarathi: 'Custodian… can you hear me? Oxygen is low. There is ice in the rocks nearby. Use your laser.' },
+  // M4: you wake in the crashed escape module; the opening's own lines are in scenes.ts (INTRO_LINES).
+  { id: 'wake', text: 'Follow the daylight to the shelter beside the solar lotus', sarathi: 'The hatch is responding. Take one breath, then follow the daylight.' },
+  { id: 'ice', text: 'Mine 3 ice — hold the left mouse button on the blue crystals', sarathi: 'The shelter is sound, but its tank is empty. There is ice in the rocks nearby. Use your laser.' },
   { id: 'iron', text: 'Mine 6 iron ore from the rust-red boulders', sarathi: 'Good. Ice gives us water, and water gives us air. We need iron to build the machine that splits it.' },
   { id: 'silica', text: 'Dig 4 silica — laser the ground; sandstone below gives more', sarathi: 'Sandstone is mostly silica. Dig into the ground below the grass — I will count what you collect.' },
   { id: 'craft_elec', text: 'Open your backpack (Tab) and craft an electrolyzer', sarathi: 'You have everything for an electrolyzer. It splits ice into oxygen and hydrogen.' },

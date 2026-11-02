@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CREATURE_NAMES, CREATURE_CODEX } from '../src/data/names';
 import { CODEX, CHAPTER1_CODEX, codexById } from '../src/data/codex';
 import { CREATURE_LINES } from '../src/data/lines';
-import { CHAPTER1_GOALS, STUCK_HINTS, PHONE_GOAL_HINTS, PHONE_STUCK_HINTS } from '../src/data/chapter1';
+import { CHAPTER1_MILESTONES as CHAPTER1_GOALS, STUCK_HINTS, PHONE_GOAL_HINTS, PHONE_STUCK_HINTS } from '../src/data/chapter1';
 
 const words = (s: string) => s.trim().split(/\s+/).length;
 

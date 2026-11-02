@@ -16,6 +16,7 @@ The Commander records SARATHI's lines in Bulbul (voice ishita, en-IN, pace 1.08)
 ## Lines to cover
 - `src/data/scenes.ts`: every line (`INTRO_LINES`, `GUARDIAN_LINES`, `CHAMBER_LINES`, `LIFTOFF_LINES`).
 - `src/data/lines.ts`: `CREATURE_LINES` (6).
+- `src/data/story.ts`: the goals `wake` and `ice` (new words; files `goal_wake.mp3` and `goal_ice.mp3`, the old `goal_ice.mp3` is replaced).
 - `src/data/chapter1.ts`: `STUCK_HINTS` (16; desktop wording).
 
 ## Write

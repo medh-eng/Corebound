@@ -7,6 +7,36 @@ export const START_BASE = {
   path: { stones: 9, spacing: 1.5 },
 };
 
+/** The crash site behind you at the start (M4): the escape module lies tilted in a scorched
+ *  hollow, and the cryo-pod has slid half out of its hatch. yawDeg turns the model; 0 points its
+ *  front (+Z) at where you stand. tiltDeg leans it over, as if it rolled on landing. */
+export const CRASH_SITE = {
+  escapeModule: { forward: -5.6, right: -1.6, yawDeg: 0, tiltDeg: 9, scale: 1.35, sink: 0.35, radius: 2.4 },
+  cryoPod: { forward: -1.7, right: -2.3, yawDeg: 90, tiltDeg: 4, scale: 1, sink: 0.12, radius: 1.1 },
+  /** The module still holds a little air: standing beside it refills the suit until it runs out. */
+  airRadius: 3.2,
+};
+
+/** The wake-up (M4 slice 1): seconds after a new game starts. SARATHI's lines are in scenes.ts
+ *  (INTRO_LINES); "control" is when you can walk, "camera" when the view swings to the sunrise. */
+export const OPENING = {
+  beats: [
+    { t: 1.2, line: 'pod_open' },
+    { t: 6.5, line: 'systems' },
+    { t: 12, line: 'hatch_ready' },
+    { t: 17, line: 'hatch_sunrise' },
+    { t: 23, line: 'oxygen' },
+    { t: 29, line: 'module' },
+    { t: 35, line: 'shelter' },
+  ],
+  fadeSeconds: 2.5,
+  camera: 12.5,
+  control: 13.5,
+  lineSeconds: 5.4,
+  /** Reaching this close to the shelter completes the first goal. */
+  shelterReach: 6,
+};
+
 export const SCATTER = {
   banyan: { count: 26, minSpacing: 24, minDegFromBase: 15 },
   mushroomTree: { count: 85, minSpacing: 9, minDegFromBase: 6.5 },

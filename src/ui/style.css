@@ -78,6 +78,8 @@ html:has(body.touch) { overscroll-behavior: none; }
 #goals .k { font-size: 10px; letter-spacing: 0.2em; color: var(--copper); text-transform: uppercase; margin-right: 8px; }
 #goals .done { color: var(--teal); }
 #goals .mystery { color: #c7b4ff; font-style: italic; }
+#goals .chapter { font-size: 0.82em; color: #f3d9a8; letter-spacing: 0.02em; }
+#goals .chapter .k { color: #9fe8ff; }
 #help { position: absolute; left: 16px; bottom: 16px; padding: 12px 14px; transition: opacity 1.2s; }
 #help .keys { margin: 0; font-size: 12px; gap: 3px 12px; }
 #stats { position: absolute; right: 16px; top: 220px; padding: 8px 12px; font: 12px ui-monospace, Menlo, Consolas, monospace; white-space: pre; }
@@ -315,3 +317,7 @@ body.touch #goals { top: 16px; bottom: auto; width: auto; min-width: 0; max-widt
   body.touch #hud { padding: 12px; gap: 8px; }
   body.touch #goals { max-width: none; }
 }
+
+/* The wake-up's opening shot (M4): only SARATHI's words over the picture. */
+body.cinematic #vitals, body.cinematic #goals, body.cinematic #res, body.cinematic #gear, body.cinematic #help, body.cinematic #touch { opacity: 0; pointer-events: none; transition: opacity 0.8s; }
+#vitals, #goals, #res, #gear { transition: opacity 0.8s; }

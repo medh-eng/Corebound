@@ -60,7 +60,7 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | — | Decide Mooladri's body: humanoid or buttressed trunk (Sarvam) | P1 | **next** |
 | — | Escape module and cryo-pod models (reference: `concept/jiva_crash_site.png`) | P1 | **next** |
 | — | Turn on GitHub Pages | — | done ✓ |
-| — | Play M2 and M3, then say "go" for M4 | — | **next** |
+| — | Play M2 and M3, then say "go" for M4 | — | done ✓ (2026-11-02) |
 
 ## Director (Claude)
 
@@ -71,6 +71,8 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | D-007 | Huxley hologram and SARATHI drone in the game | done ✓ (2026-10-29) |
 | D-008 | Android: touch controls, Phone preset, installable app (phone track P1) | done ✓ first version (2026-10-29); tuning after the Commander's phone test |
 | D-009 | Creature remarks wired; birds scannable (T-037) | done ✓ (2026-11-02) |
-| D-010 | M4 build plan (`docs/M4-PLAN.md`) | written ✓ (2026-11-02); waits for the Commander's go |
+| D-010 | M4 build plan (`docs/M4-PLAN.md`) | written ✓; **go given 2026-11-02** |
+| D-011 | M4 slice 1: wake-up in the escape module, Chapter 1 goal panel, stuck hints | done ✓ (2026-11-02) |
+| D-012 | M4 slice 2: Huxley's message, translator, memory logs in the wreckage | next |
 | D-005 | Store art for the store pages and loading screen | M4 |
 | D-006 | M3 Harmony and life | first version done ✓; scanner/Codex waits for T-016/T-017/T-018 |

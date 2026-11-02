@@ -5,7 +5,7 @@
 
 export interface ChapterGoal { id: string; title: string; hint: string }
 
-export const CHAPTER1_GOALS: ChapterGoal[] = [
+export const CHAPTER1_MILESTONES: ChapterGoal[] = [
   {
     id: "wake",
     title: "Follow the daylight",
@@ -120,3 +120,21 @@ export const PHONE_STUCK_HINTS: Record<string, string> = {
   memory_logs: "Read any memory log you find with Use, then tap Codex to revisit it.",
 };
 
+
+/** Which Chapter 1 milestone each step of the guided goals (story.ts) belongs to. The goal panel
+ *  shows the milestone's title above the step, and SARATHI's stuck hint is the milestone's.
+ *  Steps not listed (the M3 Harmony steps until slice 3) show no milestone and fall back to the
+ *  step's own SARATHI line. */
+export const STEP_MILESTONE: Record<string, string> = {
+  wake: 'wake',
+  ice: 'oxygen_supply', iron: 'oxygen_supply', silica: 'oxygen_supply', craft_elec: 'oxygen_supply',
+  place_elec: 'oxygen_supply', load_ice: 'oxygen_supply', breathe: 'oxygen_supply',
+  battery: 'battery', night: 'battery',
+  smelter: 'smelter',
+  research_station: 'automation', research_drill: 'automation', place_drill: 'automation',
+  research_belt: 'automation', belt: 'automation', auto_plates: 'automation',
+};
+
+/** Seconds without progress on the active goal before SARATHI offers its stuck hint (T-031),
+ *  and before she offers it again. */
+export const STUCK = { firstAfter: 180, repeatAfter: 360 };

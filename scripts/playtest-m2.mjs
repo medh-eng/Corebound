@@ -15,7 +15,7 @@ const frames = (n) => page.evaluate((k) => new Promise((r) => { let i = 0; const
 const result = await page.evaluate(() => {
   const g = window.__game;
   const out = {};
-  g.goalIndex(10);                                   // jump to the research_station goal
+  g.goalIndex('research_station');                   // jump to the research_station goal
   for (const [k, n] of [['iron_plate', 40], ['silica', 40], ['carbon', 30]]) g.give(k, n);
   const st = g.place('research_station', 6, -5);
   g.simulate(1);

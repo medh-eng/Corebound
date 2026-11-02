@@ -3,7 +3,7 @@
 // the Fragment chamber and the first lift-off.
 
 export const INTRO_LINES: Record<string, string> = {
-  pod_open: "Cryo-pod seals hiss open. Custodian, you are inside the crashed escape module. Welcome back.",
+  pod_open: "Cryo-pod seals hiss open. Custodian, our escape module has crashed, and you are awake. Welcome back.",
   systems: "SARATHI online. Your memory may take a moment to settle. My filing system has not enjoyed the landing either.",
   oxygen: "Your suit oxygen is low. Please check the gauge before leaving the pod.",
   module: "The module has limited reserves. We need a steady oxygen supply before they run out.",

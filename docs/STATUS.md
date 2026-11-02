@@ -2,7 +2,21 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
-## 2026-11-02
+## 2026-11-02 (morning): M4 slice 1, waking up
+
+**The Commander said go for M4.** Slice 1 of six is built and live.
+
+- **A new game now opens on the crash site.** After the flight down from orbit, the camera holds on the crashed escape module (the Commander's model, tilted, hatch open), the cryo-pod hissing steam beside it, the Custodian and SARATHI. The HUD stays hidden while SARATHI talks you awake; after about 12 seconds the view swings round to the sunrise and you can walk. Her seven intro lines (T-022) play in order over the first 40 seconds.
+- **First goal: "Follow the daylight to the shelter beside the solar lotus."** Reaching the shelter completes it and the ice goal follows.
+- **The module's last air:** standing beside it refills your suit slowly until its small reserve runs out.
+- **The goal panel shows the Chapter 1 milestone** above the current step ("Chapter 1 · Give the shelter air"), using T-031's titles.
+- **Stuck hints (T-031):** if nothing moves on for 3 minutes, SARATHI says the milestone's hint (phone wording on phones), and again every 6 minutes after that.
+- **Saved games keep working:** saves now remember the goal by name, and older saves are moved one goal on to make room for the new first goal.
+- **Two SARATHI lines reworded** to match what you see (the pod line and the first ice line). They are text only until recorded; the old ice recording is held back so it never plays with the new words.
+
+**Checked:** 217 tests; build; new playtest `scripts/playtest-wake.mjs` passes 9 of 9 on desktop and phone sizes (lines in order, no walking during the opening shot, walking after it, the stuck hint, the shelter completes the goal, module air refills the suit). The factory and phone playtests still pass. The crash site adds about 40,000 triangles (about 4% of a frame) and two models.
+
+## 2026-11-02 (early)
 
 **Four worker deliveries reviewed and merged** (all text; all four PRs met their "Done when" lists):
 - **T-036 (Sarvam):** Jivagraha's creatures have names: **Mridugami** the grazer ("gentle-goer"), **Bilavasa** the burrower ("burrow-dweller"), **Divachari** the bird ("day-wanderer"). They show in the Codex with Devanagari, and their voice respellings are stored. Sarvam also reviewed the 11 new models: 8 fine, 3 need trim fixes (Huxley's projector arms meet in an arch over him; the launch pad has a petal ring, needle finials and a doorway lintel; the fragment's cage reads as a relic case). The jellyfish's shape is fine: re-export with colour. The Sabatier reactor's shape fixes are still not done.

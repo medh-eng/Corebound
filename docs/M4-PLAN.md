@@ -1,6 +1,8 @@
 # M4 build plan: the Chapter 1 demo
 
-*Written by the Director on 2 November 2026. Nothing here starts until the Commander has played M2 and M3 and says **go**.*
+*Written by the Director on 2 November 2026. The Commander said **go** the same morning.*
+
+**Progress:** slice 1 ✓ (2 Nov) · slice 2 next
 
 M4 turns the sandbox into a story you can finish in about an hour: wake in a crashed pod, survive, build a factory, calm Mooladri, find the Fragment and lift off. It is built in **six slices**. Each slice ends playable and live on GitHub Pages, so the Commander can play after each one and stop us early if something feels wrong.
 
@@ -19,9 +21,9 @@ M4 turns the sandbox into a story you can finish in about an hour: wake in a cra
 
 ## The six slices
 
-**Slice 1: Waking up** (first 5 minutes)
+**Slice 1: Waking up** (first 5 minutes) ✓ built 2 Nov
 - New game starts inside the crashed escape module: the cryo pod opens, SARATHI's intro lines play, oxygen is low, the hatch opens on sunrise.
-- Escape module placed near the shelter and lotus; its limited reserves replace the current "start outside" opening.
+- Escape module and cryo-pod placed behind where you start; the module's last air refills the suit until it runs out.
 - Goal panel switches to the Chapter 1 list (`chapter1.ts`); the existing M1–M2 goals become the sub-steps under it.
 - Stuck hints: after 3 minutes with no progress on the active goal, SARATHI says the hint (phone wording on touch screens).
 - *Check:* a playtest that runs the opening without touching anything and confirms each hint appears.
@@ -47,7 +49,7 @@ M4 turns the sandbox into a story you can finish in about an hour: wake in a cra
 - Waits for: the starter ship model.
 
 **Slice 6: Finish and publish**
-- Difficulty (Relaxed / Standard), photo mode, the Graphics setting (T-038), first-hour pacing pass.
+- Difficulty (Calm / Standard / Engineer, as in GDD §16), photo mode, the Graphics setting (T-038), first-hour pacing pass.
 - Credits, store pages on itch.io (and the Steam page text) once the Commander approves the text.
 - **Hook test (the M4 gate):** five first-time players play the first 30 minutes while the Commander watches; every bored or lost moment is fixed before publishing.
 

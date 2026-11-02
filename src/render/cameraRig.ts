@@ -27,6 +27,7 @@ export class CameraRig {
   private smoothPos = new THREE.Vector3();
   private smoothUp = new THREE.Vector3(0, 1, 0);
   private first = true;
+  private cine: Pose | null = null;
 
   constructor(private camera: THREE.PerspectiveCamera, planetRadius: number, private groundRadius: (dir: THREE.Vector3) => number) {
     this.orbitDist = planetRadius * 3.4;
@@ -35,12 +36,29 @@ export class CameraRig {
   setMode(mode: CamMode, duration = 1.2) {
     if (mode === this.mode) return;
     this.from = { pos: this.camera.position.clone(), quat: this.camera.quaternion.clone() };
+    this.releasing = false;
     this.mode = mode;
     this.t = 0;
     this.dur = duration;
   }
 
-  get transitioning() { return this.t < 1; }
+  /** True during flights between views (input waits); the swing back from a shot does not count. */
+  get transitioning() { return this.t < 1 && !this.releasing; }
+  private releasing = false;
+
+  /** Holds the camera on a fixed shot (the wake-up). Pass null to hand the view back to the player,
+   *  blending over `blend` seconds. Setting a shot during a flight lands the flight on the shot. */
+  shot(pos: THREE.Vector3 | null, look?: THREE.Vector3, up?: THREE.Vector3, blend = 2) {
+    if (pos && look && up) { this.cine = lookPose(pos, look, up); return; }
+    if (!this.cine) return;
+    this.cine = null;
+    this.releasing = true;
+    this.from = { pos: this.camera.position.clone(), quat: this.camera.quaternion.clone() };
+    this.t = 0;
+    this.dur = blend;
+  }
+
+  get onShot() { return this.cine !== null; }
 
   private followPose(target: THREE.Vector3, up: THREE.Vector3, heading: THREE.Vector3): Pose {
     // Over the right shoulder, so the Custodian never hides the crosshair.
@@ -73,7 +91,7 @@ export class CameraRig {
     if (this.first) { this.smoothPos.copy(playerPos); this.smoothUp.copy(up); this.first = false; }
     this.smoothPos.lerp(playerPos, 1 - Math.exp(-14 * dt));
     this.smoothUp.lerp(up, 1 - Math.exp(-10 * dt)).normalize();
-    const target = this.mode === 'follow' ? this.followPose(this.smoothPos, this.smoothUp, heading) : this.orbitPose(up, heading);
+    const target = this.cine ?? (this.mode === 'follow' ? this.followPose(this.smoothPos, this.smoothUp, heading) : this.orbitPose(up, heading));
 
     if (this.t < 1 && this.from) {
       this.t = Math.min(1, this.t + dt / this.dur);

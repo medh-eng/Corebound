@@ -17,6 +17,7 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 
 | Date | What | Result |
 | --- | --- | --- |
+| 2 Nov | **M4 slice 1: waking up** | ✓ Live. New game: wake beside the crashed escape module and your cryo-pod, SARATHI talks you awake, then follow the daylight to the shelter. Your `escape_module` and `cryo_pod` models are in the game |
 | 2 Nov | **Four agent deliveries** (T-030, T-031, T-036, T-037) | ✓ Merged. The creatures have names (**Mridugami**, **Bilavasa**, **Divachari**) and SARATHI remarks on them; Chapter 1 goals, hints and Codex entries are ready for M4 |
 | 1 Nov | **Phone landscape fix**: the picture stayed half-width after turning | ✓ Fixed; the game now checks its size every frame |
 | 1 Nov | **11 new models** (31 Oct): escape module, grazer, burrower, bird, jellyfish, projector, launch pad, memory log, quantum fragment, rover, translator; cryo pod and Sabatier with colour | ✓ All processed. **Grazers, burrowers and birds now live in the game.** The rest wait for M4. The jellyfish is all black (row 3) |
@@ -38,7 +39,7 @@ Upload writing answers to `team-inbox/writing/` with the file name the task give
 
 | # | What | Where it goes | Prompt |
 | --- | --- | --- | --- |
-| 1 | **Say "go" for M4** after playing M2 and M3. The plan is in `docs/M4-PLAN.md`: six slices, each playable when it lands. Also say yes or no to the three creature names (other options are in `team-inbox/writing/T-036-names-and-models.md`) | — | — |
+| 1 | **Play the new opening**: press Ctrl+F5, then **New game** on the title screen (Continue keeps your old base). Tell the Director if the wake-up feels too long, too short or confusing. Also yes or no to the three creature names (other options in `team-inbox/writing/T-036-names-and-models.md`) | — | — |
 | 2 | **Play on your phone again** (Ctrl+F5 or reopen the tab): turn sideways and back; walk near the grazers, burrowers and birds (SARATHI now comments). Tell the Director the frame rate (add `?fps=1`) and whether movement ever locks (issue #24) | — | — |
 | 3 | **Mooladri's body:** upload your two trunk concepts as `concept/guardian_root_trunk.png` and `concept/guardian_root_trunk_scene.png`, with Sarvam's 5 changes: few thick strands that reach the ground, unequal blunt arms, no shoulder stubs, no single bright glow at the top, pale green glow when calm. M4 slice 3 needs it | `art-inbox/concept/` | `team-inbox/writing/T-032-review-models-mooladri.md` §7 |
 | 4 | **Starter ship** model (the demo's last scene; M4 slice 5 needs it) | `art-inbox/models/ship_starter.glb` | §7 |

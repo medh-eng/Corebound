@@ -39,7 +39,7 @@ const KEYS: [string, string][] = [
   ['Esc', 'Pause'],
 ];
 
-export interface Goal { key: string; text: string; done?: boolean; mystery?: boolean }
+export interface Goal { key: string; text: string; done?: boolean; mystery?: boolean; chapter?: boolean }
 
 export class UI {
   private logFrame = 0;
@@ -630,7 +630,7 @@ export class UI {
 
   goals(list: Goal[]) {
     $('#goals').innerHTML = list
-      .map((g) => `<div class="g ${g.done ? 'done' : ''} ${g.mystery ? 'mystery' : ''}"><span class="k">${g.key}</span>${g.done ? '✓ ' : ''}${T(g.text)}</div>`)
+      .map((g) => `<div class="g ${g.done ? 'done' : ''} ${g.mystery ? 'mystery' : ''} ${g.chapter ? 'chapter' : ''}"><span class="k">${g.key}</span>${g.done ? '✓ ' : ''}${T(g.text)}</div>`)
       .join('');
   }
 
