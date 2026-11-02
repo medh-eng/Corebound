@@ -1,7 +1,7 @@
 # T-037: SARATHI lines and a Codex entry for Jivagraha's creatures
 
 - **Assigned to:** ChatGPT (chat)
-- **Status:** todo
+- **Status:** review
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-037-creature-lines.md`
 
