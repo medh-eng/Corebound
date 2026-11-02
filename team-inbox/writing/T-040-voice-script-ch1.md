@@ -159,3 +159,48 @@ These are the ones to listen to first when the files come back. I would rather n
 - **Wire the six prefixes in `voice.ts` first**, or the files will sit in the folder unplayed — which is exactly what happened with the `sarathi_goal_ice` / `goal_ice` mismatch on 31 October. A test that no two lines map to one file name would catch both that class of bug and the `battery` / `smelter` collision above.
 - **Record `intro_systems`, `guardian_awake`, `liftoff_next_world` and `liftoff_cliffhanger` first**, and send them to me. If the four names survive, the other 48 will; if they do not, we have saved 48 recordings and found out on line four.
 - **When the set lands, I will run the same technical pass as T-035** — clipping, trim, levels, pace against the existing 57 — and give you the short listen list rather than asking for all 52 by ear.
+
+---
+
+## 6. Approved since: the rewording, and the four phone variants
+
+Two decisions were open in section 1 and section 4. Both are now taken, so this section is the final word on them.
+
+### 6a. `intro_systems` — reworded, with the exact edit
+
+"SARATHI online" is the one line I would not record as written: सारथी is an ordinary Sanskrit word as well as her name, and a voice given "Saa ra thee online" may stress it as a word rather than a name. The rewording is approved, so **two things change and they must change together**:
+
+| | |
+| --- | --- |
+| **In `src/data/scenes.ts`,** the line becomes | `systems: "Systems online. Your memory may take a moment to settle. My filing system has not enjoyed the landing either.",` |
+| **The file name stays** | `intro_systems.mp3` |
+| **Paste into Bulbul** | Systems online. Your memory may take a moment to settle. My filing system has not enjoyed the landing either. |
+
+The Director needs to make the one-line change in `scenes.ts`; the recording is made from the new text. If the old text were kept in the file and the new text recorded, the subtitle and the voice would disagree — which is the one failure this whole script exists to prevent. **If you would rather keep "SARATHI online", say so and I will put the respelling back; the risk is stress, not comprehension.**
+
+### 6b. The four phone variants
+
+Rather than accept a phone player hearing "press Tab" while the screen says "tap Bag", record the four hints that have touch wording. Four extra files, and they close the mismatch for the whole set — the other twelve stuck hints contain no key names at all, so their desktop and touch wording is identical and one recording serves both.
+
+Naming: keep the `stuck_` group and add `_touch` to the key, so nothing collides with the desktop file of the same hint.
+
+| File | Line as the game shows it on a phone | Line to paste into Bulbul |
+| --- | --- | --- |
+| `stuck_oxygen_supply_touch.mp3` | Gather blue ice, rust-red iron and silica beneath the grass, then tap Bag to craft an electrolyzer. | *same* |
+| `stuck_automation_touch.mp3` | Research drills and conveyors at a powered station, then tap Belt, then Pick on the drill, then Pick on the smelter. | *same* |
+| `stuck_huxley_message_touch.mp3` | Look for Prof. Huxley's recording on the main deck and tap Use to listen. | Look for Professor Hux lee's recording on the main deck and tap Use to listen. |
+| `stuck_memory_logs_touch.mp3` | Read any memory log you find with Use, then tap Codex to revisit it. | *same* |
+
+That brings the session to **56 files: 52 desktop lines and 4 touch variants.**
+
+### 6c. Fallback respellings, if a name still fails
+
+Try these in order and stop at the first that sounds right. Each keeps the syllables the same and only changes how they are glued together.
+
+| Name | First try | Second try | Third try |
+| --- | --- | --- | --- |
+| Mooladri | `Moo laa dri` | `Moo-laa-dri` | `Moolaa dri` |
+| Taptashila | `Tup ta shee laa` | `Tup-taa-shee-laa` | `Tupta sheelaa` |
+| Huxley | `Hux lee` | `Hux-lee` | — |
+
+**The rule behind the third column:** a hyphen joins syllables tightly and stops a voice treating the pieces as separate words, while a space does the opposite. If a name sounds like two words, remove the space. If it sounds rushed, add one.
