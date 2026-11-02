@@ -1,7 +1,7 @@
 # T-040: Voice script for Chapter 1 (respellings for SARATHI's new lines)
 
 - **Assigned to:** Sarvam AI
-- **Status:** todo
+- **Status:** review
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-040-voice-script-ch1.md` (pull request from `sarvam/T-040-voice-script`)
 
