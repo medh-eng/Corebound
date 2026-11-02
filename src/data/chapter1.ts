@@ -133,6 +133,7 @@ export const STEP_MILESTONE: Record<string, string> = {
   smelter: 'smelter',
   research_station: 'automation', research_drill: 'automation', place_drill: 'automation',
   research_belt: 'automation', belt: 'automation', auto_plates: 'automation',
+  huxley_message: 'huxley_message', translator: 'translator', memory_logs: 'memory_logs',
 };
 
 /** Seconds without progress on the active goal before SARATHI offers its stuck hint (T-031),

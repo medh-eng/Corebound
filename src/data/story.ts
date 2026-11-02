@@ -20,6 +20,10 @@ export const CHAPTER1_GOALS: StoryGoal[] = [
   { id: 'research_belt', text: 'Research conveyors at the research station', sarathi: 'A drill that nobody empties will fill up and stop. We need belts.' },
   { id: 'belt', text: 'Craft conveyors, press C, click the drill, then click the smelter', sarathi: 'A belt from the drill to the smelter, and the smelter never waits for you again.' },
   { id: 'auto_plates', text: 'Make 5 iron plates from ore that came by belt (keep the smelter fed with carbon)', sarathi: 'Iron plates, made while you were not looking. I believe this is called a factory.' },
+  // M4 slice 2: Huxley's message, the translator and the memory logs (milestones in chapter1.ts).
+  { id: 'huxley_message', text: "Go back to the escape module and press E at Prof. Huxley's projector by the hatch", sarathi: "The factory can mind itself for a while. The module's projector is still holding a recording addressed to you." },
+  { id: 'translator', text: 'Collect the translator from beside the escape module (E)', sarathi: 'Prof. Huxley mentioned a translator. It should be near the module, if the landing was kind to it.' },
+  { id: 'memory_logs', text: 'Find 3 memory logs: follow the blue beams of light, then press E', sarathi: 'Some of your memories were stored on logs, and the crash scattered them. Each one shows a blue beam.' },
   { id: 'harmony_look', text: 'Press M to see the whole planet — and how healthy it is', sarathi: 'Our machines make smoke and stir up mud. The planet notices. Look at it from above.' },
   { id: 'bio_filter', text: 'Research a bio-filter and build one to clean the air', sarathi: 'Algae eat smoke. A bio-filter by the smelters will keep the forest glowing.' },
   { id: 'bloom', text: 'Keep the world thriving until a bloom flower opens, then collect it with the laser', sarathi: 'A flower that only grows where the air, water and soil are clean. I would like to study one.' },

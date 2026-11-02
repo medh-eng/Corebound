@@ -2,10 +2,11 @@
 import { CHAPTER1_LOGS } from './data/logs';
 import * as THREE from 'three';
 import { JIVAGRAHA } from './data/worlds';
-import { START_BASE, CRASH_SITE, OPENING } from './data/base';
+import { START_BASE, CRASH_SITE, OPENING, STORY_PROPS } from './data/base';
 import { INTRO_LINES } from './data/scenes';
 import { CHAPTER1_MILESTONES, STEP_MILESTONE, STUCK_HINTS, PHONE_STUCK_HINTS, STUCK } from './data/chapter1';
 import { buildCrashSite } from './render/crashsite';
+import { buildStoryProps, dryGround, type PropSpot } from './render/storyprops';
 import { ITEMS, YIELD, MACHINES, SURVIVAL, RECIPES, type ItemId, type MachineId, type Recipe } from './data/items';
 import { researchById } from './data/research';
 import { CODEX, codexById } from './data/codex';
@@ -198,16 +199,27 @@ export async function startGame(opts: GameOptions) {
   scene.add(crash.group);
   colliders.push({ pos: P(modulePoint), radius: CRASH_SITE.escapeModule.radius }, { pos: P(podPoint), radius: CRASH_SITE.cryoPod.radius });
 
+  // ── Story props (M4 slice 2): Huxley's projector, the translator, memory logs ──
+  const SP = STORY_PROPS;
+  const propSpots: PropSpot[] = [
+    { id: 'projector', kind: 'projector', dir: dryGround(terrain, along(SP.projector.forward, SP.projector.right), up0), yawDeg: SP.projector.yawDeg, scale: SP.projector.scale, sink: 0.02 },
+    { id: 'translator', kind: 'translator', dir: dryGround(terrain, along(SP.translator.forward, SP.translator.right), up0), yawDeg: SP.translator.yawDeg, scale: SP.translator.scale, sink: 0.02 },
+    ...SP.logs.map((l, i): PropSpot => ({ id: l.id, kind: 'log', dir: dryGround(terrain, along(l.forward, l.right), up0), yawDeg: i * 47, scale: SP.logScale, sink: l.buried ? 0.13 : 0.01 })),
+  ];
+  const story = await buildStoryProps(terrain, propSpots, spawnPoint);
+  scene.add(story.group);
+  const propClear = story.props.map((p) => ({ pos: p.point, radius: p.kind === 'log' ? 1.6 : 1.2 }));
+
   // ── Plants, rocks, crystals, ore ──────────────────────
   ui.loading('Growing the forest', 0.5); await nextFrame();
   const scatter = scatterWorld(terrain, world.seed, up0, [
     { pos: domePoint, radius: 8 }, { pos: lotusPoint, radius: 4 }, { pos: spawnPoint, radius: 4.5 },
-    { pos: modulePoint, radius: 6 }, { pos: podPoint, radius: 3 },
+    { pos: modulePoint, radius: 6 }, { pos: podPoint, radius: 3 }, ...propClear,
   ], phone ? 0.65 : 1);
   scene.add(scatter.group);
   colliders.push(...scatter.colliders);
   scene.add(decorateBase(terrain, { up: up0, forward, right }, { dome: domePoint }));
-  const ore = new OreField(terrain, world.seed, { up: up0, forward, right }, [{ pos: domePoint, radius: 5 }, { pos: lotusPoint, radius: 2.5 }, { pos: spawnPoint, radius: 2 }, { pos: modulePoint, radius: 5 }, { pos: podPoint, radius: 2.5 }]);
+  const ore = new OreField(terrain, world.seed, { up: up0, forward, right }, [{ pos: domePoint, radius: 5 }, { pos: lotusPoint, radius: 2.5 }, { pos: spawnPoint, radius: 2 }, { pos: modulePoint, radius: 5 }, { pos: podPoint, radius: 2.5 }, ...propClear]);
   scene.add(ore.group);
   const laser = new LaserView();
   scene.add(laser.group);
@@ -454,6 +466,9 @@ export async function startGame(opts: GameOptions) {
       case 'harmony_look': return !!flags.sawPlanet;
       case 'bio_filter': return base.machines.some((m) => m.id === 'bio_filter');
       case 'bloom': return (mined.bloom ?? 0) >= 1;
+      case 'huxley_message': return !!flags.heardHuxley;
+      case 'translator': return !!flags.hasTranslator;
+      case 'memory_logs': return SP.logs.filter((l) => flags[`log_${l.id}`]).length >= SP.logsForGoal;
       case 'auto_plates': return base.machines.filter((m) => m.id === 'smelter' && (m.fedByBelt ?? 0) > 0).reduce((s, m) => s + (m.made ?? 0), 0) >= 5;
       default: return false;
     }
@@ -564,7 +579,33 @@ export async function startGame(opts: GameOptions) {
     if (/huxley/i.test(log.speaker ?? '')) void huxley.start(document.getElementById('log-holo') as HTMLCanvasElement);
     if (document.pointerLockElement) document.exitPointerLock(); return true;
   };
-  const closeLog = () => { ui.hideLog(); if (playing && !opts.shot) input.lock(); };
+  const closeLog = () => { ui.hideLog(); if (playing && !opts.shot) input.lock(); advanceGoals(); };
+  // Story props: use one with E (M4 slice 2). Logs and Huxley's message can be played again.
+  let reactionNext = 0;
+  const LOG_REACTIONS = CHAPTER1_LOGS.filter((l) => l.id.startsWith('sarathi_log_react')).map((l) => l.id);
+  const propDone = (id: string) => (id === 'projector' ? !!flags.heardHuxley : id === 'translator' ? !!flags.hasTranslator : !!flags[`log_${id}`]);
+  const nearestProp = (p: THREE.Vector3) => {
+    let best: (typeof story.props)[number] | null = null, bd = STORY_PROPS.reach;
+    for (const s of story.props) { if (s.kind === 'translator' && s.done) continue; const d = s.point.distanceTo(p); if (d < bd) { bd = d; best = s; } }
+    return best ? { prop: best, dist: bd } : null;
+  };
+  const propPrompt = (s: (typeof story.props)[number]): string => {
+    if (s.kind === 'projector') return `Prof. Huxley's projector · <b>E</b> ${s.done ? 'play his message again' : 'play the recording'}`;
+    if (s.kind === 'translator') return 'Translator · <b>E</b> pick it up';
+    const log = CHAPTER1_LOGS.find((l) => l.id === s.id);
+    return `Memory log${s.done && log?.title ? ` · ${log.title}` : ''} · <b>E</b> ${s.done ? 'read it again' : 'read it'}`;
+  };
+  const useProp = (s: (typeof story.props)[number]) => {
+    if (s.kind === 'projector') { flags.heardHuxley = true; openLog('huxley_01'); }
+    else if (s.kind === 'translator') {
+      flags.hasTranslator = true; s.done = true;
+      ui.pickup('Picked up the translator', '#9fffe0'); sound.goal(); unlockCodex('translator'); advanceGoals(); save();
+    } else {
+      const first = !flags[`log_${s.id}`];
+      openLog(s.id, first ? LOG_REACTIONS[reactionNext++ % LOG_REACTIONS.length] : undefined);
+      if (first) { const n = STORY_PROPS.logs.filter((l) => flags[`log_${l.id}`]).length; ui.toast(`Memory log ${n} of ${STORY_PROPS.logs.length + 2} found`); }
+    }
+  };
   ui.onLog = (id) => { ui.setCodex(false); openLog(id); };
   if (touch) touch.onClose = () => {
     if (ui.logOpen) closeLog(); else if (ui.packOpen) closePack(); else if (ui.buildOpen) closeBuild(); else if (ui.researchOpen) closeResearch(); else if (ui.codexOpen) closeCodex();
@@ -876,6 +917,12 @@ export async function startGame(opts: GameOptions) {
     if (m && V(m.pos).distanceTo(camera.position) < 25) hits.push([V(m.pos).distanceTo(o), m.id]);
     { const oc = domePoint.clone().addScaledVector(domeDir, 1.8).sub(o); const t = oc.dot(camDir); if (t > 0 && t < 30 && oc.lengthSq() - t * t < 3.2 * 3.2) hits.push([t, 'shelter_dome']); }
     const bl = blooms.raycast(o, camDir, 30); if (bl) hits.push([bl.t, 'bloom']);
+    // The crash site and the translator (M4 slice 2).
+    for (const [c, r, id] of [[modulePoint.clone().addScaledVector(moduleDir, 1.2), 2.4, 'escape_module'], [podPoint.clone().addScaledVector(podDir, 0.6), 1.0, 'cryo_pod']] as const) {
+      const oc = c.clone().sub(o); const t = oc.dot(camDir); if (t > 0 && t < 30 && oc.lengthSq() - t * t < r * r) hits.push([t, id]);
+    }
+    const tr = story.props.find((p) => p.id === 'translator');
+    if (tr && !tr.done) { const oc = tr.point.clone().addScaledVector(tr.point.clone().normalize(), 0.3).sub(o); const t = oc.dot(camDir); if (t > 0 && t < 20 && oc.lengthSq() - t * t < 0.6 * 0.6) hits.push([t, 'translator']); }
     const on = ore.raycast(o, camDir, 30); if (on) hits.push([on.t, KIND_CODEX[on.node.kind]]);
     const mt = fauna.nearRay(o, camDir, 25); if (mt !== null) hits.push([mt, 'glow_moth']);
     const cr = creatures.nearRay(o, camDir, 30); if (cr) hits.push(cr);
@@ -969,8 +1016,14 @@ export async function startGame(opts: GameOptions) {
     if (playing && !ui.paused) { tickOpening(dt); tickStuck(dt, opening >= 0 || ui.packOpen || ui.buildOpen || ui.researchOpen || ui.codexOpen || ui.logOpen || rig.mode !== 'follow'); }
     let prompt: string | null = null;
     const wasBelt = beltMode;
+    const np = walk && !building && !beltMode ? nearestProp(pos) : null;
+    if (np && (!near || np.dist < V(near.pos).distanceTo(pos))) {
+      prompt = propPrompt(np.prop);
+      if (input.hit('KeyE')) useProp(np.prop);
+    }
     if (walk && !building && !beltMode) {
-      if (near) {
+      if (prompt) { /* a story prop is nearer than any machine */ }
+      else if (near) {
         if (near.out && total(near.out) > 0 && !base.belts.some((b) => b.from === near.uid)) collectOut(near);
         prompt = machinePrompt(near);
         if (input.hit('KeyE')) useMachine(near);
@@ -1196,6 +1249,11 @@ export async function startGame(opts: GameOptions) {
     (planet.water.material as THREE.MeshStandardMaterial).color.set(world.palette.water).lerp(murk, THREE.MathUtils.smoothstep(base.harmony.water, 10, 70) * 0.8);
     const abundance = band === 'thriving' ? 1 : THREE.MathUtils.clamp((hv - 25) / 55, 0, 1) * 0.7;
     fauna.update(shared.uTime.value, pos, abundance);
+    for (const s of story.props) {
+      s.done = propDone(s.id);
+      if (s.kind === 'translator') s.group.children[0].visible = !s.done;
+    }
+    story.update(shared.uTime.value);
     creatures.update(dt, shared.uTime.value, pos, Math.max(abundance, 0.5), night);
     // SARATHI notices the shy creatures (T-037): each remark once; a shy line only after that creature's first remark,
     // and never two creature remarks within 20 seconds.
@@ -1362,6 +1420,17 @@ export async function startGame(opts: GameOptions) {
   // Hooks for tests and tuning in the browser console.
   window.__game = {
     setTime: (offsetDays: number) => { days = t0 + offsetDays; envTimer = 0; },
+    /** Story props (M4 slice 2): where each one stands and whether it has been used. */
+    storyProps: () => story.props.map((s) => ({ id: s.id, kind: s.kind, x: s.point.x, y: s.point.y, z: s.point.z, done: s.done })),
+    /** Puts you `back` metres from a point, facing it (for walking up to a prop). */
+    teleportTo: (x: number, y: number, z: number, back = 1.5) => {
+      const t = new THREE.Vector3(x, y, z), u = t.clone().normalize();
+      const away = V(me.pos).sub(t); away.addScaledVector(u, -away.dot(u));
+      if (away.lengthSq() < 1e-4) away.crossVectors(u, new THREE.Vector3(0, 1, 0));
+      const d = t.clone().addScaledVector(away.normalize(), back).normalize();
+      me.pos = P(d.multiplyScalar(terrain.groundRadius(P(d)) + 0.1));
+      const h = t.clone().sub(V(me.pos)); h.addScaledVector(u, -h.dot(u)); me.heading = P(h.normalize());
+    },
     teleport: (fw: number, rt: number) => { const d = along(fw, rt); me.pos = P(d.multiplyScalar(terrain.groundRadius(P(d)) + 0.1)); },
     stats: () => ({ calls: renderer.info.render.calls, triangles: renderer.info.render.triangles }),
     state: () => ({ pos: { ...me.pos }, grounded: me.grounded, fuel: me.jetFuel, alt: altitude(me, groundR), oxygen: base.oxygen, power: base.power, shelterO2: base.shelterO2, goal: CHAPTER1_GOALS[goalIndex].id, pack: pack.slots, machines: base.machines.length, smelters: base.machines.filter((m) => m.id === 'smelter').map((m) => ({ inv: m.inv, out: m.out, burn: m.burn, made: m.made, fed: m.fedByBelt })) }),

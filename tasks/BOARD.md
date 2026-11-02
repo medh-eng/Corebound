@@ -11,7 +11,7 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | [T-003](T-003-credits-screen.md) | Credits screen | ChatGPT (Codex) | P1 | done ✓ |
 | [T-004](T-004-names.md) | Names | Sarvam AI | P2 | done ✓; Sarvam's follow-up review (PR #6) fixed three names |
 | [T-005](T-005-sarathi-voice-test.md) | SARATHI voice test | Sarvam AI + Commander | P2 | done ✓ (PR #21, 31 Oct; 57 lines speak in the game; Director fixed the file names) |
-| [T-006](T-006-translations-ch1.md) | Hindi and Marathi, Chapter 1 | Sarvam AI | P3 | waiting (text freeze at M4); glossary and pilot done ✓ (PR #7) |
+| [T-006](T-006-translations-ch1.md) | Hindi and Marathi, Chapter 1 | Sarvam AI | P3 | waiting for the freeze after slice 5; batches 1–2 (106 strings) merged ✓ (PR #38, 2 Nov); glossary and pilot done ✓ (PR #7) |
 | [T-010](T-010-inventory-tests.md) | Unit tests for the backpack and crafting | ChatGPT (Codex) | P1 | done ✓ (PR #5, 47 tests) |
 | [T-011](T-011-loading-tips.md) | Tips on the loading screen | ChatGPT (Codex) | P2 | done ✓ (PR #9) |
 | [T-012](T-012-cultural-review.md) | Cultural review of art and music prompts | Sarvam AI | P2 | done ✓ (PR #4, applied to PROMPTS.md); art follow-up PR #15 applied too |
@@ -40,7 +40,10 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | [T-037](T-037-creature-lines.md) | SARATHI lines and a bird Codex entry for the creatures | ChatGPT (chat) | P2 | done ✓ (PR #35, 2 Nov; SARATHI's six creature remarks in the game; bird Codex entry, birds now scannable) |
 | [T-038](T-038-graphics-setting.md) | A Graphics setting (Phone / Low / High) | ChatGPT (Codex) | P2 | todo (new) |
 | [T-039](T-039-m4-machine-lines.md) | SARATHI lines for the M4 machines, research and vehicles | ChatGPT (chat) | P2 | todo (new) |
-| [T-040](T-040-voice-script-ch1.md) | Voice script for Chapter 1: respellings for SARATHI's new lines | Sarvam AI | P2 | todo (new) |
+| [T-040](T-040-voice-script-ch1.md) | Voice script for Chapter 1: respellings for SARATHI's new lines | Sarvam AI | P2 | done ✓ (PR #37, 2 Nov; 56 files; prefixes wired in `voice.ts`, silent until recorded) |
+| [T-041](T-041-photo-mode-panel.md) | Photo mode panel | ChatGPT (Codex) | P2 | todo (new) |
+| [T-042](T-042-mooladri-ui-text.md) | Text for Mooladri's valley; polish of three slice-2 goal lines | ChatGPT (chat) | P1 | todo (new) |
+| [T-043](T-043-voice-addendum.md) | Voice addendum: five goal lines, with Hindi and Marathi | Sarvam AI | P2 | todo (new) |
 | [T-018](T-018-codex-text.md) | Codex entries for Jivagraha and Harmony | ChatGPT (chat) | P2 | done ✓ (PR #11; in the game) |
 
 ## Commander
@@ -73,6 +76,7 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | D-009 | Creature remarks wired; birds scannable (T-037) | done ✓ (2026-11-02) |
 | D-010 | M4 build plan (`docs/M4-PLAN.md`) | written ✓; **go given 2026-11-02** |
 | D-011 | M4 slice 1: wake-up in the escape module, Chapter 1 goal panel, stuck hints | done ✓ (2026-11-02) |
-| D-012 | M4 slice 2: Huxley's message, translator, memory logs in the wreckage | next |
+| D-012 | M4 slice 2: Huxley's message, translator, memory logs in the wreckage | done ✓ (2026-11-02) |
+| D-013 | M4 slice 3: Mooladri, the closed valley, the calming puzzle | next (needs the trunk concept) |
 | D-005 | Store art for the store pages and loading screen | M4 |
 | D-006 | M3 Harmony and life | first version done ✓; scanner/Codex waits for T-016/T-017/T-018 |

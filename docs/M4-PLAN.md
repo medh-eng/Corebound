@@ -2,7 +2,7 @@
 
 *Written by the Director on 2 November 2026. The Commander said **go** the same morning.*
 
-**Progress:** slice 1 ✓ (2 Nov) · slice 2 next
+**Progress:** slice 1 ✓ (2 Nov) · slice 2 ✓ (2 Nov) · slice 3 next (waits for the Commander's trunk concept for proportions)
 
 M4 turns the sandbox into a story you can finish in about an hour: wake in a crashed pod, survive, build a factory, calm Mooladri, find the Fragment and lift off. It is built in **six slices**. Each slice ends playable and live on GitHub Pages, so the Commander can play after each one and stop us early if something feels wrong.
 
@@ -28,7 +28,7 @@ M4 turns the sandbox into a story you can finish in about an hour: wake in a cra
 - Stuck hints: after 3 minutes with no progress on the active goal, SARATHI says the hint (phone wording on touch screens).
 - *Check:* a playtest that runs the opening without touching anything and confirms each hint appears.
 
-**Slice 2: Huxley, the translator and the logs**
+**Slice 2: Huxley, the translator and the logs** ✓ built 2 Nov
 - Huxley's projector inside the module plays his first message; the translator is picked up from the module.
 - Memory logs (the Commander's model) placed in the wreckage and around the planet; each opens in the log viewer and stays in the Logs tab.
 

@@ -2,6 +2,23 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
+## 2026-11-02 (evening): M4 slice 2, Huxley, the translator and the memory logs
+
+**Slice 2 of six is built and live.**
+- **Three new steps after the factory goals** (under the Chapter 1 milestones "Listen to Prof. Huxley", "Find the translator", "Gather the missing memories"): go back to the escape module and press E at **Prof. Huxley's projector** (his first message plays with his hologram); pick up the **translator** beside the module (it joins the Codex); **read 3 memory logs**.
+- **Seven memory logs placed** (the Commander's model): three near the crash site, base and shelter, four half-buried further out (22 to 57 m away), as their text says. Each prop stands under a soft column of light until used: gold for the projector, green for the translator, blue for logs. No real lights, so phones keep their shader budget (79 slots of 224). Spots under water move to the nearest dry ground. Logs 08 and 09 belong by Mooladri's roots and come in slice 3.
+- **Reading a log** the first time gives one of SARATHI's five reactions in turn and a "Memory log 3 of 9 found" count; logs stay in the Codex's Logs tab; Huxley's message and every log can be played again.
+- **Scanner:** the escape module, cryo-pod and translator can now be scanned (their T-030 Codex entries are live).
+- **Voice (T-040 wired):** SARATHI's Chapter 1 lines have file names ready (`intro_`, `guardian_`, `chamber_`, `liftoff_`, `creature_`, `stuck_`, and `_touch` for phone hints). They stay text-only until the recordings arrive. A new test checks that no two lines share a file name. "SARATHI online" is now "Systems online" (Sarvam's advice).
+
+**Merged:** T-040 voice script (Sarvam, PR #37: 56 files, 15 respellings) and T-006 batches 1–2 (Sarvam, PR #38: 106 Hindi and Marathi strings, kept in `team-inbox/translations/` until the text freeze). Found in review: the T-040 script left out `goal_wake` and `goal_ice`; asked for in T-043.
+
+**Checked:** 226 tests; build; new playtest `scripts/playtest-story.mjs` passes 11 of 11 (projector prompt, Huxley's message moves the goal on, translator, three logs complete the goal, no page errors); screenshots by day and night; shader slots 79.
+
+**New tasks:** T-041 photo mode panel (ChatGPT Codex), T-042 slice 3 valley text and a polish of the new goal lines (ChatGPT chat), T-043 voice addendum (Sarvam). Still open: T-038, T-039.
+
+**Waiting for the Commander:** record the 4 test lines; yes to two Hindi spellings; Mooladri's trunk concept (slice 3 needs it); starter ship model; play slice 2. No new uploads in `art-inbox/` since 31 October.
+
 ## 2026-11-02 (morning): M4 slice 1, waking up
 
 **The Commander said go for M4.** Slice 1 of six is built and live.

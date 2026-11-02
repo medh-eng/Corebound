@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CREATURE_NAMES, CREATURE_CODEX } from '../src/data/names';
-import { CODEX, CHAPTER1_CODEX, codexById } from '../src/data/codex';
+import { CODEX, CHAPTER1_CODEX, CHAPTER1_IN_WORLD, codexById } from '../src/data/codex';
 import { CREATURE_LINES } from '../src/data/lines';
 import { CHAPTER1_MILESTONES as CHAPTER1_GOALS, STUCK_HINTS, PHONE_GOAL_HINTS, PHONE_STUCK_HINTS } from '../src/data/chapter1';
 
@@ -27,7 +27,7 @@ describe('T-037 creature lines and T-030 Chapter 1 Codex', () => {
     for (const [id, l] of Object.entries(CREATURE_LINES)) expect(words(l), id).toBeLessThan(30);
   });
   it('Chapter 1 entries have unique ids, 40-100 words, a science line, and no violence words', () => {
-    const ids = [...CODEX, ...CHAPTER1_CODEX].map((e) => e.id);
+    const ids = [...CODEX.filter((e) => !CHAPTER1_IN_WORLD.includes(e.id)), ...CHAPTER1_CODEX].map((e) => e.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const e of CHAPTER1_CODEX) {
       expect(words(e.text), e.id).toBeGreaterThanOrEqual(40); expect(words(e.text), e.id).toBeLessThanOrEqual(100);

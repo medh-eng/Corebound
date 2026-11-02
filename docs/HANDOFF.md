@@ -1,5 +1,6 @@
 # Corebound handoff (28 October 2026, updated 2 November)
 
+> **2 November, evening:** slice 2 is live: Huxley's projector and the translator by the module, seven memory logs around the crash site under beams of light (`src/render/storyprops.ts`, `STORY_PROPS` in `src/data/base.ts`, `scripts/playtest-story.mjs`; hooks `__game.storyProps()`, `__game.teleportTo(x,y,z,back)`). T-040 and T-006 batches 1–2 merged; T-040's prefixes wired in `src/data/voice.ts` (`AWAITING_GROUPS` until recorded). New tasks T-041, T-042, T-043. Next: slice 3 (Mooladri), when the trunk concept arrives. 226 tests.
 > **2 November, later:** the Commander said **go for M4**. Slice 1 is live: a new game opens beside the crashed escape module and cryo-pod, SARATHI talks you awake, then you follow the daylight to the shelter (`src/render/crashsite.ts`, `OPENING` in `src/data/base.ts`, `scripts/playtest-wake.mjs`, `?wake=1`). Goal panel shows Chapter 1 milestones; stuck hints after 3 minutes. Next: slice 2 (Huxley, translator, logs).
 > **2 November:** T-030, T-031, T-036, T-037 merged: creatures named (Mridugami, Bilavasa, Divachari) and SARATHI remarks on them; Chapter 1 goals, hints and Codex entries ready (`src/data/chapter1.ts`, `CHAPTER1_CODEX`). M4 plan in six slices: `docs/M4-PLAN.md` (waits for the Commander's go). Open: T-038, T-039, T-040. 217 tests.
 > **29 October:** Huxley (rigged, five clips) and SARATHI models are in the game: SARATHI floats beside the Custodian; Huxley appears as a hologram in his recordings. Mooladri is faceless (the Commander's new concepts).
@@ -209,8 +210,9 @@ Then do your Director duties:
 
 Where we are (2 Nov): M0–M3 have first versions built (217 tests pass); Huxley, SARATHI and the creatures
 (Mridugami, Bilavasa, Divachari) are in. Chapter 1 text is ready (scenes.ts, chapter1.ts, CHAPTER1_CODEX).
-The M4 plan is docs/M4-PLAN.md (six slices). Open tasks: T-038 (ChatGPT Codex, Graphics setting),
-T-039 (ChatGPT chat, M4 machine lines), T-040 (Sarvam, Chapter 1 voice script).
+The M4 plan is docs/M4-PLAN.md (six slices). Open tasks: T-038 and T-041 (ChatGPT Codex: Graphics setting, photo mode),
+T-039 and T-042 (ChatGPT chat: M4 machine lines, Mooladri valley text), T-043 (Sarvam, voice addendum).
+Slices 1-2 of M4 are live; slice 3 (Mooladri) is next.
 Mooladri is faceless with a trunk body (approved); its final concept is mine to upload. M4 is under way (go given 2 Nov): build the slices in docs/M4-PLAN.md in order.
 
 Rules: no violence; the GDD is the source of truth (log every design decision there); never merge

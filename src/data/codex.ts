@@ -74,3 +74,9 @@ export const CHAPTER1_CODEX: CodexEntry[] = [
   { id: "mooladri", kind: "world", title: "Root Guardian", name: "Mooladri", deva: "मूलाद्रि", text: "Mooladri is faceless, with a crown of glowing root tips that brightens and dims with the forest's health. Its restlessness follows the strain our machines place on the ground beneath them. I am treating it as part of Jivagraha rather than an obstacle in front of it: something to listen to, give room to and help, never to push aside. When the forest is well, I expect it to tell us in its own time.", science: "Plant roots take up water and dissolved nutrients and help anchor plants in soil." },
   { id: "root_valley", kind: "world", title: "Root valley", text: "Living roots close the way into this valley while Mooladri is restless. The barrier is a reminder to look at the ground beneath the factory, not only at its output. Whatever opens the path will have to begin with the forest's own needs. I note the direction of the roots and the dimming of the canopy here. An open route, when it comes, will not make the valley an empty building site.", science: "Living roots help hold soil in place, while leaf litter protects its surface and slows runoff." },
 ];
+
+/** Chapter 1 entries that are now in the world to be scanned. Each M4 slice adds its own:
+ *  slice 2 the crash site and the translator; slice 3 Mooladri and the valley; slice 4 the
+ *  vehicle bay, rover and Fragment; slice 5 the launch pad and starter ship. */
+export const CHAPTER1_IN_WORLD = ['cryo_pod', 'escape_module', 'translator'];
+CODEX.push(...CHAPTER1_CODEX.filter((e) => CHAPTER1_IN_WORLD.includes(e.id) && !CODEX.some((c) => c.id === e.id)));

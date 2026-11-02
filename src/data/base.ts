@@ -37,6 +37,31 @@ export const OPENING = {
   shelterReach: 6,
 };
 
+/** Story props (M4 slice 2), in metres from where you first stand (forward, right). Huxley's projector
+ *  and the translator wait by the escape module's hatch; the Custodian's memory logs lie scattered
+ *  by the crash, some half-buried. Each shows a soft beam of light until it is used. Logs 08 and 09
+ *  lie by Mooladri's roots and are placed with the Guardian in slice 3. `buried` sinks the log so
+ *  only its top shows, for the logs the text calls underground. If a spot is under water, the game
+ *  moves it to the nearest dry ground. */
+export const STORY_PROPS = {
+  projector: { forward: -3.3, right: 0.4, yawDeg: 200, scale: 1.6 },
+  translator: { forward: -6.8, right: 3.2, yawDeg: 140, scale: 1.6 },
+  logScale: 1.8,
+  logs: [
+    { id: 'log_01', forward: -9.5, right: -4.5, buried: false },
+    { id: 'log_02', forward: 6, right: -5.5, buried: false },
+    { id: 'log_03', forward: 16, right: 12.5, buried: false },
+    { id: 'log_04', forward: -22, right: 14, buried: true },
+    { id: 'log_05', forward: 34, right: -26, buried: true },
+    { id: 'log_06', forward: -40, right: -30, buried: true },
+    { id: 'log_07', forward: 48, right: 30, buried: true },
+  ],
+  /** How close you must stand to use one (metres). */
+  reach: 2.4,
+  /** How many logs complete the "Gather the missing memories" goal. */
+  logsForGoal: 3,
+};
+
 export const SCATTER = {
   banyan: { count: 26, minSpacing: 24, minDegFromBase: 15 },
   mushroomTree: { count: 85, minSpacing: 9, minDegFromBase: 6.5 },

@@ -17,6 +17,8 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 
 | Date | What | Result |
 | --- | --- | --- |
+| 2 Nov (evening) | **M4 slice 2: Huxley, the translator, memory logs** | ✓ Live. After the factory goals, go back to the escape module: **Prof. Huxley's projector** (gold beam of light) plays his message; pick up the **translator** (green beam); find **3 memory logs** (blue beams) around the crash site and base. Your `huxley_projector`, `translator` and `memory_log` models are in the game |
+| 2 Nov (evening) | **Sarvam's voice script** (T-040) and first Hindi/Marathi (T-006) | ✓ Merged. The script is ready to record (row 1 below) |
 | 2 Nov | **M4 slice 1: waking up** | ✓ Live. New game: wake beside the crashed escape module and your cryo-pod, SARATHI talks you awake, then follow the daylight to the shelter. Your `escape_module` and `cryo_pod` models are in the game |
 | 2 Nov | **Four agent deliveries** (T-030, T-031, T-036, T-037) | ✓ Merged. The creatures have names (**Mridugami**, **Bilavasa**, **Divachari**) and SARATHI remarks on them; Chapter 1 goals, hints and Codex entries are ready for M4 |
 | 1 Nov | **Phone landscape fix**: the picture stayed half-width after turning | ✓ Fixed; the game now checks its size every frame |
@@ -29,9 +31,9 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 
 | Agent | Paste | Status |
 | --- | --- | --- |
-| ChatGPT Codex | `Do tasks/T-038-graphics-setting.md in medh-eng/Corebound. Follow AGENTS.md.` | ⏳ still waiting |
-| ChatGPT chat | Writer intro (HANDOFF §3c), then the text of `tasks/T-039-m4-machine-lines.md` | ⏳ new |
-| Sarvam AI | Adviser intro (HANDOFF §3d), then `tasks/T-040-voice-script-ch1.md` | ⏳ new |
+| ChatGPT Codex | `Do tasks/T-038-graphics-setting.md in medh-eng/Corebound. Follow AGENTS.md.` then, when it is done, the same with `tasks/T-041-photo-mode-panel.md` | ⏳ T-038 still waiting; T-041 new |
+| ChatGPT chat | Writer intro (HANDOFF §3c), then the text of `tasks/T-042-mooladri-ui-text.md` (first: slice 3 needs it), then `tasks/T-039-m4-machine-lines.md` | ⏳ T-042 new; T-039 still waiting |
+| Sarvam AI | Adviser intro (HANDOFF §3d), then `tasks/T-043-voice-addendum.md` | ⏳ new |
 
 Upload writing answers to `team-inbox/writing/` with the file name the task gives. Codex opens its own pull request.
 
@@ -39,6 +41,9 @@ Upload writing answers to `team-inbox/writing/` with the file name the task give
 
 | # | What | Where it goes | Prompt |
 | --- | --- | --- | --- |
+| 0 | **Record 4 test lines first** (Sarvam's advice): open `team-inbox/writing/T-040-voice-script-ch1.md` and record `intro_systems`, `guardian_awake`, `liftoff_next_world`, `liftoff_cliffhanger` in Bulbul (voice ishita, en-IN, pace 1.08) using the "paste into Bulbul" column. Upload them; if the names sound right, record the other 52 | `art-inbox/audio/voice/` | T-040 §5 |
+| 0b | **Two spellings for Hindi and Marathi:** Sarvam wrote Jivagraha as **जीवग्रह** and Taptashila as **तप्तशिला**. Say yes, or give your spelling | — | T-006 |
+| 0c | **Play slice 2** (Ctrl+F5, Continue works): after the factory goals, find Huxley's projector, the translator and three logs by their beams. Are the beams easy to see? Is anything too far? | — | — |
 | 1 | **Play the new opening**: press Ctrl+F5, then **New game** on the title screen (Continue keeps your old base). Tell the Director if the wake-up feels too long, too short or confusing. Also yes or no to the three creature names (other options in `team-inbox/writing/T-036-names-and-models.md`) | — | — |
 | 2 | **Play on your phone again** (Ctrl+F5 or reopen the tab): turn sideways and back; walk near the grazers, burrowers and birds (SARATHI now comments). Tell the Director the frame rate (add `?fps=1`) and whether movement ever locks (issue #24) | — | — |
 | 3 | **Mooladri's body:** upload your two trunk concepts as `concept/guardian_root_trunk.png` and `concept/guardian_root_trunk_scene.png`, with Sarvam's 5 changes: few thick strands that reach the ground, unequal blunt arms, no shoulder stubs, no single bright glow at the top, pale green glow when calm. M4 slice 3 needs it | `art-inbox/concept/` | `team-inbox/writing/T-032-review-models-mooladri.md` §7 |
