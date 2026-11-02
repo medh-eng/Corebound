@@ -1,5 +1,6 @@
 # Corebound handoff (28 October 2026, updated 2 November)
 
+> **2 November, later:** the Commander said **go for M4**. Slice 1 is live: a new game opens beside the crashed escape module and cryo-pod, SARATHI talks you awake, then you follow the daylight to the shelter (`src/render/crashsite.ts`, `OPENING` in `src/data/base.ts`, `scripts/playtest-wake.mjs`, `?wake=1`). Goal panel shows Chapter 1 milestones; stuck hints after 3 minutes. Next: slice 2 (Huxley, translator, logs).
 > **2 November:** T-030, T-031, T-036, T-037 merged: creatures named (Mridugami, Bilavasa, Divachari) and SARATHI remarks on them; Chapter 1 goals, hints and Codex entries ready (`src/data/chapter1.ts`, `CHAPTER1_CODEX`). M4 plan in six slices: `docs/M4-PLAN.md` (waits for the Commander's go). Open: T-038, T-039, T-040. 217 tests.
 > **29 October:** Huxley (rigged, five clips) and SARATHI models are in the game: SARATHI floats beside the Custodian; Huxley appears as a hologram in his recordings. Mooladri is faceless (the Commander's new concepts).
 > **1 November:** phone landscape fixed (size checked every frame; `scripts/playtest-rotate.mjs`); dug-hole list moved to a texture (Android shader limit; `scripts/check-uniforms.mjs`); grazers, burrowers and birds live in the world (`src/render/creatures.ts`); 11 new models processed; T-026, T-028, T-032 to T-035 merged. Open: T-030, T-031, T-036, T-037, T-038.
@@ -210,7 +211,7 @@ Where we are (2 Nov): M0–M3 have first versions built (217 tests pass); Huxley
 (Mridugami, Bilavasa, Divachari) are in. Chapter 1 text is ready (scenes.ts, chapter1.ts, CHAPTER1_CODEX).
 The M4 plan is docs/M4-PLAN.md (six slices). Open tasks: T-038 (ChatGPT Codex, Graphics setting),
 T-039 (ChatGPT chat, M4 machine lines), T-040 (Sarvam, Chapter 1 voice script).
-Mooladri is faceless with a trunk body (approved); its final concept is mine to upload. Start M4 only after I say go.
+Mooladri is faceless with a trunk body (approved); its final concept is mine to upload. M4 is under way (go given 2 Nov): build the slices in docs/M4-PLAN.md in order.
 
 Rules: no violence; the GDD is the source of truth (log every design decision there); never merge
 design changes without my yes; data in src/data/; plain-English commit messages; every milestone
