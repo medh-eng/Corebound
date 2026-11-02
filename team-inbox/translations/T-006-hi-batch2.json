@@ -1,0 +1,277 @@
+[
+ {
+  "id": "ch1_goal_wake_title",
+  "where": "goal",
+  "text": "रोशनी की तरफ बढ़ो"
+ },
+ {
+  "id": "ch1_goal_oxygen_supply_title",
+  "where": "goal",
+  "text": "शेल्टर को हवा दो"
+ },
+ {
+  "id": "ch1_goal_battery_title",
+  "where": "goal",
+  "text": "रात के लिए रोशनी स्टोर करो"
+ },
+ {
+  "id": "ch1_goal_smelter_title",
+  "where": "goal",
+  "text": "अपनी पहली लोहे की प्लेटें बनाओ"
+ },
+ {
+  "id": "ch1_goal_automation_title",
+  "where": "goal",
+  "text": "फैक्ट्री को सामान ढोने दो"
+ },
+ {
+  "id": "ch1_goal_huxley_message_title",
+  "where": "goal",
+  "text": "Prof. Huxley को सुनो"
+ },
+ {
+  "id": "ch1_goal_translator_title",
+  "where": "goal",
+  "text": "ट्रांसलेटर ढूँढो"
+ },
+ {
+  "id": "ch1_goal_memory_logs_title",
+  "where": "goal",
+  "text": "खोई यादें इकट्ठा करो"
+ },
+ {
+  "id": "ch1_goal_rover_title",
+  "where": "goal",
+  "text": "रोवर बनाओ"
+ },
+ {
+  "id": "ch1_goal_roots_title",
+  "where": "goal",
+  "text": "जड़ों को जगह दो"
+ },
+ {
+  "id": "ch1_goal_clear_smog_title",
+  "where": "goal",
+  "text": "जंगल को सांस लेने दो"
+ },
+ {
+  "id": "ch1_goal_replant_bloom_title",
+  "where": "goal",
+  "text": "ब्लूम को जड़ पकड़ने में मदद करो"
+ },
+ {
+  "id": "ch1_goal_fragment_chamber_title",
+  "where": "goal",
+  "text": "अनजानी रोशनी की तरफ बढ़ो"
+ },
+ {
+  "id": "ch1_goal_launch_pad_title",
+  "where": "goal",
+  "text": "लॉन्च पैड बनाओ"
+ },
+ {
+  "id": "ch1_goal_starter_ship_title",
+  "where": "goal",
+  "text": "स्टार्टर शिप तैयार करो"
+ },
+ {
+  "id": "ch1_goal_lift_off_title",
+  "where": "goal",
+  "text": "जीवग्रह को ऊपर से देखो"
+ },
+ {
+  "id": "ch1_goal_wake_hint",
+  "where": "hint",
+  "text": "अपना ऑक्सीजन गेज देखो, खुले हैच से क्रायो-पॉड से बाहर निकलो, और सोलर कमल के पास वाला शेल्टर ढूँढो।"
+ },
+ {
+  "id": "ch1_goal_oxygen_supply_hint",
+  "where": "hint",
+  "text": "बर्फ, लोह-अयस्क और सिलिका इकट्ठा करो; इलेक्ट्रोलाइज़र क्राफ्ट करो, शेल्टर के पास लगाओ, और उसमें बर्फ डालो।"
+ },
+ {
+  "id": "ch1_goal_battery_hint",
+  "where": "hint",
+  "text": "काले पत्थरों से कार्बन इकट्ठा करो, फिर बैटरी क्राफ्ट करके लगाओ ताकि सूरज डूबने के बाद भी दिन की पावर चले।"
+ },
+ {
+  "id": "ch1_goal_smelter_hint",
+  "where": "hint",
+  "text": "स्मेल्टर क्राफ्ट करके लगाओ, E से लोह-अयस्क और कार्बन डालो, फिर चार लोहे की प्लेटें लो।"
+ },
+ {
+  "id": "ch1_goal_automation_hint",
+  "where": "hint",
+  "text": "रिसर्च स्टेशन बनाओ, ड्रिल और कन्वेयर खोलो, फिर बेल्ट से एक ड्रिल को स्मेल्टर से जोड़ो।"
+ },
+ {
+  "id": "ch1_goal_huxley_message_hint",
+  "where": "hint",
+  "text": "मेन डेक की रिकॉर्डिंग ढूँढो और E दबाकर Prof. Huxley को अपना अगला कदम समझाते सुनो।"
+ },
+ {
+  "id": "ch1_goal_translator_hint",
+  "where": "hint",
+  "text": "Prof. Huxley के बताए रास्ते पर फ्रंट डेक तक जाओ और ट्रांसलेटर उठाओ।"
+ },
+ {
+  "id": "ch1_goal_memory_logs_hint",
+  "where": "hint",
+  "text": "घूमते हुए मेमोरी लॉग ढूँढो; E दबाकर पढ़ो और J दबाकर दोबारा सुनो।"
+ },
+ {
+  "id": "ch1_goal_rover_hint",
+  "where": "hint",
+  "text": "रोवर खोलो, व्हीकल बे बनाओ, और उसे जोड़ने के लिए ज़रूरी पार्ट्स दो।"
+ },
+ {
+  "id": "ch1_goal_roots_hint",
+  "where": "hint",
+  "text": "घाटी के पास सिस्मिक स्कैन चलाओ, फिर हर ड्रिल चिह्नित जड़ों से दूर हटाओ।"
+ },
+ {
+  "id": "ch1_goal_clear_smog_hint",
+  "where": "hint",
+  "text": "बायो-फिल्टर रिसर्च करो, धुएँ के पास लगाओ, और धुंध छँटने तक उन्हें पानी और पावर देते रहो।"
+ },
+ {
+  "id": "ch1_goal_replant_bloom_hint",
+  "where": "hint",
+  "text": "जब मिट्टी साफ हो जाए, मूलाद्रि की खुली जड़ों के आसपास ब्लूम के बीज दोबारा लगाओ और घाटी को शांत होने दो।"
+ },
+ {
+  "id": "ch1_goal_fragment_chamber_hint",
+  "where": "hint",
+  "text": "मूलाद्रि के शांत होने के बाद खुली घाटी के रास्ते फ्रैगमेंट चैंबर की तरफ बढ़ो और उस अनजाने सिग्नल को स्कैन करो।"
+ },
+ {
+  "id": "ch1_goal_launch_pad_hint",
+  "where": "hint",
+  "text": "लॉन्च पैड के लिए लिखे पार्ट्स इकट्ठा करो और स्टार्टर शिप के लिए खुली जगह पर लगाओ।"
+ },
+ {
+  "id": "ch1_goal_starter_ship_hint",
+  "where": "hint",
+  "text": "लॉन्च पैड को लिखे शिप पार्ट्स, हाइड्रोजन और ऑक्सीजन दो, फिर कार्गो जाँचो।"
+ },
+ {
+  "id": "ch1_goal_lift_off_hint",
+  "where": "hint",
+  "text": "लॉन्च चेक पूरे करो, पैड साफ करो, और तप्तशिला की तरफ पहली उड़ान शुरू करो।"
+ },
+ {
+  "id": "ch1_stuck_wake",
+  "where": "stuck",
+  "text": "खुले हैच से रोशनी की तरफ बढ़ो और सोलर कमल के पास वाले शेल्टर तक जाओ।"
+ },
+ {
+  "id": "ch1_stuck_oxygen_supply",
+  "where": "stuck",
+  "text": "घास के नीचे से नीली बर्फ, ज़ंग जैसा लाल लोह-अयस्क और सिलिका इकट्ठा करो, फिर इलेक्ट्रोलाइज़र क्राफ्ट करने के लिए Tab दबाओ।"
+ },
+ {
+  "id": "ch1_stuck_battery",
+  "where": "stuck",
+  "text": "सूरज डूबने से पहले बैटरी को शेल्टर के पावर नेटवर्क पर लगाओ और बची हुई सोलर पावर से उसे चार्ज होने दो। अंधेरा वादे नहीं मानता।"
+ },
+ {
+  "id": "ch1_stuck_smelter",
+  "where": "stuck",
+  "text": "चालू स्मेल्टर में लोह-अयस्क और कार्बन डालो, फिर तैयार प्लेटें लेने के लिए पास जाओ।"
+ },
+ {
+  "id": "ch1_stuck_automation",
+  "where": "stuck",
+  "text": "पावर वाले स्टेशन पर ड्रिल और कन्वेयर रिसर्च करो, फिर C दबाओ, ड्रिल पर क्लिक करो, फिर स्मेल्टर पर।"
+ },
+ {
+  "id": "ch1_stuck_huxley_message",
+  "where": "stuck",
+  "text": "मेन डेक पर Prof. Huxley की रिकॉर्डिंग ढूँढो और सुनने के लिए E दबाओ।"
+ },
+ {
+  "id": "ch1_stuck_translator",
+  "where": "stuck",
+  "text": "फ्रंट डेक पर वह ट्रांसलेटर ढूँढो जिसका Prof. Huxley ने ज़िक्र किया।"
+ },
+ {
+  "id": "ch1_stuck_memory_logs",
+  "where": "stuck",
+  "text": "जो भी मेमोरी लॉग मिले उसे E से पढ़ो, फिर Codex में दोबारा देखने के लिए J दबाओ।"
+ },
+ {
+  "id": "ch1_stuck_rover",
+  "where": "stuck",
+  "text": "व्हीकल बे की पार्ट्स लिस्ट देखो और जो कम है वह दो ताकि रोवर पूरा हो। तुम्हारे जूतों ने कुछ मदद कमा ली है।"
+ },
+ {
+  "id": "ch1_stuck_roots",
+  "where": "stuck",
+  "text": "घाटी के पास सिस्मिक स्कैन चलाओ, फिर हर ड्रिल चिह्नित जीवित जड़ों से दूर हटाओ।"
+ },
+ {
+  "id": "ch1_stuck_clear_smog",
+  "where": "stuck",
+  "text": "धुंध छँटने तक धुएँ के पास वाले बायो-फिल्टर को पानी और पावर देते रहो।"
+ },
+ {
+  "id": "ch1_stuck_replant_bloom",
+  "where": "stuck",
+  "text": "मिट्टी साफ होते ही मूलाद्रि की खुली जड़ों के आसपास ब्लूम के बीज दोबारा लगाओ, फिर नई हरियाली को जमने का वक्त दो।"
+ },
+ {
+  "id": "ch1_stuck_fragment_chamber",
+  "where": "stuck",
+  "text": "मूलाद्रि ने जो रास्ता खोला है उस पर बढ़ो और जब कक्ष सुरक्षित पहुँच में हो, परत के नीचे की अनजानी रोशनी स्कैन करो।"
+ },
+ {
+  "id": "ch1_stuck_launch_pad",
+  "where": "stuck",
+  "text": "लॉन्च पैड की पार्ट्स लिस्ट देखो, जो कम है इकट्ठा करो, और लगाने के लिए साफ जगह चुनो।"
+ },
+ {
+  "id": "ch1_stuck_starter_ship",
+  "where": "stuck",
+  "text": "शिप के लिखे पार्ट्स पूरे करो, हाइड्रोजन और ऑक्सीजन दो, और उड़ान से पहले कार्गो जाँचो।"
+ },
+ {
+  "id": "ch1_stuck_lift_off",
+  "where": "stuck",
+  "text": "लॉन्च चेक पूरे करो और पैड साफ होते ही उड़ान शुरू करो। मेरा नेविगेशन सिस्टम अपनी पूरी कोशिश की तैयारी कर रहा है।"
+ },
+ {
+  "id": "ch1_phone_goal_smelter",
+  "where": "phone",
+  "text": "स्मेल्टर क्राफ्ट करके लगाओ, Use से लोह-अयस्क और कार्बन डालो, फिर चार लोहे की प्लेटें लो।"
+ },
+ {
+  "id": "ch1_phone_goal_huxley_message",
+  "where": "phone",
+  "text": "मेन डेक की रिकॉर्डिंग ढूँढो और Prof. Huxley को अगला कदम समझाते सुनने के लिए Use टैप करो।"
+ },
+ {
+  "id": "ch1_phone_goal_memory_logs",
+  "where": "phone",
+  "text": "घूमते हुए मेमोरी लॉग ढूँढो; पढ़ने के लिए Use टैप करो और दोबारा सुनने के लिए Codex टैप करो।"
+ },
+ {
+  "id": "ch1_phone_stuck_oxygen_supply",
+  "where": "phone",
+  "text": "घास के नीचे से नीली बर्फ, ज़ंग जैसा लाल लोह-अयस्क और सिलिका इकट्ठा करो, फिर इलेक्ट्रोलाइज़र क्राफ्ट करने के लिए Bag टैप करो।"
+ },
+ {
+  "id": "ch1_phone_stuck_automation",
+  "where": "phone",
+  "text": "पावर वाले स्टेशन पर ड्रिल और कन्वेयर रिसर्च करो, फिर Belt टैप करो, फिर ड्रिल पर Pick, फिर स्मेल्टर पर Pick।"
+ },
+ {
+  "id": "ch1_phone_stuck_huxley_message",
+  "where": "phone",
+  "text": "मेन डेक पर Prof. Huxley की रिकॉर्डिंग ढूँढो और सुनने के लिए Use टैप करो।"
+ },
+ {
+  "id": "ch1_phone_stuck_memory_logs",
+  "where": "phone",
+  "text": "जो मेमोरी लॉग मिले उसे Use से पढ़ो, फिर दोबारा देखने के लिए Codex टैप करो।"
+ }
+]
