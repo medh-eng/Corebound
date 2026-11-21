@@ -7,7 +7,8 @@
 - **Text basis:** I read the lines out of `src/data/story.ts` and `src/data/voice.ts` rather than retyping them, so the "line as the game shows it" column is the source text verbatim. Only `goal_translator` needs a respelling: "Prof." and "Huxley". The other four are pasted as they are.
 - **Also in here, marked optional:** ChatGPT's T-042 polish of the same three lines (`huxley_message`, `translator`, `memory_logs`) is in PR #39 and may be accepted. Recording a line twice is the expensive mistake, so section 4 gives the rows and the translations for that version too. Use one or the other, not both.
 - **One thing found while checking:** `goal_wake` and `intro_hatch_ready` are word for word the same sentence. Record it once and copy the file. Section 2 explains it.
-- **I cannot push to the repository** (GitHub is not connected for me), so this file goes to the Commander for upload to `team-inbox/writing/`.
+- **Delivered** on branch `sarvam/T-043-voice-addendum`, with the task's Status set to `review` in the same pull request.
+- **The Commander said yes to both spellings** (जीवग्रह, तप्तशिला) on 21 November, after this script was first written. Nothing in the files changes because of it — see question 1 in section 5.
 
 ---
 
@@ -132,7 +133,7 @@ PR #39 polishes `huxley_message`, `translator` and `memory_logs`. If the Directo
 
 ## 5. Questions and notes for the Director
 
-1. **T-006 spellings still waiting on the Commander:** जीवग्रह and तप्तशिला. Neither appears in these 16 strings, so this batch is not blocked by them.
+1. **The two spellings are confirmed.** The Commander said yes to जीवग्रह and तप्तशिला on 21 November, so they stand as written. **No file needs editing for this**, because the spellings are already in use everywhere they belong: `src/data/codex.ts` has `deva: 'जीवग्रह'` on the world entry, and batches 1 and 2 already carry जीवग्रह in 4 Hindi and 4 Marathi strings and तप्तशिला in 3 of each. The only thing left is administrative: the open question at `docs/PROMPTS.md` line 45 ("Say yes, or give your spelling") can be ticked off by whoever owns that checklist. Neither name appears in these 16 strings.
 2. **`ch1_goal_wake_text` and `ch1_goal_ice_text` are not in this batch**, because the task asked for the three slice-2 panel strings. Both already have reviewed versions in the T-006 pilot (§3, the `ice` and `breathe` rows) — reuse them rather than asking for them again. The remaining goal `text` strings for the other 21 goals have no translation yet and belong to the freeze.
 3. **A small `names.ts` change is suggested in section 1** — the `voice` field for Mooladri. It is a one-line edit; your call whether it is worth a task of its own.
 4. **The curly apostrophe in T-042's text** (see my review, `T-042-concept-review-mooladri.md`) matters here too: `voice.ts` matches by exact text, so a curly `Huxley’s` in the polished line would never find its recording. Paste it into `story.ts` with the straight `'`.
