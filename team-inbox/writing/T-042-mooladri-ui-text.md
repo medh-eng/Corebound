@@ -42,7 +42,7 @@ export const VALLEY_STEPS = {
     sarathi: 'Supply bio-filters near the smog with water and power until the haze clears.',
   },
   replant_bloom: {
-    text: 'Replant bloom spores around Mooladri’s exposed roots once the soil is clean.',
+    text: 'Replant bloom spores around Mooladri\'s exposed roots once the soil is clean.',
     sarathi: 'Replant bloom spores around the exposed roots once the soil is clean, then give the new growth time to settle.',
   },
 };
@@ -53,8 +53,8 @@ export const VALLEY_STEPS = {
 ```ts
 export const SLICE2_GOALS = {
   huxley_message: {
-    text: 'Return to the escape module; press E at Prof. Huxley’s projector by the hatch.',
-    sarathi: 'Return to the module and listen to Prof. Huxley’s recording by the hatch. The factory can manage a short absence.',
+    text: 'Return to the escape module; press E at Prof. Huxley\'s projector by the hatch.',
+    sarathi: 'Return to the module and listen to Prof. Huxley\'s recording by the hatch. The factory can manage a short absence.',
   },
   translator: {
     text: 'Press E to collect the translator beside the escape module.',
@@ -82,7 +82,7 @@ export const DIRECTOR_HANDOFF = {
   relocation: 'The drill prompt names the required movement; use the existing pickup and placement controls without adding an interaction key.',
   soil: 'Clean soil remains a prerequisite for replanting; clearing the haze must not bypass the soil check.',
   slice2: 'The polished goals preserve the hatch-side projector, nearby translator, three readable logs, blue beams and E interaction.',
-  names: 'All required IDs are unchanged; retain Mooladri’s name and the existing Codex wording.',
+  names: 'All required IDs are unchanged; retain Mooladri\'s name and the existing Codex wording.',
   integration: 'This writing delivery adds no gameplay trigger, completion check, timer, controller binding or voice recording.',
   review: 'Please check stage gating, root visibility, planting eligibility and phone wording when building slice 3.',
 };
