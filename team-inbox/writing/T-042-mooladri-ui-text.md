@@ -17,7 +17,7 @@ export const DELIVERY_NOTE = {
 export const VALLEY_PROMPTS = {
   roots_blocked: 'Living roots close the valley. Give them room.',
   seismic_scan_hold: 'Keep holding Scan to trace the roots.',
-  root_marked: 'Living root marked. Keep drills clear.',
+  root_marked: 'Living root marked.',
   drill_on_root: 'Move this drill clear of the marked roots.',
   bloom_spores_plant: 'Press E to plant bloom spores here.',
   bloom_spores_wrong: 'The soil is not clean enough for planting yet.',
