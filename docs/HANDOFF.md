@@ -1,4 +1,4 @@
-# Corebound handoff (28 October 2026, updated 2 November)
+# Corebound handoff (28 October 2026, updated 22 November)
 
 > **22 November:** slice 3 is live: Mooladri wakes, four calming steps, the valley opens (`src/data/valley.ts`, `src/systems/guardian.ts`, `src/render/mooladri.ts`, `scripts/playtest-mooladri.mjs`; hooks `__game.mooladri()`, `guardianTime(s)`, `nearMooladri(m, deg)`, `seismicAt(t)`, `move(i, fw, rt)`). T-042 and T-043 merged; new T-044. 242 tests. **The Commander is deciding on a Unity port: `docs/UNITY-PLAN.md`.** Next: the hook test on the web build, then the Unity port (or slice 4 here if he says no).
 > **2 November, evening:** slice 2 is live: Huxley's projector and the translator by the module, seven memory logs around the crash site under beams of light (`src/render/storyprops.ts`, `STORY_PROPS` in `src/data/base.ts`, `scripts/playtest-story.mjs`; hooks `__game.storyProps()`, `__game.teleportTo(x,y,z,back)`). T-040 and T-006 batches 1–2 merged; T-040's prefixes wired in `src/data/voice.ts` (`AWAITING_GROUPS` until recorded). New tasks T-041, T-042, T-043. Next: slice 3 (Mooladri), when the trunk concept arrives. 226 tests.
@@ -209,12 +209,11 @@ Then do your Director duties:
    quality checks yourself.
 5. Tell me what changed and what needs my decision.
 
-Where we are (2 Nov): M0–M3 have first versions built (217 tests pass); Huxley, SARATHI and the creatures
-(Mridugami, Bilavasa, Divachari) are in. Chapter 1 text is ready (scenes.ts, chapter1.ts, CHAPTER1_CODEX).
-The M4 plan is docs/M4-PLAN.md (six slices). Open tasks: T-038 and T-041 (ChatGPT Codex: Graphics setting, photo mode),
-T-039 and T-042 (ChatGPT chat: M4 machine lines, Mooladri valley text), T-043 (Sarvam, voice addendum).
-Slices 1-2 of M4 are live; slice 3 (Mooladri) is next.
-Mooladri is faceless with a trunk body (approved); its final concept is mine to upload. M4 is under way (go given 2 Nov): build the slices in docs/M4-PLAN.md in order.
+Where we are (22 Nov): M4 slices 1-3 are live (wake-up; Huxley, translator, logs; Mooladri and the
+valley). 242 tests pass; playtests include scripts/playtest-mooladri.mjs. Open tasks: T-038 and T-041
+(ChatGPT Codex: Graphics setting, photo mode), T-039 and T-044 (ChatGPT chat: M4 machine lines, slice 3 polish).
+I am deciding whether to move the game to Unity: read docs/UNITY-PLAN.md. If I said yes, follow its steps
+(freeze the web game at slice 3, hook test, then the port). If I said no, build slice 4 of docs/M4-PLAN.md.
 
 Rules: no violence; the GDD is the source of truth (log every design decision there); never merge
 design changes without my yes; data in src/data/; plain-English commit messages; every milestone
@@ -225,7 +224,7 @@ Practical notes from the last chat:
 - Screenshots: `node scripts/screenshots.mjs "/?shot=1" out.png 1280 720 0 "<js>"`. Test hooks are on
   window.__game (setTime, teleport, give, place, simulate, openCodex, showLog, pollute, planetView, and more).
   The headless browser is slow: keep commands under 10 minutes and use few frames.
-- Playtests: scripts/playtest-m2.mjs, scripts/playtest-mouse.mjs and scripts/playtest-touch.mjs (phone screen).
+- Playtests: scripts/playtest-m2.mjs, playtest-mouse.mjs, playtest-touch.mjs (phone), playtest-story.mjs, playtest-mooladri.mjs.
 - Phones: ?touch=1 forces touch controls, ?q=phone the phone preset, ?fps=1 shows the frame rate.
 - Creature test hooks: __game.bringCreature('grazer'|'burrower'|'bird', metres) puts one in front of you;
   __game.creatureTalkNow() lets SARATHI remark at once; __game.unlockCodex(...ids). Playtest: scripts/playtest-creatures.mjs.
