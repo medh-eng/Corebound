@@ -1,7 +1,7 @@
 # T-043: Voice script addendum: five goal lines, and answers to your T-006 questions
 
 - **Assigned to:** Sarvam AI
-- **Status:** todo
+- **Status:** review
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-043-voice-addendum.md`
 
