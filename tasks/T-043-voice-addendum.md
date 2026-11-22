@@ -1,7 +1,7 @@
 # T-043: Voice script addendum: five goal lines, and answers to your T-006 questions
 
 - **Assigned to:** Sarvam AI
-- **Status:** review
+- **Status:** done ✓ (PR #40, merged 2026-11-22; Mooladri voice respelling in `names.ts`; new goal files wait in `AWAITING_VOICE`)
 - **Priority:** P2
 - **Deliver to:** `team-inbox/writing/T-043-voice-addendum.md`
 

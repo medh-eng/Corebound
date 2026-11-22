@@ -17,7 +17,7 @@ const press = async (k) => { await page.keyboard.down(k); await frames(2); await
 await g('goalIndex', 'huxley_message'); await frames(2);
 check((await g('state')).goal === 'huxley_message', 'goal: listen to Prof. Huxley');
 const props = await g('storyProps');
-check(props.length === 9, `nine props placed (${props.length})`);
+check(props.length === 11, `eleven props placed (two by Mooladri's roots) (${props.length})`);
 
 // 1. Huxley's projector by the hatch.
 const pj = props.find((p) => p.id === 'projector');

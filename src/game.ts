@@ -3,8 +3,11 @@ import { CHAPTER1_LOGS } from './data/logs';
 import * as THREE from 'three';
 import { JIVAGRAHA } from './data/worlds';
 import { START_BASE, CRASH_SITE, OPENING, STORY_PROPS } from './data/base';
-import { INTRO_LINES } from './data/scenes';
-import { CHAPTER1_MILESTONES, STEP_MILESTONE, STUCK_HINTS, PHONE_STUCK_HINTS, STUCK } from './data/chapter1';
+import { INTRO_LINES, GUARDIAN_LINES } from './data/scenes';
+import { MOOLADRI, VALLEY_PROMPTS, STEP_DONE_LINE } from './data/valley';
+import { buildMooladri } from './render/mooladri';
+import { growRoots, onRoot, stepDone, soilReady, crownGlow, type GuardianSave } from './systems/guardian';
+import { CHAPTER1_MILESTONES, STEP_MILESTONE, STUCK_HINTS, PHONE_STUCK_HINTS, STUCK, RETIRED_GOALS } from './data/chapter1';
 import { buildCrashSite } from './render/crashsite';
 import { buildStoryProps, dryGround, type PropSpot } from './render/storyprops';
 import { ITEMS, YIELD, MACHINES, SURVIVAL, RECIPES, type ItemId, type MachineId, type Recipe } from './data/items';
@@ -88,6 +91,7 @@ interface SaveData {
   crafted: Partial<Record<ItemId, number>>;
   flags: Record<string, boolean>;
   codex?: string[];
+  guardian?: GuardianSave;   // M4 slice 3: Mooladri's roots and the planted bloom spores
 }
 
 const V = (v: V3) => new THREE.Vector3(v.x, v.y, v.z);
@@ -199,13 +203,47 @@ export async function startGame(opts: GameOptions) {
   scene.add(crash.group);
   colliders.push({ pos: P(modulePoint), radius: CRASH_SITE.escapeModule.radius }, { pos: P(podPoint), radius: CRASH_SITE.cryoPod.radius });
 
+  // ── Mooladri, the Root Guardian, and the closed valley (M4 slice 3) ──
+  const MO = MOOLADRI;
+  // Near its planned spot, pick the ground that is driest and most level for the trunk and the valley.
+  const mooSite = (() => {
+    const pref = along(MO.place.forward, MO.place.right);
+    const t1 = new THREE.Vector3().crossVectors(pref, up0).normalize(), t2 = new THREE.Vector3().crossVectors(pref, t1).normalize();
+    const pt = (c: THREE.Vector3, a: number, b: number) => c.clone().multiplyScalar(R).addScaledVector(t1, a).addScaledVector(t2, b).normalize();
+    let best = pref, bestScore = -Infinity;
+    for (let ring = 0; ring <= 4; ring++) for (let k = 0; k < (ring ? 10 : 1); k++) {
+      const ang = (k / 10) * Math.PI * 2;
+      const c = pt(pref, Math.cos(ang) * ring * 7, Math.sin(ang) * ring * 7);
+      let dry = 0, lo = Infinity, hi = -Infinity, n = 0;
+      for (let r = 0; r <= 24; r += 4) for (let q = 0; q < (r ? 12 : 1); q++) {
+        const a2 = (q / 12) * Math.PI * 2;
+        const d = pt(c, Math.cos(a2) * r, Math.sin(a2) * r);
+        const h = terrain.height(d.x, d.y, d.z);
+        n++; if (h > world.seaLevel + 0.6) dry++;
+        if (r <= 10) { lo = Math.min(lo, h); hi = Math.max(hi, h); }
+      }
+      const score = dry / n - (hi - lo) * 0.08 - ring * 0.02 - (c.distanceTo(domeDir) * R < 45 ? 1 : 0);
+      if (score > bestScore) { bestScore = score; best = c; }
+    }
+    return best;
+  })();
+  const moo = buildMooladri(terrain, mooSite, domePoint, MO);
+  scene.add(moo.group);
+  colliders.push(...moo.colliders);
+  const gateColliders = moo.gateColliders.slice();
+  colliders.push(...gateColliders);
+
   // ── Story props (M4 slice 2): Huxley's projector, the translator, memory logs ──
   const SP = STORY_PROPS;
   const propSpots: PropSpot[] = [
     { id: 'projector', kind: 'projector', dir: dryGround(terrain, along(SP.projector.forward, SP.projector.right), up0), yawDeg: SP.projector.yawDeg, scale: SP.projector.scale, sink: 0.02 },
     { id: 'translator', kind: 'translator', dir: dryGround(terrain, along(SP.translator.forward, SP.translator.right), up0), yawDeg: SP.translator.yawDeg, scale: SP.translator.scale, sink: 0.02 },
     ...SP.logs.map((l, i): PropSpot => ({ id: l.id, kind: 'log', dir: dryGround(terrain, along(l.forward, l.right), up0), yawDeg: i * 47, scale: SP.logScale, sink: l.buried ? 0.13 : 0.01 })),
+    // Logs 08 and 09 lie by Mooladri's roots; they show once it has woken.
+    ...MO.logs.map((l, i): PropSpot => ({ id: l.id, kind: 'log', dir: dryGround(terrain, moo.at(l.forward, l.right), up0), yawDeg: 30 + i * 70, scale: SP.logScale, sink: l.buried ? 0.13 : 0.01 })),
   ];
+  const GUARDIAN_LOGS = MO.logs.map((l) => l.id);
+  const ALL_LOGS = [...SP.logs.map((l) => l.id), ...GUARDIAN_LOGS];
   const story = await buildStoryProps(terrain, propSpots, spawnPoint);
   scene.add(story.group);
   const propClear = story.props.map((p) => ({ pos: p.point, radius: p.kind === 'log' ? 1.6 : 1.2 }));
@@ -215,11 +253,12 @@ export async function startGame(opts: GameOptions) {
   const scatter = scatterWorld(terrain, world.seed, up0, [
     { pos: domePoint, radius: 8 }, { pos: lotusPoint, radius: 4 }, { pos: spawnPoint, radius: 4.5 },
     { pos: modulePoint, radius: 6 }, { pos: podPoint, radius: 3 }, ...propClear,
+    { pos: moo.point, radius: MO.clearRadius }, { pos: moo.valleyPoint, radius: 9.5 }, { pos: moo.gatePoint, radius: 5 },
   ], phone ? 0.65 : 1);
   scene.add(scatter.group);
   colliders.push(...scatter.colliders);
   scene.add(decorateBase(terrain, { up: up0, forward, right }, { dome: domePoint }));
-  const ore = new OreField(terrain, world.seed, { up: up0, forward, right }, [{ pos: domePoint, radius: 5 }, { pos: lotusPoint, radius: 2.5 }, { pos: spawnPoint, radius: 2 }, { pos: modulePoint, radius: 5 }, { pos: podPoint, radius: 2.5 }, ...propClear]);
+  const ore = new OreField(terrain, world.seed, { up: up0, forward, right }, [{ pos: domePoint, radius: 5 }, { pos: lotusPoint, radius: 2.5 }, { pos: spawnPoint, radius: 2 }, { pos: modulePoint, radius: 5 }, { pos: podPoint, radius: 2.5 }, ...propClear, { pos: moo.point, radius: MO.clearRadius }, { pos: moo.valleyPoint, radius: 9.5 }]);
   scene.add(ore.group);
   const laser = new LaserView();
   scene.add(laser.group);
@@ -340,6 +379,42 @@ export async function startGame(opts: GameOptions) {
   const fraction = new Map<ItemId, number>();
   const codexKnown: string[] = [];
   const codexNew: string[] = [];
+
+  // ── Mooladri (M4 slice 3): state, roots, and the calming steps ──
+  let guardian: GuardianSave = { roots: [], planted: [] };
+  /** Seconds into the waking scene (-1 = not running), the settling once calm, and the gate opening. */
+  let wakeT = -1, settleT = -1, gateT = -1, seismicT = 0, revealT = 0, rootCheck = 0, drillsOnRoots = 0, mooBloomTimer = 4;
+  let rise = 0;
+  const later: { t: number; line: string }[] = [];
+  /** SARATHI says a line after `seconds` (so two lines do not talk over each other). */
+  const sayLater = (line: string, seconds: number) => later.push({ t: seconds, line });
+  const drillsOnRootsNow = () => guardian.roots.length === 0 ? 0
+    : base.machines.filter((m) => m.id === 'auto_drill' && onRoot(m.pos, guardian.roots, R, MO.rootClear)).length;
+  const calmView = () => ({
+    rootsMapped: !!flags.rootsMapped, drillsOnRoots: drillsOnRootsNow(), air: base.harmony.air, soil: base.harmony.soil,
+    filterWorking: base.machines.some((m) => m.id === 'bio_filter' && !!m.working), planted: guardian.planted.length,
+  });
+  /** Roots reach out from the trunk towards the drills that strain it (and a few wander off). */
+  const growGuardianRoots = () => {
+    const drills = base.machines.filter((m) => m.id === 'auto_drill').map((m) => m.pos);
+    guardian.roots = growRoots(P(moo.point), drills, R, { maxToDrills: MO.maxRootsToDrills, wander: MO.wanderRoots, seed: world.seed % 1000, away: P(moo.front.clone().negate()) });
+    moo.setRoots(guardian.roots);
+  };
+  /** Makes the scene match the saved story (after loading, or for a test jump). */
+  const syncGuardian = () => {
+    const awake = !!flags.guardianAwake;
+    rise = awake ? 1 : 0;
+    moo.setRise(rise);
+    if (awake && guardian.roots.length === 0) growGuardianRoots(); else moo.setRoots(guardian.roots);
+    revealT = flags.rootsMapped && !flags.mooladriCalm ? 1 : 0;
+    moo.setRootReveal(revealT);
+    base.floraBonus = !!flags.mooladriCalm;
+    const open = !!flags.valleyOpen;
+    gateT = open ? 1 : -1;
+    moo.setGateOpen(open ? 1 : 0);
+    for (const c of gateColliders) { const i = colliders.indexOf(c); if (open && i >= 0) colliders.splice(i, 1); else if (!open && i < 0) colliders.push(c); }
+    if (flags.mooladriCalm && !open) { gateT = 0; }
+  };
   /** Adds a Codex entry the first time something is scanned. */
   const unlockCodex = (id: string) => {
     const e = codexById(id);
@@ -420,6 +495,7 @@ export async function startGame(opts: GameOptions) {
     const data: SaveData = {
       v: 1, days, me: { pos: { ...me.pos }, heading: { ...me.heading } }, pack: pack.toJSON(), base,
       digs: voxels.digs, ore: ore.amounts(), goal: goalIndex, goalId: CHAPTER1_GOALS[goalIndex].id, mined, crafted, flags, codex: codexKnown,
+      guardian: guardian,
     };
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch { /* storage full or blocked */ }
   };
@@ -434,12 +510,15 @@ export async function startGame(opts: GameOptions) {
     for (const g of d.digs) clearFlora(V(g), g.r);
     ore.restore(d.ore);
     // Older saves count goals from before the wake-up goal existed (M4), so they are one behind.
-    const byId = d.goalId ? CHAPTER1_GOALS.findIndex((g) => g.id === d.goalId) : -1;
+    const gid = d.goalId && RETIRED_GOALS[d.goalId] ? RETIRED_GOALS[d.goalId] : d.goalId;
+    const byId = gid ? CHAPTER1_GOALS.findIndex((g) => g.id === gid) : -1;
     goalIndex = byId >= 0 ? byId : Math.min(d.goal + 1, CHAPTER1_GOALS.length - 1);
     Object.assign(mined, d.mined); Object.assign(crafted, d.crafted); Object.assign(flags, d.flags);
     codexKnown.splice(0, codexKnown.length, ...(d.codex ?? []));
+    guardian = d.guardian ?? { roots: [], planted: [] };
     for (const m of base.machines) addMachineView(m, m.yaw ?? 0);
     refreshFactory();
+    syncGuardian();
   };
   addEventListener('beforeunload', save);
 
@@ -469,6 +548,9 @@ export async function startGame(opts: GameOptions) {
       case 'huxley_message': return !!flags.heardHuxley;
       case 'translator': return !!flags.hasTranslator;
       case 'memory_logs': return SP.logs.filter((l) => flags[`log_${l.id}`]).length >= SP.logsForGoal;
+      case 'guardian_find': return !!flags.guardianAwake;
+      case 'seismic_scan': case 'move_drills': case 'bio_filters_valley': case 'replant_bloom': return stepDone(id, calmView(), MO);
+      case 'valley_calm': return !!flags.mooladriCalm;
       case 'auto_plates': return base.machines.filter((m) => m.id === 'smelter' && (m.fedByBelt ?? 0) > 0).reduce((s, m) => s + (m.made ?? 0), 0) >= 5;
       default: return false;
     }
@@ -481,13 +563,20 @@ export async function startGame(opts: GameOptions) {
     if (ms) list.push({ key: 'Chapter 1', text: ms.title, chapter: true });
     list.push({ key: 'Now', text: cur.text });
     if (next) list.push({ key: 'Next', text: next.text });
-    list.push({ key: '???', text: 'Something vast moves beneath the glowing forest…', mystery: true });
+    list.push({ key: '???', text: flags.mooladriCalm ? 'A light below the valley does not match the minerals around it…' : 'Something vast moves beneath the glowing forest…', mystery: true });
     return list;
   };
   const advanceGoals = () => {
     let moved = false;
-    while (goalIndex < CHAPTER1_GOALS.length - 1 && goalDone(CHAPTER1_GOALS[goalIndex].id)) { goalIndex++; moved = true; }
-    if (moved) { ui.sarathi(CHAPTER1_GOALS[goalIndex].sarathi, 9); ui.toast('Goal complete'); sound.goal(); player.startEmote('salute'); save(); }
+    let finished = '';
+    while (goalIndex < CHAPTER1_GOALS.length - 1 && goalDone(CHAPTER1_GOALS[goalIndex].id)) { finished = CHAPTER1_GOALS[goalIndex].id; goalIndex++; moved = true; }
+    if (moved) {
+      // Mooladri's steps: SARATHI first says what changed, then (if needed) what to do next.
+      const done = STEP_DONE_LINE[finished];
+      if (done) { ui.sarathi(GUARDIAN_LINES[done.line], 9); if (done.nextLine) sayLater(CHAPTER1_GOALS[goalIndex].sarathi, 9); }
+      else ui.sarathi(CHAPTER1_GOALS[goalIndex].sarathi, 9);
+      ui.toast('Goal complete'); sound.goal(); player.startEmote('salute'); save();
+    }
     ui.goals(goalsView());
   };
 
@@ -586,7 +675,7 @@ export async function startGame(opts: GameOptions) {
   const propDone = (id: string) => (id === 'projector' ? !!flags.heardHuxley : id === 'translator' ? !!flags.hasTranslator : !!flags[`log_${id}`]);
   const nearestProp = (p: THREE.Vector3) => {
     let best: (typeof story.props)[number] | null = null, bd = STORY_PROPS.reach;
-    for (const s of story.props) { if (s.kind === 'translator' && s.done) continue; const d = s.point.distanceTo(p); if (d < bd) { bd = d; best = s; } }
+    for (const s of story.props) { if ((s.kind === 'translator' && s.done) || !s.group.visible) continue; const d = s.point.distanceTo(p); if (d < bd) { bd = d; best = s; } }
     return best ? { prop: best, dist: bd } : null;
   };
   const propPrompt = (s: (typeof story.props)[number]): string => {
@@ -603,7 +692,7 @@ export async function startGame(opts: GameOptions) {
     } else {
       const first = !flags[`log_${s.id}`];
       openLog(s.id, first ? LOG_REACTIONS[reactionNext++ % LOG_REACTIONS.length] : undefined);
-      if (first) { const n = STORY_PROPS.logs.filter((l) => flags[`log_${l.id}`]).length; ui.toast(`Memory log ${n} of ${STORY_PROPS.logs.length + 2} found`); }
+      if (first) { const n = ALL_LOGS.filter((id) => flags[`log_${id}`]).length; ui.toast(`Memory log ${n} of ${ALL_LOGS.length} found`); }
     }
   };
   ui.onLog = (id) => { ui.setCodex(false); openLog(id); };
@@ -681,7 +770,8 @@ export async function startGame(opts: GameOptions) {
   // ── Stuck hints (T-031): SARATHI helps when nothing has moved on for a while ──
   let stuckClock = 0, stuckSig = '', stuckCheck = 0, stuckSaid = 0;
   const progressSig = () => [goalIndex, Object.values(mined).reduce((a, n) => a + (n ?? 0), 0), Object.values(crafted).reduce((a, n) => a + (n ?? 0), 0),
-    base.machines.length, base.belts.length, base.research.done.length, base.research.progress > 0 ? 1 : 0, flags.reachedShelter ? 1 : 0].join('|');
+    base.machines.length, base.belts.length, base.research.done.length, base.research.progress > 0 ? 1 : 0, flags.reachedShelter ? 1 : 0,
+    Object.values(flags).filter(Boolean).length, guardian.planted.length, Math.round(base.harmony.air / 3), Math.round(base.harmony.soil / 3), drillsOnRoots].join('|');
   const stuckHint = (): string => {
     const step = CHAPTER1_GOALS[goalIndex];
     const ms = STEP_MILESTONE[step.id];
@@ -697,6 +787,87 @@ export async function startGame(opts: GameOptions) {
     stuckClock += 1;
     const due = stuckSaid === 0 ? STUCK.firstAfter : STUCK.firstAfter + stuckSaid * STUCK.repeatAfter;
     if (stuckClock >= due && goalIndex < CHAPTER1_GOALS.length - 1) { stuckSaid++; ui.sarathi(stuckHint(), 9); }
+  };
+
+  // ── Mooladri wakes, is calmed, and opens the valley (M4 slice 3) ──
+  const goalAt = (id: string) => CHAPTER1_GOALS.findIndex((g) => g.id === id);
+  const WAKE = { restless: 0.4, riseFrom: 1.0, awake: 8.5, calming: 15.5, end: 21 };
+  const tickGuardian = (dt: number, pos: THREE.Vector3, t: number) => {
+    const cur = CHAPTER1_GOALS[goalIndex].id;
+    const d = pos.distanceTo(moo.point);
+    // A save from past the waking (or a test jump): it is simply awake.
+    if (!flags.guardianAwake && wakeT < 0 && goalIndex > goalAt('guardian_find')) { flags.guardianAwake = true; syncGuardian(); }
+    moo.setBeam(cur === 'guardian_find' && wakeT < 0);
+    if (cur === 'guardian_find' && wakeT < 0) {
+      if (!flags.guardianShadow && d < MO.shadowAt) { flags.guardianShadow = true; ui.sarathi(GUARDIAN_LINES.forest_shadow, 8); sound.tremor(0.6); }
+      if (d < MO.wakeAt) {
+        wakeT = 0;
+        growGuardianRoots();
+        // Its distress thickens the haze over the forest (the smog the bio-filter step clears).
+        base.harmony.air = Math.max(base.harmony.air, MO.airOnWake);
+        sound.tremor(1);
+      }
+    }
+    if (wakeT >= 0) {
+      const before = wakeT;
+      wakeT += dt;
+      const beat = (at: number) => before < at && wakeT >= at;
+      if (beat(WAKE.restless)) ui.sarathi(GUARDIAN_LINES.restless, 7);
+      if (beat(3.5)) sound.tremor(0.8);
+      if (beat(WAKE.awake)) ui.sarathi(GUARDIAN_LINES.awake, 7);
+      if (beat(WAKE.calming)) ui.sarathi(GUARDIAN_LINES.calming_start, 6);
+      rise = THREE.MathUtils.smoothstep(wakeT, WAKE.riseFrom, WAKE.riseFrom + MO.riseSeconds);
+      moo.setRise(rise);
+      if (wakeT >= WAKE.end) { wakeT = -1; flags.guardianAwake = true; rise = 1; moo.setRise(1); advanceGoals(); save(); }
+    }
+    // The root map spreads out from the trunk after a scan, and fades once Mooladri is calm.
+    if (flags.rootsMapped && !flags.mooladriCalm) revealT = Math.min(1, revealT + dt / 4);
+    else if (flags.mooladriCalm) revealT = Math.max(0, revealT - dt / 6);
+    moo.setRootReveal(revealT);
+    rootCheck -= dt;
+    if (rootCheck <= 0) { rootCheck = 0.5; drillsOnRoots = flags.rootsMapped && !flags.mooladriCalm ? drillsOnRootsNow() : 0; }
+    // Once the soil is clean during planting, SARATHI says so (once).
+    if (cur === 'replant_bloom' && !flags.soilToldClean && soilReady(base.harmony.soil, MO)) { flags.soilToldClean = true; sayLater(GUARDIAN_LINES.bloom_hint, 2); }
+    // Blooms open by the exposed roots while you plant, even if the world is only stable.
+    if (cur === 'replant_bloom' && soilReady(base.harmony.soil, MO) && d < 60) {
+      mooBloomTimer -= dt;
+      if (mooBloomTimer <= 0 && blooms.blooms.length < HARMONY.bloomMax) {
+        mooBloomTimer = MO.bloomEverySec;
+        blooms.spawn(moo.point, shared.uTime.value, (p) => p.distanceTo(moo.point) < 6 || moo.plantPoints.some((q) => q.distanceTo(p) < 2) || terrain.height(p.x, p.y, p.z) < world.seaLevel + 0.3 || colliders.some((c) => V(c.pos).distanceTo(p) < c.radius + 0.3));
+      }
+    }
+    // Calm: the glow steadies, then the roots open the valley.
+    if (cur === 'valley_calm' && settleT < 0 && !flags.mooladriCalm) { settleT = 0; sound.tremor(0.5); }
+    if (settleT >= 0) {
+      settleT += dt;
+      if (settleT >= MO.settleSeconds) {
+        settleT = -1; flags.mooladriCalm = true; base.floraBonus = true; gateT = 0; sound.tremor(0.7);
+        unlockCodex('root_valley'); advanceGoals(); save();
+      }
+    }
+    if (gateT >= 0 && gateT < 1) {
+      gateT = Math.min(1, gateT + dt / 6);
+      moo.setGateOpen(THREE.MathUtils.smoothstep(gateT, 0, 1));
+      if (gateT >= 1) {
+        flags.valleyOpen = true;
+        for (const c of gateColliders) { const i = colliders.indexOf(c); if (i >= 0) colliders.splice(i, 1); }
+        ui.toast(VALLEY_PROMPTS.valley_open); save();
+      }
+    }
+    const steps = ['seismic_scan', 'move_drills', 'bio_filters_valley', 'replant_bloom'].filter((id) => goalIndex > goalAt(id)).length;
+    const state = flags.mooladriCalm ? 'calm' : flags.guardianAwake || wakeT >= 0 ? 'restless' : 'resting';
+    const settle = settleT >= 0 ? settleT / MO.settleSeconds : 0;
+    moo.setGlow(THREE.MathUtils.lerp(crownGlow(state, steps, t), 1, settle));
+    moo.setPlantSpots(cur === 'replant_bloom', guardian.planted);
+    moo.update(t, state === 'restless' && settle === 0);
+    for (const l of [...later]) { l.t -= dt; if (l.t <= 0) { later.splice(later.indexOf(l), 1); ui.sarathi(l.line, 9); } }
+  };
+  /** The planting spot you are standing at, if planting is open and it has no spores yet. */
+  const nearPlantSpot = (pos: THREE.Vector3) => {
+    if (CHAPTER1_GOALS[goalIndex].id !== 'replant_bloom') return -1;
+    let best = -1, bd = MO.plantReach;
+    moo.plantPoints.forEach((p, i) => { const dd = p.distanceTo(pos); if (dd < bd && !guardian.planted.includes(i)) { bd = dd; best = i; } });
+    return best;
   };
 
   const begin = (resume: boolean) => {
@@ -846,6 +1017,7 @@ export async function startGame(opts: GameOptions) {
     if (d.filter) return `${d.name} · ${m.working ? 'cleaning' : d.powerKW < 0 ? 'no power' : 'idle'}${x}`;
     if (d.research) return `Research station${base.research.active ? ` · ${researchById(base.research.active)!.name}` : ''} · <b>E</b> research${x}`;
     if (d.storage) return `Storage silo · ${total(m.inv)}/${d.storage}${total(m.inv) ? ` (${names(m.inv)})` : ''} · <b>E</b> take all${x}`;
+    if (d.drill && drillsOnRoots > 0 && onRoot(m.pos, guardian.roots, R, MO.rootClear)) return `Auto-drill · <b>${VALLEY_PROMPTS.drill_on_root}</b>${x}`;
     if (d.drill) return `Auto-drill · mining ${m.mine ? ITEMS[m.mine].name.toLowerCase() : 'nothing'} (${Math.round((m.rich ?? 0) * 100)}% rich)${total(m.out) ? ` · ${total(m.out)} waiting` : ''}${x}`;
     if (d.accepts) {
       const what = Object.keys(d.accepts).map((k) => ITEMS[k as ItemId].name.toLowerCase()).join(' + ');
@@ -892,6 +1064,7 @@ export async function startGame(opts: GameOptions) {
       const node = researchById(base.research.active)!;
       return researchReady(base) ? `${node.name} ${Math.round((base.research.progress / node.seconds) * 100)}%` : `${node.name}: needs parts`;
     }
+    if (d.drill && drillsOnRoots > 0 && onRoot(m.pos, guardian.roots, R, MO.rootClear)) return VALLEY_PROMPTS.drill_on_root;
     if (d.drill) return total(m.out) >= (d.outCap ?? 20) ? 'Full — collect or add a belt' : '';
     if (d.process?.fuel) return (m.burn ?? 0) <= 0 && !(m.inv?.carbon) ? 'Needs carbon' : '';
     if (d.process) {
@@ -921,6 +1094,9 @@ export async function startGame(opts: GameOptions) {
     for (const [c, r, id] of [[modulePoint.clone().addScaledVector(moduleDir, 1.2), 2.4, 'escape_module'], [podPoint.clone().addScaledVector(podDir, 0.6), 1.0, 'cryo_pod']] as const) {
       const oc = c.clone().sub(o); const t = oc.dot(camDir); if (t > 0 && t < 30 && oc.lengthSq() - t * t < r * r) hits.push([t, id]);
     }
+    // Mooladri's trunk and the ring of roots round the valley (M4 slice 3).
+    if (rise > 0.5) { const oc = moo.point.clone().addScaledVector(moo.up, 5).sub(o); const t = oc.dot(camDir); if (t > 0 && t < 45 && oc.lengthSq() - t * t < 3.4 * 3.4) hits.push([t, 'mooladri']); }
+    { const oc = moo.valleyPoint.clone().addScaledVector(moo.up, 1.5).sub(o); const t = oc.dot(camDir); if (t > 0 && t < 40 && oc.lengthSq() - t * t < 8 * 8) hits.push([t + 6, 'root_valley']); }
     const tr = story.props.find((p) => p.id === 'translator');
     if (tr && !tr.done) { const oc = tr.point.clone().addScaledVector(tr.point.clone().normalize(), 0.3).sub(o); const t = oc.dot(camDir); if (t > 0 && t < 20 && oc.lengthSq() - t * t < 0.6 * 0.6) hits.push([t, 'translator']); }
     const on = ore.raycast(o, camDir, 30); if (on) hits.push([on.t, KIND_CODEX[on.node.kind]]);
@@ -1013,6 +1189,7 @@ export async function startGame(opts: GameOptions) {
     const atShelter = pos.distanceTo(domePoint) < 4.4;
     const atModule = pos.distanceTo(podPoint) < CRASH_SITE.airRadius || pos.distanceTo(modulePoint) < CRASH_SITE.escapeModule.radius + 1.2;
     if (playing && !flags.reachedShelter && pos.distanceTo(domePoint) < OPENING.shelterReach) { flags.reachedShelter = true; advanceGoals(); }
+    if (playing && !ui.paused) tickGuardian(dt, pos, shared.uTime.value);
     if (playing && !ui.paused) { tickOpening(dt); tickStuck(dt, opening >= 0 || ui.packOpen || ui.buildOpen || ui.researchOpen || ui.codexOpen || ui.logOpen || rig.mode !== 'follow'); }
     let prompt: string | null = null;
     const wasBelt = beltMode;
@@ -1021,8 +1198,23 @@ export async function startGame(opts: GameOptions) {
       prompt = propPrompt(np.prop);
       if (input.hit('KeyE')) useProp(np.prop);
     }
+    // Mooladri's planting spots, and the roots that close the valley (M4 slice 3).
+    const spot = walk && !building && !beltMode && !prompt ? nearPlantSpot(pos) : -1;
+    if (spot >= 0) {
+      if (!soilReady(base.harmony.soil, MO)) prompt = VALLEY_PROMPTS.bloom_spores_wrong;
+      else if (pack.count('bloom') < 1) prompt = VALLEY_PROMPTS.bloom_spores_none;
+      else {
+        prompt = VALLEY_PROMPTS.bloom_spores_plant;
+        if (input.hit('KeyE') && pack.remove('bloom', 1)) {
+          guardian.planted.push(spot);
+          sound.place(); sound.goal();
+          ui.pickup(`Bloom spores planted (${guardian.planted.length} of ${MO.plantSpots})`, ITEMS.bloom.color);
+          advanceGoals(); save();
+        }
+      }
+    } else if (walk && !building && !beltMode && !prompt && !flags.valleyOpen && pos.distanceTo(moo.gatePoint) < 5.5) prompt = VALLEY_PROMPTS.roots_blocked;
     if (walk && !building && !beltMode) {
-      if (prompt) { /* a story prop is nearer than any machine */ }
+      if (prompt) { /* a story prop or planting spot is nearer than any machine */ }
       else if (near) {
         if (near.out && total(near.out) > 0 && !base.belts.some((b) => b.from === near.uid)) collectOut(near);
         prompt = machinePrompt(near);
@@ -1095,6 +1287,9 @@ export async function startGame(opts: GameOptions) {
       const clear = colliders.every((c) => V(c.pos).distanceTo(building!.pos) > c.radius + r + 0.2);
       const dry = terrain.height(target.x, target.y, target.z) > world.seaLevel + 0.2;
       building.ok = clear && dry && building.pos.distanceTo(domePoint) > 3.9;
+      // While Mooladri is restless, drills may not go back onto its marked roots.
+      const onMarkedRoot = building.id === 'auto_drill' && !!flags.rootsMapped && !flags.mooladriCalm && onRoot(P(building.pos), guardian.roots, R, MO.rootClear);
+      if (onMarkedRoot) building.ok = false;
       const g = building.ghost;
       g.matrixAutoUpdate = true;
       g.position.set(0, 0, 0); g.quaternion.identity(); g.scale.set(1, 1, 1);
@@ -1102,7 +1297,7 @@ export async function startGame(opts: GameOptions) {
       g.position.copy(building.pos);
       (g.userData.ghostMat as THREE.MeshBasicMaterial).color.set(building.ok ? '#5cffd6' : '#ff6a5a');
       const mines = building.sample ? ` · mines <b>${ITEMS[building.sample.item].name.toLowerCase()}</b>, ${Math.round(building.sample.rich * 100)}% rich` : '';
-      prompt = building.ok ? `<b>Click</b> to place${mines} · <b>R</b> turn · <b>B</b> cancel` : 'Too close to something, or in water';
+      prompt = building.ok ? `<b>Click</b> to place${mines} · <b>R</b> turn · <b>B</b> cancel` : onMarkedRoot ? VALLEY_PROMPTS.drill_place_on_root : 'Too close to something, or in water';
       if (walk && input.hit('Mouse0') && building.ok && pack.remove(building.item, 1)) {
         const m = addMachine(base, { id: building.id, pos: P(building.pos) });
         if (building.sample) { m.mine = building.sample.item; m.rich = building.sample.rich; }
@@ -1121,7 +1316,22 @@ export async function startGame(opts: GameOptions) {
 
     // Scanner (hold right mouse): learn what something is; adds it to the Codex.
     let scanning = false;
-    if (walk && !building && !beltMode && input.down('Mouse2')) {
+    const seismic = CHAPTER1_GOALS[goalIndex].id === 'seismic_scan' && !flags.rootsMapped && pos.distanceTo(moo.point) < MO.scan.range;
+    if (walk && !building && !beltMode && input.down('Mouse2') && seismic) {
+      // The seismic scan (M4 slice 3): hold Scan beside the valley and the roots appear on the ground.
+      scanning = true;
+      seismicT += dt;
+      ui.progress(Math.min(1, seismicT / MO.scan.seconds));
+      prompt = VALLEY_PROMPTS.seismic_scan_hold;
+      if (seismicT >= MO.scan.seconds) {
+        seismicT = 0; flags.rootsMapped = true; revealT = 0;
+        if (guardian.roots.length === 0) growGuardianRoots();
+        unlockCodex('mooladri');
+        ui.toast(VALLEY_PROMPTS.root_marked); sound.tremor(0.4);
+        advanceGoals(); save();
+      }
+    } else if (walk && !building && !beltMode && input.down('Mouse2')) {
+      seismicT = 0;
       const t = scanTarget();
       scanning = true;
       if (!t) { prompt = 'Scanner: aim at a plant, rock, creature or machine'; scanTimer = 0; }
@@ -1252,6 +1462,7 @@ export async function startGame(opts: GameOptions) {
     for (const s of story.props) {
       s.done = propDone(s.id);
       if (s.kind === 'translator') s.group.children[0].visible = !s.done;
+      if (GUARDIAN_LOGS.includes(s.id)) s.group.visible = !!flags.guardianAwake;
     }
     story.update(shared.uTime.value);
     creatures.update(dt, shared.uTime.value, pos, Math.max(abundance, 0.5), night);
@@ -1276,7 +1487,7 @@ export async function startGame(opts: GameOptions) {
         blooms.spawn(pos, shared.uTime.value, (p) => p.distanceTo(domePoint) < 6 || base.machines.some((m) => V(m.pos).distanceTo(p) < 2.5) || terrain.height(p.x, p.y, p.z) < world.seaLevel + 0.3);
       }
     }
-    blooms.update(shared.uTime.value, band === 'thriving');
+    blooms.update(shared.uTime.value, band === 'thriving' || (CHAPTER1_GOALS[goalIndex].id === 'replant_bloom' && soilReady(base.harmony.soil, MO)));
     if (playing && band !== lastBand) {
       const msg = { thriving: SARATHI_EVENTS.bandThriving, stable: SARATHI_EVENTS.bandStable, stressed: SARATHI_EVENTS.bandStressed, collapse: SARATHI_EVENTS.bandCollapse }[band];
       if (lastBand !== null && (band !== 'thriving' || lastBand !== 'stable' || !flags.toldThriving)) { ui.sarathi(msg, 8); ui.toast(`Harmony: ${BAND_TEXT[band]}`); if (band === 'thriving') flags.toldThriving = true; }
@@ -1391,7 +1602,8 @@ export async function startGame(opts: GameOptions) {
       sound.smelter(near);
     }
     // Music for the moment: title, day, night, underground, or a restless planet.
-    sound.playMusic(!playing ? 'title_theme' : band === 'collapse' ? 'guardian_awake' : underground ? 'jiva_underground' : night > 0.6 ? 'jiva_night' : 'jiva_day');
+    const nearMoo = playing && pos.distanceTo(moo.point) < 45 && (!!flags.guardianAwake || wakeT >= 0);
+    sound.playMusic(!playing ? 'title_theme' : nearMoo ? (flags.mooladriCalm ? 'guardian_calm' : 'guardian_awake') : band === 'collapse' ? 'guardian_awake' : underground ? 'jiva_underground' : night > 0.6 ? 'jiva_night' : 'jiva_day');
     sound.update(dt, night, me.grounded ? Math.hypot(me.vel.x, me.vel.y, me.vel.z) : 0,
       Math.min(1, base.machines.filter((m) => m.working || m.fuelOn).length / 8), harmonyValue(base.harmony) / 100);
     resTimer -= dt;
@@ -1476,6 +1688,27 @@ export async function startGame(opts: GameOptions) {
       belts.add(addBelt(base, f, t, len), pts); advanceGoals(); return 'ok';
     },
     goalIndex: (i: number | string) => { goalIndex = typeof i === 'number' ? i : Math.max(0, CHAPTER1_GOALS.findIndex((g) => g.id === i)); ui.goals(goalsView()); },
+    /** Mooladri (M4 slice 3), for playtests. */
+    mooladri: () => ({
+      point: P(moo.point), gate: P(moo.gatePoint), valley: P(moo.valleyPoint), plants: moo.plantPoints.map(P), rise, wakeT, settleT, gateT,
+      roots: guardian.roots.length, planted: [...guardian.planted], drillsOnRoots: drillsOnRootsNow(), awake: !!flags.guardianAwake,
+      mapped: !!flags.rootsMapped, calm: !!flags.mooladriCalm, open: !!flags.valleyOpen, air: base.harmony.air, soil: base.harmony.soil,
+      blocked: gateColliders.some((c) => colliders.includes(c)),
+    }),
+    /** Skips ahead through Mooladri's scenes (the waking, settling and the gate) by `seconds`. */
+    guardianTime: (seconds: number) => { for (let k = 0; k < seconds * 10; k++) tickGuardian(0.1, V(me.pos), shared.uTime.value); },
+    /** Puts the seismic scan this many seconds from done (holding Scan finishes it). */
+    seismicAt: (t: number) => { seismicT = t; },
+    /** Stands `back` metres in front of Mooladri (towards the base), facing it. */
+    nearMooladri: (back = 14, angleDeg = 0) => {
+      const a = (angleDeg * Math.PI) / 180;
+      const d = moo.at(back * Math.cos(a), back * Math.sin(a));
+      me.pos = P(d.clone().multiplyScalar(terrain.groundRadius(P(d)) + 0.1));
+      const h = moo.point.clone().sub(V(me.pos)); h.addScaledVector(d, -h.dot(d)).normalize(); me.heading = P(h);
+    },
+    /** Moves a placed machine to (fw, rt) metres from the start, as picking it up and placing it again would. */
+    move: (i: number, fw: number, rt: number) => { const m = base.machines[i]; removeMachine(m); const d = along(fw, rt); const p = d.multiplyScalar(terrain.groundRadius(P(d))); const n = addMachine(base, { id: m.id, pos: P(p) }); n.mine = m.mine; n.rich = m.rich; addMachineView(n); refreshFactory(); advanceGoals(); return base.machines.indexOf(n); },
+    advance: () => advanceGoals(),
     /** The wake-up: seconds since it began (-1 = not running); start it again for a playtest. */
     opening: () => opening,
     startOpening: () => startOpening(),

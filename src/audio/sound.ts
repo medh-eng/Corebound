@@ -397,6 +397,8 @@ export class Sound {
   click() { if (!this.play('ui_click', 0.8)) this.tone(1500, 'square', 0.04, 0.002, 0.04, this.sfxBus); }
   goal() { [0, 0.12, 0.24].forEach((w, i) => this.tone(this.midi(74 + [0, 3, 7][i]), 'sine', 0.12, 0.01, 1.4, this.sfxBus, w)); }
   alarm() { if (!this.play('o2_low', 0.8)) { this.tone(988, 'square', 0.06, 0.005, 0.12, this.sfxBus); this.tone(740, 'square', 0.06, 0.005, 0.12, this.sfxBus, 0.18); } }
+  /** A deep tremor from under the forest (Mooladri waking, roots settling). */
+  tremor(strength = 1) { this.tone(34, 'sine', 0.55 * strength, 0.4, 2.6, this.sfxBus); this.tone(47, 'sine', 0.3 * strength, 0.6, 2.2, this.sfxBus, 0.3, 12); this.burst(140, 0.5, 0.35 * strength, 2.4); }
   jump() { this.play('jump', 0.6, 1, 0.05); }
   land(strength: number) { this.play('land', Math.min(1, 0.3 + strength * 0.12), 1, 0.05); }
   canister() { this.play('canister_breathe', 0.8); }

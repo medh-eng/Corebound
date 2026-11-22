@@ -23,7 +23,7 @@ export interface PropSpot { id: string; kind: PropKind; dir: THREE.Vector3; yawD
 const BEAM_COLOR: Record<PropKind, string> = { projector: '#ffd27a', translator: '#9fffe0', log: '#7cc8ff' };
 
 /** A soft column of light, brightest at the ground and fading upwards. */
-function makeBeam(color: string, height: number): THREE.Mesh {
+export function makeBeam(color: string, height: number): THREE.Mesh {
   const geo = new THREE.CylinderGeometry(0.16, 0.3, height, 14, 1, true);
   geo.translate(0, height / 2, 0);
   const mat = new THREE.ShaderMaterial({

@@ -2,7 +2,7 @@
 
 *Written by the Director on 2 November 2026. The Commander said **go** the same morning.*
 
-**Progress:** slice 1 ✓ (2 Nov) · slice 2 ✓ (2 Nov) · slice 3 next (waits for the Commander's trunk concept for proportions)
+**Progress:** slice 1 ✓ (2 Nov) · slice 2 ✓ (2 Nov) · slice 3 ✓ (22 Nov) · slice 4 next (see `docs/UNITY-PLAN.md`: the Commander decides first whether slices 4–6 are built here or in Unity)
 
 M4 turns the sandbox into a story you can finish in about an hour: wake in a crashed pod, survive, build a factory, calm Mooladri, find the Fragment and lift off. It is built in **six slices**. Each slice ends playable and live on GitHub Pages, so the Commander can play after each one and stop us early if something feels wrong.
 
@@ -32,7 +32,7 @@ M4 turns the sandbox into a story you can finish in about an hour: wake in a cra
 - Huxley's projector inside the module plays his first message; the translator is picked up from the module.
 - Memory logs (the Commander's model) placed in the wreckage and around the planet; each opens in the log viewer and stays in the Logs tab.
 
-**Slice 3: Mooladri** (the heart of the demo)
+**Slice 3: Mooladri** (the heart of the demo) ✓ built 22 Nov
 - Mooladri's body built in code from roots (the approved trunk, faceless, crown of glowing root tips), with calm and restless states driven by Harmony and drill pressure on its roots.
 - The closed valley: living roots block the way until Mooladri is calm.
 - The three-step calming puzzle, in the order of `scenes.ts`: seismic scan shows the roots and you move drills off them; bio-filters clear the haze; replant bloom spores in clean soil. Mooladri settles, the valley opens, and plants clean pollution twice as fast afterwards.

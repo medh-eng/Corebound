@@ -1,7 +1,7 @@
 # T-042: Text for Mooladri's valley (M4 slice 3), and a polish of three new goal lines
 
 - **Assigned to:** ChatGPT (chat)
-- **Status:** review
+- **Status:** done ✓ (PR #39, merged 2026-11-22; in `src/data/valley.ts` and `story.ts`)
 - **Priority:** P1
 - **Deliver to:** `team-inbox/writing/T-042-mooladri-ui-text.md`
 

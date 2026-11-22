@@ -46,6 +46,8 @@ export interface BaseState {
   nextUid: number;
   research: ResearchState;
   harmony: HarmonyState;
+  /** Mooladri is calm (M4 slice 3): the forest cleans the air, water and soil twice as fast. */
+  floraBonus?: boolean;
 }
 
 export interface Tick {
@@ -312,7 +314,7 @@ export function tickBase(b: BaseState, t: Tick): TickResult {
 
   // Harmony: working machines dirty or clean the world; when it suffers, machines need attention.
   const working = b.machines.filter((m) => m.working || m.fuelOn).map((m) => m.id);
-  tickHarmony(b.harmony, working, dt, { clean: effectOn(b, 'clean_smelting'), filter2: effectOn(b, 'bloom_filter') });
+  tickHarmony(b.harmony, working, dt, { clean: effectOn(b, 'clean_smelting'), filter2: effectOn(b, 'bloom_filter'), flora2: !!b.floraBonus });
   const faults: PlacedMachine[] = [];
   const band = bandOf(harmonyValue(b.harmony));
   const perMin = band === 'collapse' ? HARMONY.faultPerMinute.collapse : band === 'stressed' ? HARMONY.faultPerMinute.stressed : 0;

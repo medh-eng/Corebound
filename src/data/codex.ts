@@ -78,5 +78,5 @@ export const CHAPTER1_CODEX: CodexEntry[] = [
 /** Chapter 1 entries that are now in the world to be scanned. Each M4 slice adds its own:
  *  slice 2 the crash site and the translator; slice 3 Mooladri and the valley; slice 4 the
  *  vehicle bay, rover and Fragment; slice 5 the launch pad and starter ship. */
-export const CHAPTER1_IN_WORLD = ['cryo_pod', 'escape_module', 'translator'];
+export const CHAPTER1_IN_WORLD = ['cryo_pod', 'escape_module', 'translator', 'mooladri', 'root_valley'];
 CODEX.push(...CHAPTER1_CODEX.filter((e) => CHAPTER1_IN_WORLD.includes(e.id) && !CODEX.some((c) => c.id === e.id)));

@@ -2,6 +2,24 @@
 
 *Updated by the Director (Claude) at the end of every session. Newest first. The Commander reads this to know where everything stands.*
 
+## 2026-11-22: M4 slice 3, Mooladri; Unity plan
+
+**Slice 3 of six is built and live.** The Commander's trunk concepts arrived (PR #39) and Sarvam accepted them (PR #40).
+- **After the memory logs and the planet view**, a tall **pale-green beam** points to the forest valley about 60 m from the base. SARATHI feels the first tremor; closer in she sees the vast shadow; within 26 m **Mooladri rises out of the ground** over seven seconds (faceless; broad pale-wood trunk on buttress roots, a hollow at its foot, two unequal blunt boughs with three aerial roots each, five uneven glowing crown tips). Its distress thickens the haze over the forest. Music changes to *Guardian awake* near it, and to *Guardian calm* once it settles.
+- **Four calming steps** (T-042's text): 1) **hold Scan beside it** for 3 seconds: its roots appear as glowing lines on the ground, reaching for the drills that strain it; 2) **move every drill off the marked roots** (drills on roots say so; you cannot place one back on a root while it is restless); 3) **keep a bio-filter working until the haze clears**; 4) **plant bloom spores at the three pink rings round its foot** (needs clean soil and a bloom; while you plant, blooms open near its roots even if the world is only stable). Then it settles, the **ring of living roots opens the valley**, and the forest cleans pollution **twice as fast** from then on.
+- **Logs 08 and 09** appear by its roots once it wakes ("Memory log n of 9").
+- **Never fought:** no health, no damage, nothing hits the player.
+- **Body built in code** from the concept with Sarvam's four notes (gaps 1.5 m or more, three roots per bough, about 12 m tall, glow as a material: no extra lights, shader slots still 79 of 224).
+- **Saves:** older saves on the retired bloom goals move to Mooladri; a save past the waking finds it already risen.
+
+**Merged:** T-042 (valley text, slice-2 goal polish, trunk concepts) and T-043 (voice addendum, Mooladri's voice respelling, Sarvam's concept review). Seven goal lines are new or changed and wait for recording (`AWAITING_VOICE`); `goal_done`'s words changed, so its old recording is held back.
+
+**Checked:** 242 tests (16 new for roots, steps, goal order and valley text); build; shader slots 79; new playtest `scripts/playtest-mooladri.mjs` passes 28 of 28 (rests, wakes, rises, gate blocks, scan maps roots, drills moved, haze clears, dirty soil refused, three spores planted, calm, flora bonus, gate opens, no page errors). Screenshots: `docs/review/2026-11-22/`. `playtest-story.mjs`: 10 of 11; the translator-prompt check fails the same way on the 2 November code (the prompt is read a frame too early in the headless browser; picking up the translator works), so it is a test timing problem, to fix later.
+
+**New:** T-044 (ChatGPT chat: polish of six short lines the Director wrote for slice 3). **`docs/UNITY-PLAN.md`**: the Director's advice and step-by-step plan for moving to Unity.
+
+**Waiting for the Commander:** play slice 3; decide the Unity move; record the 4 test lines; starter ship model (only if slices 4–6 stay on the web).
+
 ## 2026-11-02 (evening): M4 slice 2, Huxley, the translator and the memory logs
 
 **Slice 2 of six is built and live.**

@@ -1,4 +1,7 @@
 // The guided first hour on Jivagraha: goals in order, and what SARATHI says along the way.
+import { GUARDIAN_LINES } from './scenes';
+import { VALLEY_STEPS } from './valley';
+
 export interface StoryGoal { id: string; text: string; sarathi: string }
 
 export const CHAPTER1_GOALS: StoryGoal[] = [
@@ -20,14 +23,19 @@ export const CHAPTER1_GOALS: StoryGoal[] = [
   { id: 'research_belt', text: 'Research conveyors at the research station', sarathi: 'A drill that nobody empties will fill up and stop. We need belts.' },
   { id: 'belt', text: 'Craft conveyors, press C, click the drill, then click the smelter', sarathi: 'A belt from the drill to the smelter, and the smelter never waits for you again.' },
   { id: 'auto_plates', text: 'Make 5 iron plates from ore that came by belt (keep the smelter fed with carbon)', sarathi: 'Iron plates, made while you were not looking. I believe this is called a factory.' },
-  // M4 slice 2: Huxley's message, the translator and the memory logs (milestones in chapter1.ts).
-  { id: 'huxley_message', text: "Go back to the escape module and press E at Prof. Huxley's projector by the hatch", sarathi: "The factory can mind itself for a while. The module's projector is still holding a recording addressed to you." },
-  { id: 'translator', text: 'Collect the translator from beside the escape module (E)', sarathi: 'Prof. Huxley mentioned a translator. It should be near the module, if the landing was kind to it.' },
-  { id: 'memory_logs', text: 'Find 3 memory logs: follow the blue beams of light, then press E', sarathi: 'Some of your memories were stored on logs, and the crash scattered them. Each one shows a blue beam.' },
+  // M4 slice 2: Huxley's message, the translator and the memory logs (milestones in chapter1.ts; polished in T-042).
+  { id: 'huxley_message', text: "Return to the escape module; press E at Prof. Huxley's projector by the hatch", sarathi: "Return to the module and listen to Prof. Huxley's recording by the hatch. The factory can manage a short absence." },
+  { id: 'translator', text: 'Press E to collect the translator beside the escape module', sarathi: 'Collect the translator beside the escape module, as Prof. Huxley suggested.' },
+  { id: 'memory_logs', text: 'Follow the blue beams to find 3 memory logs; press E to read each one', sarathi: 'Follow the blue beams to find three memory logs scattered by the crash and read each one.' },
   { id: 'harmony_look', text: 'Press M to see the whole planet — and how healthy it is', sarathi: 'Our machines make smoke and stir up mud. The planet notices. Look at it from above.' },
-  { id: 'bio_filter', text: 'Research a bio-filter and build one to clean the air', sarathi: 'Algae eat smoke. A bio-filter by the smelters will keep the forest glowing.' },
-  { id: 'bloom', text: 'Keep the world thriving until a bloom flower opens, then collect it with the laser', sarathi: 'A flower that only grows where the air, water and soil are clean. I would like to study one.' },
-  { id: 'done', text: 'Explore, research, automate — and keep your shelter breathing', sarathi: 'Seismic activity below us. Something very large is… waking. We should be ready.' },
+  // M4 slice 3: Mooladri (valley.ts, scenes.ts GUARDIAN_LINES). Calmed, never fought.
+  { id: 'guardian_find', text: 'Follow the tremor to the forest valley: walk towards the pale-green light', sarathi: GUARDIAN_LINES.first_tremor },
+  { id: 'seismic_scan', ...VALLEY_STEPS.seismic_scan },
+  { id: 'move_drills', ...VALLEY_STEPS.move_drills },
+  { id: 'bio_filters_valley', ...VALLEY_STEPS.bio_filters_valley },
+  { id: 'replant_bloom', ...VALLEY_STEPS.replant_bloom },
+  { id: 'valley_calm', text: 'Give Mooladri time to settle', sarathi: 'Stay a moment. The roots are loosening.' },
+  { id: 'done', text: 'Walk the valley path Mooladri opened, and keep your shelter breathing', sarathi: GUARDIAN_LINES.flora_bonus },
 ];
 
 export const SARATHI_EVENTS = {

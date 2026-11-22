@@ -123,7 +123,7 @@ export const PHONE_STUCK_HINTS: Record<string, string> = {
 
 /** Which Chapter 1 milestone each step of the guided goals (story.ts) belongs to. The goal panel
  *  shows the milestone's title above the step, and SARATHI's stuck hint is the milestone's.
- *  Steps not listed (the M3 Harmony steps until slice 3) show no milestone and fall back to the
+ *  Steps not listed (harmony_look, done) show no milestone and fall back to the
  *  step's own SARATHI line. */
 export const STEP_MILESTONE: Record<string, string> = {
   wake: 'wake',
@@ -134,7 +134,12 @@ export const STEP_MILESTONE: Record<string, string> = {
   research_station: 'automation', research_drill: 'automation', place_drill: 'automation',
   research_belt: 'automation', belt: 'automation', auto_plates: 'automation',
   huxley_message: 'huxley_message', translator: 'translator', memory_logs: 'memory_logs',
+  guardian_find: 'roots', seismic_scan: 'roots', move_drills: 'roots',
+  bio_filters_valley: 'clear_smog', replant_bloom: 'replant_bloom', valley_calm: 'replant_bloom',
 };
+
+/** Saves made before slice 3 may sit on goals that slice 3 replaced; they move on to Mooladri. */
+export const RETIRED_GOALS: Record<string, string> = { bio_filter: 'guardian_find', bloom: 'guardian_find' };
 
 /** Seconds without progress on the active goal before SARATHI offers its stuck hint (T-031),
  *  and before she offers it again. */

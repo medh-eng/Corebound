@@ -17,6 +17,8 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 
 | Date | What | Result |
 | --- | --- | --- |
+| 22 Nov | **M4 slice 3: Mooladri** (your trunk concepts, PR #39; Sarvam's review, PR #40) | ✓ Live. After the memory logs and the planet view, follow the pale-green beam to the forest valley: Mooladri rises from the ground, and four steps calm it (hold Scan beside it to see its roots; move drills off the glowing root lines; run bio-filters until the haze clears; plant three blooms at the pink rings round its foot). Then the ring of roots opens the valley. Body built in code from your concept |
+| 22 Nov | **T-042 and T-043** (ChatGPT chat, Sarvam) | ✓ Merged. Valley text in the game; the three slice-2 goal lines use ChatGPT's polish, so record them from Sarvam's *optional* rows in `T-043-voice-addendum.md` §4 |
 | 2 Nov (evening) | **M4 slice 2: Huxley, the translator, memory logs** | ✓ Live. After the factory goals, go back to the escape module: **Prof. Huxley's projector** (gold beam of light) plays his message; pick up the **translator** (green beam); find **3 memory logs** (blue beams) around the crash site and base. Your `huxley_projector`, `translator` and `memory_log` models are in the game |
 | 2 Nov (evening) | **Sarvam's voice script** (T-040) and first Hindi/Marathi (T-006) | ✓ Merged. The script is ready to record (row 1 below) |
 | 2 Nov | **M4 slice 1: waking up** | ✓ Live. New game: wake beside the crashed escape module and your cryo-pod, SARATHI talks you awake, then follow the daylight to the shelter. Your `escape_module` and `cryo_pod` models are in the game |
@@ -32,8 +34,8 @@ This file replaces the old "Prompt Pack" tab. It lists **everything the game nee
 | Agent | Paste | Status |
 | --- | --- | --- |
 | ChatGPT Codex | `Do tasks/T-038-graphics-setting.md in medh-eng/Corebound. Follow AGENTS.md.` then, when it is done, the same with `tasks/T-041-photo-mode-panel.md` | ⏳ T-038 still waiting; T-041 new |
-| ChatGPT chat | Writer intro (HANDOFF §3c), then the text of `tasks/T-042-mooladri-ui-text.md` (first: slice 3 needs it), then `tasks/T-039-m4-machine-lines.md` | ⏳ T-042 new; T-039 still waiting |
-| Sarvam AI | Adviser intro (HANDOFF §3d), then `tasks/T-043-voice-addendum.md` | ⏳ new |
+| ChatGPT chat | Writer intro (HANDOFF §3c), then the text of `tasks/T-044-slice3-polish.md`, then `tasks/T-039-m4-machine-lines.md` | ⏳ T-044 new (small); T-039 still waiting |
+| Sarvam AI | Nothing new now (T-043 done ✓). Voice rows for the slice 3 lines come after T-044 | — |
 
 Upload writing answers to `team-inbox/writing/` with the file name the task gives. Codex opens its own pull request.
 
@@ -42,11 +44,11 @@ Upload writing answers to `team-inbox/writing/` with the file name the task give
 | # | What | Where it goes | Prompt |
 | --- | --- | --- | --- |
 | 0 | **Record 4 test lines first** (Sarvam's advice): open `team-inbox/writing/T-040-voice-script-ch1.md` and record `intro_systems`, `guardian_awake`, `liftoff_next_world`, `liftoff_cliffhanger` in Bulbul (voice ishita, en-IN, pace 1.08) using the "paste into Bulbul" column. Upload them; if the names sound right, record the other 52 | `art-inbox/audio/voice/` | T-040 §5 |
-| 0b | **Two spellings for Hindi and Marathi:** Sarvam wrote Jivagraha as **जीवग्रह** and Taptashila as **तप्तशिला**. Say yes, or give your spelling | — | T-006 |
+| 0b | **Play slice 3** (Ctrl+F5, Continue works; saves past the old bloom goal jump to Mooladri): follow the pale-green beam, watch it rise, then calm it. Is the beam easy to find? Is any step unclear? Is the haze step too slow? | — | — |
 | 0c | **Play slice 2** (Ctrl+F5, Continue works): after the factory goals, find Huxley's projector, the translator and three logs by their beams. Are the beams easy to see? Is anything too far? | — | — |
 | 1 | **Play the new opening**: press Ctrl+F5, then **New game** on the title screen (Continue keeps your old base). Tell the Director if the wake-up feels too long, too short or confusing. Also yes or no to the three creature names (other options in `team-inbox/writing/T-036-names-and-models.md`) | — | — |
 | 2 | **Play on your phone again** (Ctrl+F5 or reopen the tab): turn sideways and back; walk near the grazers, burrowers and birds (SARATHI now comments). Tell the Director the frame rate (add `?fps=1`) and whether movement ever locks (issue #24) | — | — |
-| 3 | **Mooladri's body:** upload your two trunk concepts as `concept/guardian_root_trunk.png` and `concept/guardian_root_trunk_scene.png`, with Sarvam's 5 changes: few thick strands that reach the ground, unequal blunt arms, no shoulder stubs, no single bright glow at the top, pale green glow when calm. M4 slice 3 needs it | `art-inbox/concept/` | `team-inbox/writing/T-032-review-models-mooladri.md` §7 |
+| 3 | ~~Mooladri's body concepts~~ ✓ received 21 Nov, in the game | — | — |
 | 4 | **Starter ship** model (the demo's last scene; M4 slice 5 needs it) | `art-inbox/models/ship_starter.glb` | §7 |
 | 5 | **Re-record one voice line**: `goal_breathe.mp3` in Bulbul with the first word spelled **Electrolisis**: `Electrolisis complete. You are breathing. I consider that a good start.` (voice ishita, en-IN, pace 1.08) | `public/assets/audio/voice/goal_breathe.mp3` | T-035 |
 | 6 | **Trim fixes, shape only** (colours are good). Paste each fix into your 3D tool and re-export with the same file name: **projector** `two straight posts with flat cut tops, no inward curve, unequal heights, keep the green dome and copper base`; **launch pad** `plain chamfered rim instead of the petal ring; flat-capped towers with a plain lightning rod; open cross-braced gantries, no lintel`; **quantum fragment** `three straight struts meeting a flat top plate; flat machined base plate with bolts; no point at the top`; **memory log** `the round boss becomes a small status light; a clip or recessed foot instead of the stand; squarer corners`; **Sabatier** `rectangular louvred windows; flat bolted lids; a gauge instead of the ball on top; straight base on a flat pad; the gold disc becomes a gauge`; **cryo pod** hatch frame plain round, flat base with two skids; **vehicle bay** plain round arch, no crest, no petal row | `art-inbox/models/` | `team-inbox/writing/T-036-names-and-models.md` §2, §4 |

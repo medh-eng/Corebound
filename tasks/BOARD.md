@@ -42,8 +42,9 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | [T-039](T-039-m4-machine-lines.md) | SARATHI lines for the M4 machines, research and vehicles | ChatGPT (chat) | P2 | todo (new) |
 | [T-040](T-040-voice-script-ch1.md) | Voice script for Chapter 1: respellings for SARATHI's new lines | Sarvam AI | P2 | done ✓ (PR #37, 2 Nov; 56 files; prefixes wired in `voice.ts`, silent until recorded) |
 | [T-041](T-041-photo-mode-panel.md) | Photo mode panel | ChatGPT (Codex) | P2 | todo (new) |
-| [T-042](T-042-mooladri-ui-text.md) | Text for Mooladri's valley; polish of three slice-2 goal lines | ChatGPT (chat) | P1 | todo (new) |
-| [T-043](T-043-voice-addendum.md) | Voice addendum: five goal lines, with Hindi and Marathi | Sarvam AI | P2 | todo (new) |
+| [T-042](T-042-mooladri-ui-text.md) | Text for Mooladri's valley; polish of three slice-2 goal lines | ChatGPT (chat) | P1 | done ✓ (PR #39, 22 Nov; with the Commander's trunk concepts; in `valley.ts`) |
+| [T-043](T-043-voice-addendum.md) | Voice addendum: five goal lines, with Hindi and Marathi | Sarvam AI | P2 | done ✓ (PR #40, 22 Nov; plus Sarvam's review of the trunk concepts: accepted) |
+| [T-044](T-044-slice3-polish.md) | Polish of the Director's six slice-3 lines | ChatGPT (chat) | P2 | todo (new) |
 | [T-018](T-018-codex-text.md) | Codex entries for Jivagraha and Harmony | ChatGPT (chat) | P2 | done ✓ (PR #11; in the game) |
 
 ## Commander
@@ -60,7 +61,9 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | — | Say which 3D tool made Huxley and SARATHI (licences) | P1 | done ✓ (Triple 3D) |
 | — | Upload again: cryo pod, vehicle bay, Sabatier reactor | P1 | done ✓ (30 Oct); **re-export Sabatier and cryo pod with colours** |
 | — | Play on an Android phone | P1 | done ✓ (issues #23–#25); **retest now** (movement fix is live), help/wording after T-028 |
-| — | Decide Mooladri's body: humanoid or buttressed trunk (Sarvam) | P1 | **next** |
+| — | Decide Mooladri's body: humanoid or buttressed trunk (Sarvam) | P1 | done ✓ (trunk; concepts uploaded 21 Nov) |
+| — | Play slice 3 (Mooladri) and say if anything is unclear or slow | P1 | **next** |
+| — | Decide the Unity move (see `docs/UNITY-PLAN.md`) | P1 | **next** |
 | — | Escape module and cryo-pod models (reference: `concept/jiva_crash_site.png`) | P1 | **next** |
 | — | Turn on GitHub Pages | — | done ✓ |
 | — | Play M2 and M3, then say "go" for M4 | — | done ✓ (2026-11-02) |
@@ -77,6 +80,7 @@ Updated by the Director. Status: **todo** → **doing** → **review** → **don
 | D-010 | M4 build plan (`docs/M4-PLAN.md`) | written ✓; **go given 2026-11-02** |
 | D-011 | M4 slice 1: wake-up in the escape module, Chapter 1 goal panel, stuck hints | done ✓ (2026-11-02) |
 | D-012 | M4 slice 2: Huxley's message, translator, memory logs in the wreckage | done ✓ (2026-11-02) |
-| D-013 | M4 slice 3: Mooladri, the closed valley, the calming puzzle | next (needs the trunk concept) |
+| D-013 | M4 slice 3: Mooladri, the closed valley, the calming puzzle | done ✓ (2026-11-22) |
+| D-014 | Unity migration plan (`docs/UNITY-PLAN.md`) | written ✓ (2026-11-22); waits for the Commander's decision |
 | D-005 | Store art for the store pages and loading screen | M4 |
 | D-006 | M3 Harmony and life | first version done ✓; scanner/Codex waits for T-016/T-017/T-018 |

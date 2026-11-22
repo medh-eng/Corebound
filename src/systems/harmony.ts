@@ -25,7 +25,7 @@ export function floraHealth(value: number): number {
 const DIRTY_HEAT: MachineId[] = ['smelter', 'silicon_furnace', 'coal_burner'];
 
 /** Advances the stocks by `dt` seconds of play, given which machines worked this tick. */
-export function tickHarmony(h: HarmonyState, working: MachineId[], dt: number, fx: { clean?: boolean; filter2?: boolean } = {}) {
+export function tickHarmony(h: HarmonyState, working: MachineId[], dt: number, fx: { clean?: boolean; filter2?: boolean; flora2?: boolean } = {}) {
   const minutes = dt / 60;
   for (const id of working) {
     const e = HARMONY.emit[id];
@@ -37,7 +37,8 @@ export function tickHarmony(h: HarmonyState, working: MachineId[], dt: number, f
       h[k] += v * minutes;
     }
   }
-  const health = floraHealth(harmonyValue(h));
+  // With Mooladri calm (M4 slice 3) the forest cleans twice as fast.
+  const health = floraHealth(harmonyValue(h)) * (fx.flora2 ? 2 : 1);
   for (const k of ['air', 'water', 'soil'] as Stock[]) {
     h[k] = Math.max(0, Math.min(100, h[k] - HARMONY.recovery[k] * health * minutes));
   }

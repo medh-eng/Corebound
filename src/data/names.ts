@@ -4,7 +4,7 @@
 export interface Name { name: string; deva: string; say: string; meaning: string; /** respelling for an Indian-English text-to-speech voice (Sarvam, T-023); Hindi and Marathi voices use `deva` */ voice?: string }
 
 export const GUARDIAN_NAMES: Record<string, Name> = {
-  jivagraha: { name: 'Mooladri', deva: 'मूलाद्रि', say: 'MOO-lah-dree', meaning: 'root-mountain' },
+  jivagraha: { name: 'Mooladri', deva: 'मूलाद्रि', say: 'MOO-lah-dree', meaning: 'root-mountain', voice: 'Moo laa dri' },
   taptashila: { name: 'Shailasarpa', deva: 'शैलसर्प', say: 'SHY-luh-SUR-puh', meaning: 'rock-serpent' },
   marubhumi: { name: 'Balukavela', deva: 'बालुकावेल', say: 'BAA-loo-KAA-vale', meaning: 'sand-tide' },
   himasagara: { name: 'Himavela', deva: 'हिमवेल', say: 'HEE-muh-vale', meaning: 'ice-tide' },

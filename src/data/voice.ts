@@ -9,7 +9,9 @@ import { STUCK_HINTS, PHONE_STUCK_HINTS } from './chapter1';
 
 /** Lines whose words changed (or are new) and wait for the Commander to record them (T-040):
  *  until then SARATHI shows them as text only, so an old recording never plays with new words. */
-export const AWAITING_VOICE = new Set(['goal_wake.mp3', 'goal_ice.mp3', 'goal_huxley_message.mp3', 'goal_translator.mp3', 'goal_memory_logs.mp3']);
+export const AWAITING_VOICE = new Set(['goal_wake.mp3', 'goal_ice.mp3', 'goal_huxley_message.mp3', 'goal_translator.mp3', 'goal_memory_logs.mp3',
+  // M4 slice 3 (new lines; goal_done's words changed, so its old recording must not play with them):
+  'goal_guardian_find.mp3', 'goal_seismic_scan.mp3', 'goal_move_drills.mp3', 'goal_bio_filters_valley.mp3', 'goal_replant_bloom.mp3', 'goal_valley_calm.mp3', 'goal_done.mp3']);
 
 /** Groups of lines in the Chapter 1 recording script (T-040) that are not recorded yet. When the
  *  Commander uploads a group's files, the Director removes it from this list and they play. */
